@@ -2,10 +2,9 @@ import { View, Text } from '@tarojs/components'
 import { FC, useState, useEffect } from 'react'
 import Taro from '@tarojs/taro'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { FileText, User, Shield, TrendingUp, ChevronRight, Award } from 'lucide-react-taro'
+import { Briefcase, FileText, Wrench, ChevronRight, FileSearch, UserCheck, TrendingUp, Shield } from 'lucide-react-taro'
 
 interface CreditScoreData {
   score: number
@@ -22,7 +21,6 @@ interface CreditScoreData {
 
 const IndexPage: FC = () => {
   const [creditScore, setCreditScore] = useState<CreditScoreData | null>(null)
-  const [loading, setLoading] = useState(true)
   const { userInfo, isLoggedIn } = useUserStore()
 
   useEffect(() => {
@@ -35,7 +33,7 @@ const IndexPage: FC = () => {
 
   const fetchCreditScore = async () => {
     if (!userInfo?.id) return
-    
+
     try {
       const res = await Network.request({
         url: '/api/credit/score',
@@ -50,80 +48,134 @@ const IndexPage: FC = () => {
       }
     } catch (error) {
       console.error('获取信用评分失败:', error)
-    } finally {
-      setLoading(false)
     }
-  }
-
-  const getScoreColor = (score: number) => {
-    if (score >= 750) return '#10b981'
-    if (score >= 650) return '#3b82f6'
-    if (score >= 550) return '#f59e0b'
-    return '#ef4444'
   }
 
   const getLevelText = (level: string) => {
     const levelMap: Record<string, string> = {
-      excellent: '优秀',
-      good: '良好',
-      medium: '中等',
-      poor: '较差'
+      excellent: '信用优秀',
+      good: '信用良好',
+      medium: '信用中等',
+      poor: '信用较差'
     }
     return levelMap[level] || level
   }
 
+  const quickActions = [
+    { icon: Briefcase, title: 'AI自证', action: () => {} },
+    { icon: FileText, title: '样例报告', action: () => {} },
+    { icon: Wrench, title: '信用修复', action: () => {} }
+  ]
+
   const menuItems = [
-    { icon: FileText, title: '生成信用报告', desc: '查询并生成职业信用报告', path: '/pages/report/index' },
-    { icon: User, title: '可信简历', desc: '创建并维护个人可信简历', path: '/pages/resume/index' },
-    { icon: TrendingUp, title: '信用增信', desc: '提升信用评分和报告可信度', path: '/pages/report/index?action=enhance' },
-    { icon: Shield, title: '个人信息', desc: '维护个人基本信息', path: '/pages/profile/index' }
+    { 
+      icon: FileSearch, 
+      title: '信用报告', 
+      desc: '授权查询并生成信用报告',
+      path: '/pages/report/index'
+    },
+    { 
+      icon: UserCheck, 
+      title: '可信简历', 
+      desc: '生成和维护可信简历',
+      path: '/pages/resume/index'
+    },
+    { 
+      icon: TrendingUp, 
+      title: '信用增信', 
+      desc: '提升信用分和报告可信度',
+      path: '/pages/report/index?action=enhance'
+    },
+    { 
+      icon: Shield, 
+      title: '个人信息', 
+      desc: '完善维护个人基础信息',
+      path: '/pages/profile/index'
+    }
   ]
 
   return (
-    <View className="min-h-screen bg-gray-50 p-4 pb-20">
-      <View className="mb-6">
-        <Text className="block text-xl font-semibold text-gray-900 mb-1">
-          您好，{userInfo?.name || '用户'}
+    <View className="min-h-screen bg-gray-50">
+      {/* 顶部蓝色信息栏 */}
+      <View className="bg-blue-500 px-4 pt-12 pb-20">
+        <Text className="block text-white text-xl font-semibold mb-1">
+          Hi {userInfo?.name || '用户'}
         </Text>
-        <Text className="block text-sm text-gray-500">管理您的职业信用档案</Text>
+        <Text className="block text-white text-sm opacity-90">
+          管理您的职业信用档案
+        </Text>
       </View>
 
-      <Card className="mb-4">
-        <CardContent className="p-6">
-          <View className="flex items-center justify-between">
-            <View className="flex-1">
-              <Text className="block text-sm text-gray-500 mb-2">职业信用评分</Text>
-              {loading ? (
-                <Text className="block text-4xl font-bold text-gray-400">--</Text>
-              ) : (
-                <>
-                  <Text
-                    className="block text-4xl font-bold mb-2"
-                    style={{ color: getScoreColor(creditScore?.score || 0) }}
-                  >
-                    {creditScore?.score || '--'}
-                  </Text>
-                  <Badge variant={creditScore?.level === 'excellent' ? 'default' : 'secondary'}>
-                    {getLevelText(creditScore?.level || '')}
-                  </Badge>
-                </>
-              )}
+      {/* 核心信用展示区 */}
+      <View className="px-4 -mt-12">
+        <Card className="shadow-lg">
+          <CardContent className="p-5">
+            <View className="flex items-center justify-between">
+              {/* 左侧信用评分 */}
+              <View className="flex-1">
+                <Text className="block text-gray-500 text-sm mb-2">
+                  {creditScore ? getLevelText(creditScore.level) : '信用良好'}
+                </Text>
+                <Text className="block text-5xl font-bold text-blue-600">
+                  {creditScore?.score || '650'}
+                </Text>
+              </View>
+              
+              {/* 中间占位 */}
+              <View className="flex-1 flex items-center justify-center">
+                <View 
+                  className="border-2 border-dashed border-gray-300 rounded-lg px-4 py-3"
+                  style={{ minWidth: '80px' }}
+                >
+                  <Text className="text-gray-400 text-xs text-center">slogan图文</Text>
+                </View>
+              </View>
+              
+              {/* 右侧按钮 */}
+              <View className="flex-1 flex justify-end">
+                <View
+                  className="bg-blue-600 rounded-full px-5 py-3 shadow-md active:bg-blue-700"
+                  onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
+                >
+                  <Text className="text-white text-sm font-medium">立即提信用</Text>
+                </View>
+              </View>
             </View>
-            <View className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-800 to-blue-600 flex items-center justify-center">
-              <Award size={48} color="#ffffff" />
-            </View>
-          </View>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </View>
 
-      <View className="space-y-3">
+      {/* 快捷功能图标区 */}
+      <View className="px-4 mt-4">
+        <Card>
+          <CardContent className="p-4">
+            <View className="flex justify-around">
+              {quickActions.map((item, index) => (
+                <View
+                  key={index}
+                  className="flex flex-col items-center active:opacity-70"
+                  onClick={item.action}
+                >
+                  <View className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-2">
+                    <item.icon size={24} color="#3b82f6" />
+                  </View>
+                  <Text className="text-sm text-blue-600">{item.title}</Text>
+                </View>
+              ))}
+            </View>
+          </CardContent>
+        </Card>
+      </View>
+
+      {/* 核心功能列表区 */}
+      <View className="px-4 mt-4">
         {menuItems.map((item, index) => (
-          <Card key={index} className="overflow-hidden">
+          <Card key={index} className="mb-3">
             <CardContent className="p-0">
               <View
                 className="flex items-center p-4 active:bg-gray-50"
                 onClick={() => {
-                  if (item.path.includes('?')) {
+                  if (item.path.includes('action=')) {
                     Taro.navigateTo({ url: item.path })
                   } else {
                     Taro.switchTab({ url: item.path })
@@ -131,17 +183,24 @@ const IndexPage: FC = () => {
                 }}
               >
                 <View className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mr-3">
-                  <item.icon size={20} color="#1e40af" />
+                  <item.icon size={20} color="#3b82f6" />
                 </View>
                 <View className="flex-1">
-                  <Text className="block text-base font-medium text-gray-900">{item.title}</Text>
-                  <Text className="block text-sm text-gray-500">{item.desc}</Text>
+                  <Text className="block text-base font-semibold text-gray-900">{item.title}</Text>
+                  <Text className="block text-sm text-gray-500 mt-0.5">{item.desc}</Text>
                 </View>
                 <ChevronRight size={20} color="#9ca3af" />
               </View>
             </CardContent>
           </Card>
         ))}
+      </View>
+
+      {/* 底部图文模块占位 */}
+      <View className="px-4 mt-4 mb-6">
+        <View className="border-2 border-dashed border-gray-300 rounded-xl p-6 flex items-center justify-center">
+          <Text className="text-gray-400 text-sm">图文模块</Text>
+        </View>
       </View>
     </View>
   )
