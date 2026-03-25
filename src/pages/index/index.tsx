@@ -141,8 +141,8 @@ const IndexPage: FC = () => {
               <View className="flex items-center justify-between">
                 {/* 左侧slogan */}
                 <View className="flex-1 pr-3">
-                  <Text className="text-gray-500 text-sm leading-relaxed">
-                    职业信用，职场通行证{'\n'}信用越高，机会越多
+                  <Text className="text-gray-500 text-sm">
+                    职业信用，职场通行证
                   </Text>
                 </View>
                 
