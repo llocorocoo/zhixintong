@@ -3,6 +3,8 @@ export default defineAppConfig({
     'pages/index/index',
     'pages/login/index',
     'pages/report/index',
+    'pages/authorize/index',
+    'pages/report-form/index',
     'pages/resume/index',
     'pages/profile/index'
   ],

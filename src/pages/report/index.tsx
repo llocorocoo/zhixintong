@@ -7,213 +7,248 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { FileText, Download, Share, CircleCheck, CircleAlert, Clock } from 'lucide-react-taro'
+import { FileText, Download, Share, CircleCheck, CircleAlert, Clock, ChevronRight } from 'lucide-react-taro'
 
-interface ReportStep {
+interface ReportData {
   id: string
-  title: string
-  status: 'pending' | 'processing' | 'completed' | 'skipped'
-  data?: any
+  reportNo: string
+  status: 'pending' | 'processing' | 'completed' | 'failed'
+  reportUrl?: string
+  identityInfo?: any
+  educationInfo?: any
+  qualificationInfo?: any
+  createdAt: string
 }
 
 const ReportPage: FC = () => {
-  const [currentStep, setCurrentStep] = useState(0)
-  const [isAuthorized, setIsAuthorized] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [reportId, setReportId] = useState<string | null>(null)
-  const [steps, setSteps] = useState<ReportStep[]>([
-    { id: 'identity', title: '身份学历', status: 'pending' },
-    { id: 'qualification', title: '职业资格', status: 'pending' },
-    { id: 'litigation', title: '诉讼记录', status: 'pending' },
-    { id: 'investment', title: '投资任职', status: 'pending' },
-    { id: 'financial', title: '金融信用', status: 'pending' },
-    { id: 'blacklist', title: '黑名单', status: 'pending' }
-  ])
-  const { isLoggedIn } = useUserStore()
+  const [reportData, setReportData] = useState<ReportData | null>(null)
+  const { isLoggedIn, userInfo } = useUserStore()
 
   useEffect(() => {
     if (!isLoggedIn) {
       Taro.redirectTo({ url: '/pages/login/index' })
-    }
-  }, [isLoggedIn])
-
-  const handleAuthorize = () => {
-    Taro.showModal({
-      title: '授权确认',
-      content: '授权平台查询您的职业信用信息？',
-      success: (res) => {
-        if (res.confirm) {
-          setIsAuthorized(true)
-          startReportGeneration()
-        }
-      }
-    })
-  }
-
-  const startReportGeneration = async () => {
-    const { userInfo } = useUserStore.getState()
-    if (!userInfo?.id) {
-      Taro.showToast({ title: '请先登录', icon: 'none' })
       return
     }
-    
-    setLoading(true)
+    fetchLatestReport()
+  }, [isLoggedIn])
+
+  const fetchLatestReport = async () => {
+    if (!userInfo?.id) return
+
     try {
       const res = await Network.request({
-        url: '/api/report/create',
+        url: '/api/report/latest',
         method: 'POST',
         data: { userId: userInfo.id }
       })
 
-      console.log('创建报告响应:', res.data)
+      console.log('报告数据响应:', res.data)
 
       if (res.data.code === 200 && res.data.data) {
-        setReportId(res.data.data.reportId)
-        setCurrentStep(1)
+        setReportData(res.data.data)
       }
     } catch (error) {
-      console.error('创建报告失败:', error)
-      Taro.showToast({ title: '创建失败，请重试', icon: 'none' })
-    } finally {
-      setLoading(false)
+      console.error('获取报告失败:', error)
     }
   }
 
-  const handleStepAction = async (stepId: string, skip: boolean = false) => {
-    setLoading(true)
+  const handleCreateReport = () => {
+    Taro.navigateTo({ url: '/pages/authorize/index' })
+  }
+
+  const handleDownload = async () => {
+    if (!reportData?.reportUrl) {
+      Taro.showToast({ title: '报告尚未生成', icon: 'none' })
+      return
+    }
+
+    Taro.showLoading({ title: '下载中...' })
     try {
-      const res = await Network.request({
-        url: `/api/report/step/${stepId}`,
-        method: 'POST',
-        data: { skip, reportId }
+      const res = await Network.downloadFile({
+        url: reportData.reportUrl
       })
+      Taro.hideLoading()
+      await Taro.saveFile({
+        tempFilePath: res.tempFilePath
+      })
+      Taro.showToast({ title: '保存成功', icon: 'success' })
+    } catch {
+      Taro.hideLoading()
+      Taro.showToast({ title: '下载失败', icon: 'none' })
+    }
+  }
 
-      console.log(`步骤 ${stepId} 响应:`, res.data)
+  const handleShare = () => {
+    if (!reportData?.reportUrl) {
+      Taro.showToast({ title: '报告尚未生成', icon: 'none' })
+      return
+    }
 
-      if (res.data.code === 200) {
-        setSteps(prev => prev.map(s => 
-          s.id === stepId ? { ...s, status: skip ? 'skipped' : 'completed', data: res.data.data } : s
-        ))
-        
-        if (currentStep < steps.length) {
-          setCurrentStep(currentStep + 1)
-        }
+    Taro.showShareMenu({
+      withShareTicket: true
+    })
+  }
+
+  const handlePreview = () => {
+    if (!reportData?.reportUrl) {
+      Taro.showToast({ title: '报告尚未生成', icon: 'none' })
+      return
+    }
+
+    Taro.openDocument({
+      filePath: reportData.reportUrl,
+      fileType: 'pdf',
+      fail: () => {
+        Taro.showToast({ title: '预览失败', icon: 'none' })
       }
-    } catch (error) {
-      console.error(`步骤 ${stepId} 失败:`, error)
-      Taro.showToast({ title: '操作失败，请重试', icon: 'none' })
-    } finally {
-      setLoading(false)
+    })
+  }
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <Badge className="bg-green-500"><Text className="text-white">已完成</Text></Badge>
+      case 'processing':
+        return <Badge className="bg-blue-500"><Text className="text-white">核查中</Text></Badge>
+      case 'failed':
+        return <Badge className="bg-red-500"><Text className="text-white">失败</Text></Badge>
+      default:
+        return <Badge variant="secondary"><Text>待提交</Text></Badge>
     }
   }
 
-  const getStepIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return <CircleCheck size={20} color="#10b981" />
-      case 'skipped': return <CircleAlert size={20} color="#f59e0b" />
-      case 'processing': return <Clock size={20} color="#3b82f6" />
-      default: return <View className="w-5 h-5 rounded-full bg-gray-300" />
+  const getProgressPercent = (status: string) => {
+    const progressMap: Record<string, number> = {
+      pending: 0,
+      processing: 50,
+      completed: 100,
+      failed: 0
     }
+    return progressMap[status] || 0
   }
+
+  const verificationSteps = [
+    { id: 'identity', title: '身份信息', status: reportData?.identityInfo ? 'completed' : 'pending' },
+    { id: 'education', title: '学历信息', status: reportData?.educationInfo ? 'completed' : 'pending' },
+    { id: 'qualification', title: '职业资格', status: reportData?.qualificationInfo ? 'completed' : 'pending' }
+  ]
 
   return (
     <View className="min-h-screen bg-gray-50 p-4 pb-20">
+      {/* 报告状态卡片 */}
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>职业信用报告</CardTitle>
-          <CardDescription>生成您的职业信用档案报告</CardDescription>
+          <View className="flex items-center justify-between">
+            <View className="flex items-center gap-2">
+              <FileText size={20} color="#3b82f6" />
+              <CardTitle>职业信用报告</CardTitle>
+            </View>
+            {reportData && getStatusBadge(reportData.status)}
+          </View>
+          {reportData && (
+            <CardDescription>报告编号：{reportData.reportNo}</CardDescription>
+          )}
         </CardHeader>
         <CardContent>
-          {!isAuthorized ? (
+          {!reportData ? (
             <View className="text-center py-6">
               <View className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-                <FileText size={32} color="#1e40af" />
+                <FileText size={32} color="#3b82f6" />
               </View>
-              <Text className="block text-base font-medium text-gray-900 mb-2">开始生成报告</Text>
+              <Text className="block text-base font-medium text-gray-900 mb-2">生成职业信用报告</Text>
               <Text className="block text-sm text-gray-500 mb-4">
                 授权平台查询您的职业信用信息，生成完整报告
               </Text>
-              <Button className="bg-blue-800" onClick={handleAuthorize} disabled={loading}>
-                <Text className="text-white">{loading ? '处理中...' : '授权并查询'}</Text>
+              <Button className="bg-blue-600" onClick={handleCreateReport}>
+                <Text className="text-white">开始生成</Text>
               </Button>
             </View>
-          ) : (
+          ) : reportData.status === 'processing' ? (
             <View>
               <View className="mb-4">
-                <Text className="block text-sm text-gray-500 mb-2">
-                  信息采集进度 ({steps.filter(s => s.status !== 'pending').length}/{steps.length})
-                </Text>
-                <Progress value={(steps.filter(s => s.status !== 'pending').length / steps.length) * 100} />
+                <View className="flex items-center justify-between mb-2">
+                  <Text className="text-sm text-gray-500">核查进度</Text>
+                  <Text className="text-sm font-medium text-blue-600">核查中...</Text>
+                </View>
+                <Progress value={getProgressPercent(reportData.status)} />
               </View>
 
               <View className="space-y-3">
-                {steps.map((step, index) => (
-                  <Card key={step.id}>
-                    <CardContent className="p-4">
-                      <View className="flex items-center justify-between">
-                        <View className="flex items-center gap-3">
-                          {getStepIcon(step.status)}
-                          <Text className="text-base font-medium text-gray-900">{step.title}</Text>
-                        </View>
-                        {step.status === 'pending' && currentStep === index + 1 && (
-                          <View className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleStepAction(step.id, true)}
-                              disabled={loading}
-                            >
-                              跳过
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="bg-blue-800"
-                              onClick={() => handleStepAction(step.id, false)}
-                              disabled={loading}
-                            >
-                              查询
-                            </Button>
-                          </View>
-                        )}
-                        {step.status !== 'pending' && (
-                          <Badge variant={step.status === 'completed' ? 'default' : 'secondary'}>
-                            {step.status === 'completed' ? '已完成' : '已跳过'}
-                          </Badge>
-                        )}
-                      </View>
-                    </CardContent>
-                  </Card>
+                {verificationSteps.map((step) => (
+                  <View key={step.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    {step.status === 'completed' ? (
+                      <CircleCheck size={20} color="#10b981" />
+                    ) : (
+                      <Clock size={20} color="#f59e0b" />
+                    )}
+                    <Text className="text-sm text-gray-700">{step.title}</Text>
+                  </View>
                 ))}
               </View>
 
-              {steps.every(s => s.status !== 'pending') && (
-                <View className="mt-6 space-y-3">
-                  <Button className="w-full bg-blue-800" onClick={() => {}}>
-                    <Download size={18} color="#ffffff" />
-                    <Text className="text-white ml-2">下载报告</Text>
-                  </Button>
-                  <Button className="w-full" variant="outline" onClick={() => {}}>
-                    <Share size={18} color="#1e40af" />
-                    <Text className="text-blue-800 ml-2">分享报告</Text>
-                  </Button>
+              <View className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <Text className="text-sm text-blue-700">
+                  预计 1-3 个工作日完成核查，届时将通知您查看报告。
+                </Text>
+              </View>
+            </View>
+          ) : reportData.status === 'completed' ? (
+            <View>
+              <View className="mb-4 p-4 bg-green-50 rounded-lg">
+                <View className="flex items-center gap-2 mb-2">
+                  <CircleCheck size={20} color="#10b981" />
+                  <Text className="font-medium text-green-700">报告已生成</Text>
                 </View>
-              )}
+                <Text className="text-sm text-green-600">
+                  您的职业信用报告已生成完成，可预览、下载或分享。
+                </Text>
+              </View>
+
+              <View className="space-y-3">
+                <Button className="w-full bg-blue-600" onClick={handlePreview}>
+                  <FileText size={18} color="#ffffff" />
+                  <Text className="text-white ml-2">预览报告</Text>
+                </Button>
+                <Button className="w-full" variant="outline" onClick={handleDownload}>
+                  <Download size={18} color="#3b82f6" />
+                  <Text className="text-blue-600 ml-2">下载报告</Text>
+                </Button>
+                <Button className="w-full" variant="outline" onClick={handleShare}>
+                  <Share size={18} color="#3b82f6" />
+                  <Text className="text-blue-600 ml-2">分享报告</Text>
+                </Button>
+              </View>
+            </View>
+          ) : (
+            <View className="text-center py-6">
+              <View className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 mb-4">
+                <CircleAlert size={32} color="#ef4444" />
+              </View>
+              <Text className="block text-base font-medium text-gray-900 mb-2">报告生成失败</Text>
+              <Text className="block text-sm text-gray-500 mb-4">
+                请重新提交信息或联系客服
+              </Text>
+              <Button className="bg-blue-600" onClick={handleCreateReport}>
+                <Text className="text-white">重新生成</Text>
+              </Button>
             </View>
           )}
         </CardContent>
       </Card>
 
+      {/* 样例报告 */}
       <Card>
         <CardHeader>
           <CardTitle>样例报告</CardTitle>
         </CardHeader>
         <CardContent>
           <View className="bg-gray-50 rounded-xl p-4">
-            <Text className="block text-sm text-gray-500">
+            <Text className="block text-sm text-gray-500 mb-3">
               查看职业信用报告样例，了解报告内容和格式
             </Text>
-            <Button className="mt-3" variant="outline" size="sm" onClick={() => {}}>
-              <Text>查看样例</Text>
+            <Button variant="outline" size="sm" onClick={() => {}}>
+              <Text className="text-blue-600">查看样例</Text>
+              <ChevronRight size={16} color="#3b82f6" />
             </Button>
           </View>
         </CardContent>
