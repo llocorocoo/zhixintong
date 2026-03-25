@@ -4,7 +4,7 @@ import Taro from '@tarojs/taro'
 import { Card, CardContent } from '@/components/ui/card'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { Briefcase, FileText, Wrench, ChevronRight, FileSearch, UserCheck, TrendingUp, Shield } from 'lucide-react-taro'
+import { Briefcase, FileText, Wrench, ChevronRight, FileSearch, UserCheck, TrendingUp, Shield, Award } from 'lucide-react-taro'
 
 interface CreditScoreData {
   score: number
@@ -21,6 +21,7 @@ interface CreditScoreData {
 
 const IndexPage: FC = () => {
   const [creditScore, setCreditScore] = useState<CreditScoreData | null>(null)
+  const [showDetail, setShowDetail] = useState(false)
   const { userInfo, isLoggedIn } = useUserStore()
 
   useEffect(() => {
@@ -51,14 +52,16 @@ const IndexPage: FC = () => {
     }
   }
 
-  const getLevelText = (level: string) => {
-    const levelMap: Record<string, string> = {
-      excellent: '信用优秀',
-      good: '信用良好',
-      medium: '信用中等',
-      poor: '信用较差'
+  const getFactorText = (key: string) => {
+    const factorMap: Record<string, string> = {
+      identity: '身份学历',
+      education: '教育背景',
+      qualification: '职业资格',
+      litigation: '诉讼记录',
+      investment: '投资任职',
+      financial: '金融信用'
     }
-    return levelMap[level] || level
+    return factorMap[key] || key
   }
 
   const quickActions = [
@@ -108,31 +111,42 @@ const IndexPage: FC = () => {
 
       {/* 核心信用展示区 */}
       <View className="px-4 -mt-12">
-        <Card className="shadow-lg">
-          <CardContent className="p-5">
-            <View className="flex items-center justify-between">
-              {/* 左侧信用评分 */}
-              <View className="flex-1">
-                <Text className="block text-gray-500 text-sm mb-2">
-                  {creditScore ? getLevelText(creditScore.level) : '信用良好'}
-                </Text>
-                <Text className="block text-5xl font-bold text-blue-600">
-                  {creditScore?.score || '650'}
-                </Text>
-              </View>
-              
-              {/* 中间占位 */}
-              <View className="flex-1 flex items-center justify-center">
-                <View 
-                  className="border-2 border-dashed border-gray-300 rounded-lg px-4 py-3"
-                  style={{ minWidth: '80px' }}
-                >
-                  <Text className="text-gray-400 text-xs text-center">slogan图文</Text>
+        <Card className="shadow-lg overflow-hidden">
+          <CardContent className="p-0">
+            {/* 信用分主区域 */}
+            <View className="p-5">
+              {/* 信用分居中显示 */}
+              <View className="flex items-center justify-center mb-4">
+                <View className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mr-3">
+                  <Award size={32} color="#ffffff" />
+                </View>
+                <View className="flex items-center" onClick={() => setShowDetail(!showDetail)}>
+                  <Text className="text-5xl font-bold text-blue-600">
+                    {creditScore?.score || '650'}
+                  </Text>
+                  <View className="ml-2 p-1">
+                    <ChevronRight 
+                      size={24} 
+                      color="#3b82f6" 
+                      style={{ 
+                        transform: showDetail ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.3s'
+                      }}
+                    />
+                  </View>
                 </View>
               </View>
-              
-              {/* 右侧按钮 */}
-              <View className="flex-1 flex justify-end">
+
+              {/* 下方左右分布：slogan + 按钮 */}
+              <View className="flex items-center justify-between">
+                {/* 左侧slogan */}
+                <View className="flex-1 pr-3">
+                  <Text className="text-gray-500 text-sm leading-relaxed">
+                    职业信用，职场通行证{'\n'}信用越高，机会越多
+                  </Text>
+                </View>
+                
+                {/* 右侧按钮 */}
                 <View
                   className="bg-blue-600 rounded-full px-5 py-3 shadow-md active:bg-blue-700"
                   onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
@@ -141,6 +155,34 @@ const IndexPage: FC = () => {
                 </View>
               </View>
             </View>
+
+            {/* 信用分详情卡片（展开/收起） */}
+            {showDetail && (
+              <View className="border-t border-gray-100 bg-gray-50 p-4">
+                <Text className="block text-sm font-semibold text-gray-700 mb-3">信用评分明细</Text>
+                <View className="space-y-2">
+                  {creditScore?.factors && Object.entries(creditScore.factors).map(([key, value]) => (
+                    <View key={key} className="flex items-center justify-between py-1.5">
+                      <Text className="text-sm text-gray-600">{getFactorText(key)}</Text>
+                      <View className="flex items-center">
+                        <View className="w-24 h-1.5 bg-gray-200 rounded-full mr-2">
+                          <View 
+                            className="h-full bg-blue-500 rounded-full"
+                            style={{ width: `${value}%` }}
+                          />
+                        </View>
+                        <Text className="text-sm font-medium text-gray-900 w-8 text-right">{value}</Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+                <View className="mt-3 pt-3 border-t border-gray-200">
+                  <Text className="text-xs text-gray-400">
+                    更新时间：{new Date().toLocaleDateString('zh-CN')}
+                  </Text>
+                </View>
+              </View>
+            )}
           </CardContent>
         </Card>
       </View>
