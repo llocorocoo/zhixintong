@@ -87,7 +87,7 @@ const IndexPage: FC = () => {
       icon: TrendingUp, 
       title: '信用增信', 
       desc: '提升信用分和报告可信度',
-      path: '/pages/report/index?action=enhance'
+      path: '/pages/enhancement/index'
     },
     { 
       icon: Shield, 
@@ -217,10 +217,12 @@ const IndexPage: FC = () => {
               <View
                 className="flex items-center p-4 active:bg-gray-50"
                 onClick={() => {
-                  if (item.path.includes('action=')) {
-                    Taro.navigateTo({ url: item.path })
-                  } else {
+                  const tabBarPages = ['/pages/index/index', '/pages/report/index', '/pages/resume/index', '/pages/profile/index']
+                  const isTabBar = tabBarPages.some(p => item.path.startsWith(p))
+                  if (isTabBar) {
                     Taro.switchTab({ url: item.path })
+                  } else {
+                    Taro.navigateTo({ url: item.path })
                   }
                 }}
               >
