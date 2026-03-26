@@ -15,8 +15,7 @@ import {
   Languages,
   FolderOpen,
   CircleAlert,
-  ChevronRight,
-  RefreshCw
+  ChevronRight
 } from 'lucide-react-taro'
 
 interface ResumeData {
@@ -80,7 +79,6 @@ interface ResumeData {
 
 const ResumePage: FC = () => {
   const [resumeData, setResumeData] = useState<ResumeData | null>(null)
-  const [syncing, setSyncing] = useState(false)
   const { userInfo, isLoggedIn } = useUserStore()
 
   useEffect(() => {
@@ -135,31 +133,6 @@ const ResumePage: FC = () => {
         projects: [],
         other: []
       })
-    }
-  }
-
-  const handleSyncFromReport = async () => {
-    if (!userInfo?.id) return
-
-    setSyncing(true)
-    try {
-      const res = await Network.request({
-        url: '/api/resume/sync',
-        method: 'POST',
-        data: { userId: userInfo.id }
-      })
-
-      if (res.data.code === 200) {
-        Taro.showToast({ title: '同步成功', icon: 'success' })
-        fetchResume()
-      } else {
-        Taro.showToast({ title: res.data.message || '同步失败', icon: 'none' })
-      }
-    } catch (error) {
-      console.error('同步失败:', error)
-      Taro.showToast({ title: '同步失败', icon: 'none' })
-    } finally {
-      setSyncing(false)
     }
   }
 
@@ -269,16 +242,6 @@ const ResumePage: FC = () => {
             </View>
           </CardContent>
         </Card>
-
-        {/* 更新按钮 */}
-        <Button
-          className="w-full mb-4 bg-blue-500"
-          onClick={handleSyncFromReport}
-          disabled={syncing}
-        >
-          <RefreshCw size={18} color="#ffffff" className={syncing ? 'animate-spin' : ''} />
-          <Text className="text-white ml-2">{syncing ? '同步中...' : '更新可信简历'}</Text>
-        </Button>
 
         {/* 各资料区块 */}
         {sections.map((section) => (

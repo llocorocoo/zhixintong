@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { FileText, Download, Share, CircleCheck, CircleAlert, Clock, ChevronRight } from 'lucide-react-taro'
+import { FileText, Download, Share, CircleCheck, CircleAlert, Clock, RefreshCw, Eye } from 'lucide-react-taro'
 
 interface ReportData {
   id: string
@@ -22,6 +22,7 @@ interface ReportData {
 
 const ReportPage: FC = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null)
+  const [syncing, setSyncing] = useState(false)
   const { isLoggedIn, userInfo } = useUserStore()
 
   useEffect(() => {
@@ -102,6 +103,38 @@ const ReportPage: FC = () => {
         Taro.showToast({ title: '预览失败', icon: 'none' })
       }
     })
+  }
+
+  const handleSyncToResume = async () => {
+    if (!userInfo?.id) return
+
+    setSyncing(true)
+    try {
+      const res = await Network.request({
+        url: '/api/resume/sync',
+        method: 'POST',
+        data: { userId: userInfo.id }
+      })
+
+      if (res.data.code === 200) {
+        Taro.showToast({ title: '同步成功', icon: 'success' })
+        // 跳转到可信简历页面
+        setTimeout(() => {
+          Taro.switchTab({ url: '/pages/resume/index' })
+        }, 1000)
+      } else {
+        Taro.showToast({ title: res.data.message || '同步失败', icon: 'none' })
+      }
+    } catch (error) {
+      console.error('同步失败:', error)
+      Taro.showToast({ title: '同步失败', icon: 'none' })
+    } finally {
+      setSyncing(false)
+    }
+  }
+
+  const handleViewSample = () => {
+    Taro.showToast({ title: '功能开发中', icon: 'none' })
   }
 
   const getStatusBadge = (status: string) => {
@@ -217,6 +250,28 @@ const ReportPage: FC = () => {
                   <Share size={18} color="#3b82f6" />
                   <Text className="text-blue-600 ml-2">分享报告</Text>
                 </Button>
+
+                {/* 更新可信简历按钮 */}
+                <Button 
+                  className="w-full bg-green-600" 
+                  onClick={handleSyncToResume}
+                  disabled={syncing}
+                >
+                  <RefreshCw size={18} color="#ffffff" className={syncing ? 'animate-spin' : ''} />
+                  <Text className="text-white ml-2">{syncing ? '同步中...' : '更新可信简历'}</Text>
+                </Button>
+              </View>
+
+              <View className="mt-3">
+                <Button 
+                  className="w-full" 
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleViewSample}
+                >
+                  <Eye size={16} color="#6b7280" />
+                  <Text className="text-gray-500 ml-1">查看样例报告</Text>
+                </Button>
               </View>
             </View>
           ) : (
@@ -233,24 +288,6 @@ const ReportPage: FC = () => {
               </Button>
             </View>
           )}
-        </CardContent>
-      </Card>
-
-      {/* 样例报告 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>样例报告</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <View className="bg-gray-50 rounded-xl p-4">
-            <Text className="block text-sm text-gray-500 mb-3">
-              查看职业信用报告样例，了解报告内容和格式
-            </Text>
-            <Button variant="outline" size="sm" onClick={() => {}}>
-              <Text className="text-blue-600">查看样例</Text>
-              <ChevronRight size={16} color="#3b82f6" />
-            </Button>
-          </View>
         </CardContent>
       </Card>
     </View>
