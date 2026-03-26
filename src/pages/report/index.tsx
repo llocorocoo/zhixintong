@@ -134,7 +134,7 @@ const ReportPage: FC = () => {
   }
 
   const handleViewSample = () => {
-    Taro.showToast({ title: '功能开发中', icon: 'none' })
+    Taro.navigateTo({ url: '/pages/sample-report/index' })
   }
 
   const getStatusBadge = (status: string) => {
