@@ -261,18 +261,6 @@ const ReportPage: FC = () => {
                   <Text className="text-white ml-2">{syncing ? '同步中...' : '更新可信简历'}</Text>
                 </Button>
               </View>
-
-              <View className="mt-3">
-                <Button 
-                  className="w-full" 
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleViewSample}
-                >
-                  <Eye size={16} color="#6b7280" />
-                  <Text className="text-gray-500 ml-1">查看样例报告</Text>
-                </Button>
-              </View>
             </View>
           ) : (
             <View className="text-center py-6">
@@ -288,6 +276,19 @@ const ReportPage: FC = () => {
               </Button>
             </View>
           )}
+        </CardContent>
+      </Card>
+
+      {/* 样例报告按钮 */}
+      <Card>
+        <CardContent className="p-4">
+          <Button 
+            className="w-full bg-blue-600" 
+            onClick={handleViewSample}
+          >
+            <Eye size={18} color="#ffffff" />
+            <Text className="text-white ml-2">查看样例报告</Text>
+          </Button>
         </CardContent>
       </Card>
     </View>
