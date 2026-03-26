@@ -2,12 +2,8 @@ import { View, Text, ScrollView } from '@tarojs/components'
 import { FC, useEffect } from 'react'
 import Taro from '@tarojs/taro'
 import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { useUserStore } from '@/stores/user'
-import { 
-  Plus, 
-  CircleAlert
-} from 'lucide-react-taro'
+import { CircleAlert } from 'lucide-react-taro'
 
 interface ResumeData {
   avatar?: string
@@ -159,12 +155,6 @@ const ResumePage: FC = () => {
     }
   }, [isLoggedIn])
 
-  const handleEditSection = (section: string) => {
-    Taro.navigateTo({ 
-      url: `/pages/resume-edit/index?section=${section}`
-    })
-  }
-
   return (
     <View className="min-h-screen bg-gray-50">
       {/* 顶部导航栏 */}
@@ -188,17 +178,10 @@ const ResumePage: FC = () => {
               
               {/* 用户信息 */}
               <View className="flex-1">
-                <View className="flex items-center justify-between mb-2">
+                <View className="flex items-center mb-2">
                   <Text className="text-lg font-semibold text-gray-900">
                     {resumeData?.name || '用户user'}
                   </Text>
-                  <Button 
-                    size="sm" 
-                    className="bg-blue-500 rounded-full px-3 py-1 h-7"
-                    onClick={() => handleEditSection('basic')}
-                  >
-                    <Text className="text-white text-xs">编辑</Text>
-                  </Button>
                 </View>
                 
                 {/* 补充信息 */}
@@ -220,13 +203,6 @@ const ResumePage: FC = () => {
           <CardContent className="p-4">
             <View className="flex items-center justify-between mb-3">
               <Text className="text-base font-semibold text-gray-900">工作记录</Text>
-              <Button 
-                size="sm" 
-                className="bg-blue-500 rounded-full px-3 py-1 h-7"
-                onClick={() => handleEditSection('workRecords')}
-              >
-                <Text className="text-white text-xs">编辑</Text>
-              </Button>
             </View>
             {resumeData?.workRecords && resumeData.workRecords.length > 0 ? (
               <View className="space-y-3">
@@ -257,12 +233,8 @@ const ResumePage: FC = () => {
                 ))}
               </View>
             ) : (
-              <View 
-                className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center"
-                onClick={() => handleEditSection('workRecords')}
-              >
-                <Plus size={24} color="#9ca3af" />
-                <Text className="text-sm text-gray-400 mt-2">完善工作记录，树立良好职业形象</Text>
+              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
+                <Text className="text-sm text-gray-400">暂无工作记录</Text>
               </View>
             )}
           </CardContent>
@@ -278,13 +250,6 @@ const ResumePage: FC = () => {
                   <Text className="text-sm text-gray-500">| {resumeData.certifications.length}个</Text>
                 )}
               </View>
-              <Button 
-                size="sm" 
-                className="bg-blue-500 rounded-full px-3 py-1 h-7"
-                onClick={() => handleEditSection('certifications')}
-              >
-                <Text className="text-white text-xs">编辑</Text>
-              </Button>
             </View>
             {resumeData?.certifications && resumeData.certifications.length > 0 ? (
               <View className="flex flex-row flex-wrap gap-3">
@@ -301,12 +266,8 @@ const ResumePage: FC = () => {
                 ))}
               </View>
             ) : (
-              <View 
-                className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center"
-                onClick={() => handleEditSection('certifications')}
-              >
-                <Plus size={24} color="#9ca3af" />
-                <Text className="text-sm text-gray-400 mt-2">添加技能证书，展示专业能力</Text>
+              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
+                <Text className="text-sm text-gray-400">暂无技能证书</Text>
               </View>
             )}
           </CardContent>
@@ -317,13 +278,6 @@ const ResumePage: FC = () => {
           <CardContent className="p-4">
             <View className="flex items-center justify-between mb-3">
               <Text className="text-base font-semibold text-gray-900">职业技能</Text>
-              <Button 
-                size="sm" 
-                className="bg-blue-500 rounded-full px-3 py-1 h-7"
-                onClick={() => handleEditSection('skills')}
-              >
-                <Text className="text-white text-xs">编辑</Text>
-              </Button>
             </View>
             {resumeData?.skills && resumeData.skills.length > 0 ? (
               <View className="space-y-2">
@@ -352,12 +306,8 @@ const ResumePage: FC = () => {
                 ))}
               </View>
             ) : (
-              <View 
-                className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center"
-                onClick={() => handleEditSection('skills')}
-              >
-                <Plus size={24} color="#9ca3af" />
-                <Text className="text-sm text-gray-400 mt-2">列举相关技能，提升竞争力</Text>
+              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
+                <Text className="text-sm text-gray-400">暂无职业技能</Text>
               </View>
             )}
           </CardContent>
@@ -368,13 +318,6 @@ const ResumePage: FC = () => {
           <CardContent className="p-4">
             <View className="flex items-center justify-between mb-3">
               <Text className="text-base font-semibold text-gray-900">学历学籍</Text>
-              <Button 
-                size="sm" 
-                className="bg-blue-500 rounded-full px-3 py-1 h-7"
-                onClick={() => handleEditSection('education')}
-              >
-                <Text className="text-white text-xs">编辑</Text>
-              </Button>
             </View>
             {resumeData?.education && resumeData.education.length > 0 ? (
               <View className="space-y-3">
@@ -406,12 +349,8 @@ const ResumePage: FC = () => {
                 ))}
               </View>
             ) : (
-              <View 
-                className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center"
-                onClick={() => handleEditSection('education')}
-              >
-                <Plus size={24} color="#9ca3af" />
-                <Text className="text-sm text-gray-400 mt-2">添加学历信息，增强可信度</Text>
+              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
+                <Text className="text-sm text-gray-400">暂无学历信息</Text>
               </View>
             )}
           </CardContent>
@@ -422,13 +361,6 @@ const ResumePage: FC = () => {
           <CardContent className="p-4">
             <View className="flex items-center justify-between mb-3">
               <Text className="text-base font-semibold text-gray-900">项目经历</Text>
-              <Button 
-                size="sm" 
-                className="bg-blue-500 rounded-full px-3 py-1 h-7"
-                onClick={() => handleEditSection('projects')}
-              >
-                <Text className="text-white text-xs">编辑</Text>
-              </Button>
             </View>
             {resumeData?.projects && resumeData.projects.length > 0 ? (
               <View className="space-y-3">
@@ -457,12 +389,8 @@ const ResumePage: FC = () => {
                 ))}
               </View>
             ) : (
-              <View 
-                className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center"
-                onClick={() => handleEditSection('projects')}
-              >
-                <Plus size={24} color="#9ca3af" />
-                <Text className="text-sm text-gray-400 mt-2">展示项目经验，体现实战能力</Text>
+              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
+                <Text className="text-sm text-gray-400">暂无项目经历</Text>
               </View>
             )}
           </CardContent>
@@ -473,13 +401,6 @@ const ResumePage: FC = () => {
           <CardContent className="p-4">
             <View className="flex items-center justify-between mb-3">
               <Text className="text-base font-semibold text-gray-900">语言能力</Text>
-              <Button 
-                size="sm" 
-                className="bg-blue-500 rounded-full px-3 py-1 h-7"
-                onClick={() => handleEditSection('languages')}
-              >
-                <Text className="text-white text-xs">编辑</Text>
-              </Button>
             </View>
             {resumeData?.languages && resumeData.languages.length > 0 ? (
               <View className="space-y-2">
@@ -504,12 +425,8 @@ const ResumePage: FC = () => {
                 ))}
               </View>
             ) : (
-              <View 
-                className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center"
-                onClick={() => handleEditSection('languages')}
-              >
-                <Plus size={24} color="#9ca3af" />
-                <Text className="text-sm text-gray-400 mt-2">添加语言能力，拓宽职业发展</Text>
+              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
+                <Text className="text-sm text-gray-400">暂无语言能力</Text>
               </View>
             )}
           </CardContent>
@@ -520,13 +437,6 @@ const ResumePage: FC = () => {
           <CardContent className="p-4">
             <View className="flex items-center justify-between mb-3">
               <Text className="text-base font-semibold text-gray-900">其他</Text>
-              <Button 
-                size="sm" 
-                className="bg-blue-500 rounded-full px-3 py-1 h-7"
-                onClick={() => handleEditSection('other')}
-              >
-                <Text className="text-white text-xs">编辑</Text>
-              </Button>
             </View>
             {resumeData?.other && resumeData.other.length > 0 ? (
               <View className="space-y-2">
@@ -537,12 +447,8 @@ const ResumePage: FC = () => {
                 ))}
               </View>
             ) : (
-              <View 
-                className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center"
-                onClick={() => handleEditSection('other')}
-              >
-                <Plus size={24} color="#9ca3af" />
-                <Text className="text-sm text-gray-400 mt-2">添加其他信息</Text>
+              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
+                <Text className="text-sm text-gray-400">暂无其他信息</Text>
               </View>
             )}
           </CardContent>
