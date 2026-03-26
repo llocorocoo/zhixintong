@@ -1,9 +1,8 @@
 import { View, Text, ScrollView } from '@tarojs/components'
-import { FC, useState, useEffect } from 'react'
+import { FC, useEffect } from 'react'
 import Taro from '@tarojs/taro'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import { 
   Plus, 
@@ -70,199 +69,95 @@ interface ResumeData {
 }
 
 const ResumePage: FC = () => {
-  const [resumeData, setResumeData] = useState<ResumeData | null>(null)
-  const { userInfo, isLoggedIn } = useUserStore()
+  const { isLoggedIn } = useUserStore()
+  
+  // 示例简历数据
+  const resumeData: ResumeData = {
+    name: '小王',
+    gender: '男',
+    age: '26岁',
+    phone: '133****3333',
+    email: '1234@123.com',
+    workRecords: [
+      {
+        id: '1',
+        company: '某某科技有限公司',
+        position: '高级前端工程师',
+        startDate: '2022.03',
+        endDate: '至今',
+        description: '负责公司核心产品的前端架构设计与开发',
+        isVerified: true
+      },
+      {
+        id: '2',
+        company: '互联网科技股份有限公司',
+        position: '前端开发工程师',
+        startDate: '2020.07',
+        endDate: '2022.02',
+        description: '参与电商平台前端开发，优化用户体验',
+        isVerified: true
+      }
+    ],
+    skills: [
+      { id: '1', name: 'JavaScript/TypeScript', level: '精通', isVerified: true },
+      { id: '2', name: 'React/Vue', level: '精通', isVerified: true },
+      { id: '3', name: 'Node.js', level: '熟练', isVerified: false },
+      { id: '4', name: 'Python', level: '熟练', isVerified: false }
+    ],
+    certifications: [
+      { id: '1', name: '教师资格证', issuer: '教育部', date: '2021.06', isVerified: true },
+      { id: '2', name: '法律职业资格证', issuer: '司法部', date: '2022.09', isVerified: true }
+    ],
+    education: [
+      { 
+        id: '1', 
+        school: '中国xx大学', 
+        degree: '硕士', 
+        major: '计算机科学与技术',
+        startDate: '2017.09',
+        endDate: '2020.06',
+        isVerified: true 
+      },
+      { 
+        id: '2', 
+        school: '中国xx大学', 
+        degree: '本科', 
+        major: '计算机科学与技术',
+        startDate: '2013.09',
+        endDate: '2017.06',
+        isVerified: true 
+      }
+    ],
+    languages: [
+      { id: '1', name: '英语', level: 'CET-6', isVerified: true },
+      { id: '2', name: '日语', level: 'N2', isVerified: false }
+    ],
+    projects: [
+      { 
+        id: '1', 
+        name: '企业级管理系统', 
+        role: '前端负责人',
+        description: '负责整体架构设计和核心模块开发',
+        isVerified: true 
+      },
+      { 
+        id: '2', 
+        name: '电商平台小程序', 
+        role: '核心开发',
+        description: '独立完成小程序端全部功能开发',
+        isVerified: false 
+      }
+    ],
+    other: [
+      { id: '1', title: 'GitHub开源项目', content: '参与多个开源项目，累计Star 500+', isVerified: false }
+    ]
+  }
 
   useEffect(() => {
     if (!isLoggedIn) {
       Taro.redirectTo({ url: '/pages/login/index' })
-      return
     }
-    fetchResume()
   }, [isLoggedIn])
-
-  const fetchResume = async () => {
-    if (!userInfo?.id) return
-    
-    try {
-      const res = await Network.request({
-        url: '/api/resume',
-        method: 'POST',
-        data: { userId: userInfo.id }
-      })
-
-      console.log('简历数据响应:', res.data)
-
-      if (res.data.code === 200 && res.data.data) {
-        setResumeData(res.data.data)
-      } else {
-        // 初始化示例简历数据
-        setResumeData({
-          name: '小王',
-          gender: '男',
-          age: '26岁',
-          phone: '133****3333',
-          email: '1234@123.com',
-          workRecords: [
-            {
-              id: '1',
-              company: '某某科技有限公司',
-              position: '高级前端工程师',
-              startDate: '2022.03',
-              endDate: '至今',
-              description: '负责公司核心产品的前端架构设计与开发',
-              isVerified: true
-            },
-            {
-              id: '2',
-              company: '互联网科技股份有限公司',
-              position: '前端开发工程师',
-              startDate: '2020.07',
-              endDate: '2022.02',
-              description: '参与电商平台前端开发，优化用户体验',
-              isVerified: true
-            }
-          ],
-          skills: [
-            { id: '1', name: 'JavaScript/TypeScript', level: '精通', isVerified: true },
-            { id: '2', name: 'React/Vue', level: '精通', isVerified: true },
-            { id: '3', name: 'Node.js', level: '熟练', isVerified: false },
-            { id: '4', name: 'Python', level: '熟练', isVerified: false }
-          ],
-          certifications: [
-            { id: '1', name: '教师资格证', issuer: '教育部', date: '2021.06', isVerified: true },
-            { id: '2', name: '法律职业资格证', issuer: '司法部', date: '2022.09', isVerified: true }
-          ],
-          education: [
-            { 
-              id: '1', 
-              school: '中国xx大学', 
-              degree: '硕士', 
-              major: '计算机科学与技术',
-              startDate: '2017.09',
-              endDate: '2020.06',
-              isVerified: true 
-            },
-            { 
-              id: '2', 
-              school: '中国xx大学', 
-              degree: '本科', 
-              major: '计算机科学与技术',
-              startDate: '2013.09',
-              endDate: '2017.06',
-              isVerified: true 
-            }
-          ],
-          languages: [
-            { id: '1', name: '英语', level: 'CET-6', isVerified: true },
-            { id: '2', name: '日语', level: 'N2', isVerified: false }
-          ],
-          projects: [
-            { 
-              id: '1', 
-              name: '企业级管理系统', 
-              role: '前端负责人',
-              description: '负责整体架构设计和核心模块开发',
-              isVerified: true 
-            },
-            { 
-              id: '2', 
-              name: '电商平台小程序', 
-              role: '核心开发',
-              description: '独立完成小程序端全部功能开发',
-              isVerified: false 
-            }
-          ],
-          other: [
-            { id: '1', title: 'GitHub开源项目', content: '参与多个开源项目，累计Star 500+', isVerified: false }
-          ]
-        })
-      }
-    } catch (error) {
-      console.error('获取简历失败:', error)
-      // 初始化示例简历数据
-      setResumeData({
-        name: '小王',
-        gender: '男',
-        age: '26岁',
-        phone: '133****3333',
-        email: '1234@123.com',
-        workRecords: [
-          {
-            id: '1',
-            company: '某某科技有限公司',
-            position: '高级前端工程师',
-            startDate: '2022.03',
-            endDate: '至今',
-            description: '负责公司核心产品的前端架构设计与开发',
-            isVerified: true
-          },
-          {
-            id: '2',
-            company: '互联网科技股份有限公司',
-            position: '前端开发工程师',
-            startDate: '2020.07',
-            endDate: '2022.02',
-            description: '参与电商平台前端开发，优化用户体验',
-            isVerified: true
-          }
-        ],
-        skills: [
-          { id: '1', name: 'JavaScript/TypeScript', level: '精通', isVerified: true },
-          { id: '2', name: 'React/Vue', level: '精通', isVerified: true },
-          { id: '3', name: 'Node.js', level: '熟练', isVerified: false },
-          { id: '4', name: 'Python', level: '熟练', isVerified: false }
-        ],
-        certifications: [
-          { id: '1', name: '教师资格证', issuer: '教育部', date: '2021.06', isVerified: true },
-          { id: '2', name: '法律职业资格证', issuer: '司法部', date: '2022.09', isVerified: true }
-        ],
-        education: [
-          { 
-            id: '1', 
-            school: '中国xx大学', 
-            degree: '硕士', 
-            major: '计算机科学与技术',
-            startDate: '2017.09',
-            endDate: '2020.06',
-            isVerified: true 
-          },
-          { 
-            id: '2', 
-            school: '中国xx大学', 
-            degree: '本科', 
-            major: '计算机科学与技术',
-            startDate: '2013.09',
-            endDate: '2017.06',
-            isVerified: true 
-          }
-        ],
-        languages: [
-          { id: '1', name: '英语', level: 'CET-6', isVerified: true },
-          { id: '2', name: '日语', level: 'N2', isVerified: false }
-        ],
-        projects: [
-          { 
-            id: '1', 
-            name: '企业级管理系统', 
-            role: '前端负责人',
-            description: '负责整体架构设计和核心模块开发',
-            isVerified: true 
-          },
-          { 
-            id: '2', 
-            name: '电商平台小程序', 
-            role: '核心开发',
-            description: '独立完成小程序端全部功能开发',
-            isVerified: false 
-          }
-        ],
-        other: [
-          { id: '1', title: 'GitHub开源项目', content: '参与多个开源项目，累计Star 500+', isVerified: false }
-        ]
-      })
-    }
-  }
 
   const handleEditSection = (section: string) => {
     Taro.navigateTo({ 
