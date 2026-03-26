@@ -6,6 +6,7 @@ export default defineAppConfig({
     'pages/authorize/index',
     'pages/report-form/index',
     'pages/resume/index',
+    'pages/resume-edit/index',
     'pages/enhancement/index',
     'pages/work-history/index',
     'pages/profile/index'

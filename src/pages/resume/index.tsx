@@ -1,16 +1,33 @@
-import { View, Text } from '@tarojs/components'
+import { View, Text, ScrollView } from '@tarojs/components'
 import { FC, useState, useEffect } from 'react'
 import Taro from '@tarojs/taro'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { User, Mail, Phone, Briefcase, GraduationCap, Award, Plus, CircleCheck } from 'lucide-react-taro'
+import { 
+  Plus, 
+  Briefcase, 
+  Award, 
+  Wrench, 
+  GraduationCap,
+  Languages,
+  FolderOpen,
+  CircleAlert,
+  ChevronRight,
+  RefreshCw
+} from 'lucide-react-taro'
 
 interface ResumeData {
-  summary?: string
-  workExperience?: Array<{
+  avatar?: string
+  name: string
+  gender?: string
+  age?: string
+  phone?: string
+  email?: string
+  workRecords: Array<{
+    id: string
     company: string
     position: string
     startDate: string
@@ -18,24 +35,52 @@ interface ResumeData {
     description?: string
     isVerified: boolean
   }>
-  education?: Array<{
+  skills: Array<{
+    id: string
+    name: string
+    level?: string
+    isVerified: boolean
+  }>
+  certifications: Array<{
+    id: string
+    name: string
+    issuer?: string
+    date?: string
+    isVerified: boolean
+  }>
+  education: Array<{
+    id: string
     school: string
     degree: string
-    major: string
-    startDate: string
-    endDate: string
+    major?: string
+    startDate?: string
+    endDate?: string
+    isVerified: boolean
   }>
-  skills?: string[]
-  certifications?: Array<{
+  languages?: Array<{
+    id: string
     name: string
-    issuer: string
-    date: string
+    level: string
+    isVerified: boolean
   }>
-  isVerified: boolean
+  projects?: Array<{
+    id: string
+    name: string
+    role: string
+    description?: string
+    isVerified: boolean
+  }>
+  other?: Array<{
+    id: string
+    title: string
+    content?: string
+    isVerified: boolean
+  }>
 }
 
 const ResumePage: FC = () => {
   const [resumeData, setResumeData] = useState<ResumeData | null>(null)
+  const [syncing, setSyncing] = useState(false)
   const { userInfo, isLoggedIn } = useUserStore()
 
   useEffect(() => {
@@ -60,156 +105,276 @@ const ResumePage: FC = () => {
 
       if (res.data.code === 200 && res.data.data) {
         setResumeData(res.data.data)
+      } else {
+        // 初始化空简历数据
+        setResumeData({
+          name: userInfo?.name || '',
+          phone: userInfo?.phone || '',
+          email: userInfo?.email || '',
+          workRecords: [],
+          skills: [],
+          certifications: [],
+          education: [],
+          languages: [],
+          projects: [],
+          other: []
+        })
       }
     } catch (error) {
       console.error('获取简历失败:', error)
+      // 初始化空简历数据
+      setResumeData({
+        name: userInfo?.name || '',
+        phone: userInfo?.phone || '',
+        email: userInfo?.email || '',
+        workRecords: [],
+        skills: [],
+        certifications: [],
+        education: [],
+        languages: [],
+        projects: [],
+        other: []
+      })
     }
   }
 
+  const handleSyncFromReport = async () => {
+    if (!userInfo?.id) return
+
+    setSyncing(true)
+    try {
+      const res = await Network.request({
+        url: '/api/resume/sync',
+        method: 'POST',
+        data: { userId: userInfo.id }
+      })
+
+      if (res.data.code === 200) {
+        Taro.showToast({ title: '同步成功', icon: 'success' })
+        fetchResume()
+      } else {
+        Taro.showToast({ title: res.data.message || '同步失败', icon: 'none' })
+      }
+    } catch (error) {
+      console.error('同步失败:', error)
+      Taro.showToast({ title: '同步失败', icon: 'none' })
+    } finally {
+      setSyncing(false)
+    }
+  }
+
+  const handleEditSection = (section: string) => {
+    Taro.navigateTo({ 
+      url: `/pages/resume-edit/index?section=${section}`
+    })
+  }
+
+  const sections = [
+    {
+      id: 'workRecords',
+      title: '工作记录',
+      icon: Briefcase,
+      items: resumeData?.workRecords || [],
+      emptyText: '完善工作记录，树立良好职业形象',
+      actionText: '编辑'
+    },
+    {
+      id: 'skills',
+      title: '职业技能',
+      icon: Wrench,
+      items: resumeData?.skills || [],
+      emptyText: '列举相关技能，提升竞争力',
+      actionText: '编辑'
+    },
+    {
+      id: 'certifications',
+      title: '技能证书',
+      icon: Award,
+      items: resumeData?.certifications || [],
+      emptyText: '添加技能证书，展示专业能力',
+      actionText: '编辑',
+      showCount: true
+    },
+    {
+      id: 'education',
+      title: '学历学籍',
+      icon: GraduationCap,
+      items: resumeData?.education || [],
+      emptyText: '添加学历信息，增强可信度',
+      actionText: '编辑'
+    },
+    {
+      id: 'projects',
+      title: '项目经历',
+      icon: FolderOpen,
+      items: resumeData?.projects || [],
+      emptyText: '展示项目经验，体现实战能力',
+      actionText: '编辑'
+    },
+    {
+      id: 'languages',
+      title: '语言能力',
+      icon: Languages,
+      items: resumeData?.languages || [],
+      emptyText: '添加语言能力，拓宽职业发展',
+      actionText: '编辑'
+    }
+  ]
+
   return (
-    <View className="min-h-screen bg-gray-50 p-4 pb-20">
-      <Card className="mb-4">
-        <CardContent className="p-6">
-          <View className="flex items-center gap-4">
-            <View className="w-16 h-16 rounded-full bg-blue-800 flex items-center justify-center">
-              <User size={32} color="#ffffff" />
-            </View>
-            <View className="flex-1">
-              <View className="flex items-center gap-2 mb-1">
-                <Text className="text-xl font-semibold text-gray-900">
-                  {userInfo?.name || '未设置姓名'}
-                </Text>
-                {resumeData?.isVerified && (
-                  <Badge>
-                    <CircleCheck size={12} color="#ffffff" className="mr-1" />
-                    已认证
-                  </Badge>
+    <View className="min-h-screen bg-gray-50">
+      {/* 顶部导航栏 */}
+      <View className="bg-blue-500 px-4 py-3 flex items-center">
+        <Text className="flex-1 text-center text-white text-lg font-semibold">可信简历</Text>
+      </View>
+
+      <ScrollView className="flex-1 p-4 pb-20">
+        {/* 个人基础信息区 */}
+        <Card className="mb-4 bg-white">
+          <CardContent className="p-4">
+            <View className="flex items-start gap-4">
+              {/* 头像 */}
+              <View className="w-16 h-16 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-white">
+                {resumeData?.avatar ? (
+                  <View className="w-full h-full rounded-lg bg-gray-100" />
+                ) : (
+                  <Text className="text-gray-400 text-sm">头像</Text>
                 )}
               </View>
-              <View className="space-y-1">
-                <View className="flex items-center gap-2">
-                  <Phone size={14} color="#6b7280" />
-                  <Text className="text-sm text-gray-500">{userInfo?.phone || '未设置'}</Text>
+              
+              {/* 用户信息 */}
+              <View className="flex-1">
+                <View className="flex items-center justify-between mb-2">
+                  <Text className="text-lg font-semibold text-gray-900">
+                    {resumeData?.name || '用户user'}
+                  </Text>
+                  <Button 
+                    size="sm" 
+                    className="bg-blue-500 rounded-full px-3 py-1 h-7"
+                    onClick={() => handleEditSection('basic')}
+                  >
+                    <Text className="text-white text-xs">编辑</Text>
+                  </Button>
                 </View>
-                <View className="flex items-center gap-2">
-                  <Mail size={14} color="#6b7280" />
-                  <Text className="text-sm text-gray-500">{userInfo?.email || '未设置'}</Text>
+                
+                {/* 补充信息 */}
+                <View className="rounded-lg border-2 border-dashed border-gray-300 p-3 bg-white">
+                  <Text className="text-sm text-gray-400">
+                    {resumeData?.gender || resumeData?.age || resumeData?.phone || resumeData?.email
+                      ? `${resumeData?.gender || ''} ${resumeData?.age || ''} ${resumeData?.phone || ''} ${resumeData?.email || ''}`.trim()
+                      : '性别、年龄、手机号、邮箱等'}
+                  </Text>
                 </View>
               </View>
             </View>
-          </View>
-        </CardContent>
-      </Card>
-
-      {resumeData?.summary && (
-        <Card className="mb-4">
-          <CardHeader>
-            <CardTitle>个人简介</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Text className="text-sm text-gray-700 leading-relaxed">{resumeData.summary}</Text>
           </CardContent>
         </Card>
-      )}
 
-      <Card className="mb-4">
-        <CardHeader>
-          <View className="flex items-center justify-between">
-            <CardTitle>工作经历</CardTitle>
-            <Button size="sm" variant="outline">
-              <Plus size={16} color="#1e40af" />
-              <Text className="text-blue-800 ml-1">添加</Text>
-            </Button>
-          </View>
-        </CardHeader>
-        <CardContent>
-          {resumeData?.workExperience && resumeData.workExperience.length > 0 ? (
-            <View className="space-y-4">
-              {resumeData.workExperience.map((work, index) => (
-                <View key={index} className="border-l-2 border-blue-800 pl-4 py-2">
-                  <View className="flex items-center gap-2 mb-1">
-                    <Text className="font-medium text-gray-900">{work.position}</Text>
-                    {work.isVerified && <Badge variant="secondary">已认证</Badge>}
+        {/* 更新按钮 */}
+        <Button
+          className="w-full mb-4 bg-blue-500"
+          onClick={handleSyncFromReport}
+          disabled={syncing}
+        >
+          <RefreshCw size={18} color="#ffffff" className={syncing ? 'animate-spin' : ''} />
+          <Text className="text-white ml-2">{syncing ? '同步中...' : '更新可信简历'}</Text>
+        </Button>
+
+        {/* 各资料区块 */}
+        {sections.map((section) => (
+          <Card key={section.id} className="mb-4 bg-white">
+            <CardContent className="p-4">
+              {/* 区块标题 */}
+              <View className="flex items-center justify-between mb-3">
+                <View className="flex items-center gap-2">
+                  <Text className="text-base font-semibold text-gray-900">{section.title}</Text>
+                  {section.showCount && section.items.length > 0 && (
+                    <Text className="text-sm text-gray-500">| {section.items.length}个</Text>
+                  )}
+                </View>
+                <Button 
+                  size="sm" 
+                  className="bg-blue-500 rounded-full px-3 py-1 h-7"
+                  onClick={() => handleEditSection(section.id)}
+                >
+                  <Text className="text-white text-xs">{section.actionText}</Text>
+                </Button>
+              </View>
+
+              {/* 内容区 */}
+              {section.items.length > 0 ? (
+                <View className="space-y-2">
+                  {section.items.map((item, index) => (
+                    <View 
+                      key={item.id || index}
+                      className="bg-gray-50 rounded-lg p-3 flex items-center justify-between"
+                    >
+                      <View className="flex items-center gap-2 flex-1">
+                        {item.isVerified && (
+                          <Badge className="bg-blue-500 px-2 py-0.5 rounded text-xs">
+                            <Text className="text-white">已认证</Text>
+                          </Badge>
+                        )}
+                        <Text className="text-sm text-gray-900">
+                          {item.name || item.company || item.school || item.title}
+                        </Text>
+                      </View>
+                      {!item.isVerified && (
+                        <View className="flex items-center gap-1">
+                          <CircleAlert size={14} color="#3b82f6" />
+                          <Text className="text-xs text-blue-500">待认证</Text>
+                          <ChevronRight size={14} color="#3b82f6" />
+                        </View>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <View 
+                  className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer"
+                  onClick={() => handleEditSection(section.id)}
+                >
+                  <Plus size={24} color="#9ca3af" />
+                  <Text className="text-sm text-gray-400 mt-2">{section.emptyText}</Text>
+                </View>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+
+        {/* 其他信息区块 */}
+        <Card className="mb-4 bg-white">
+          <CardContent className="p-4">
+            <View className="flex items-center justify-between mb-3">
+              <Text className="text-base font-semibold text-gray-900">其他</Text>
+              <Button 
+                size="sm" 
+                className="bg-blue-500 rounded-full px-3 py-1 h-7"
+                onClick={() => handleEditSection('other')}
+              >
+                <Text className="text-white text-xs">编辑</Text>
+              </Button>
+            </View>
+            {resumeData?.other && resumeData.other.length > 0 ? (
+              <View className="space-y-2">
+                {resumeData.other.map((item, index) => (
+                  <View key={item.id || index} className="bg-gray-50 rounded-lg p-3">
+                    <Text className="text-sm text-gray-900">{item.title}</Text>
                   </View>
-                  <Text className="text-sm text-gray-600 mb-1">{work.company}</Text>
-                  <Text className="text-xs text-gray-400">
-                    {work.startDate} - {work.endDate || '至今'}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View className="text-center py-6">
-              <Briefcase size={40} color="#d1d5db" className="mx-auto mb-2" />
-              <Text className="text-sm text-gray-500">暂无工作经历</Text>
-            </View>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card className="mb-4">
-        <CardHeader>
-          <View className="flex items-center justify-between">
-            <CardTitle>教育背景</CardTitle>
-            <Button size="sm" variant="outline">
-              <Plus size={16} color="#1e40af" />
-              <Text className="text-blue-800 ml-1">添加</Text>
-            </Button>
-          </View>
-        </CardHeader>
-        <CardContent>
-          {resumeData?.education && resumeData.education.length > 0 ? (
-            <View className="space-y-4">
-              {resumeData.education.map((edu, index) => (
-                <View key={index} className="border-l-2 border-blue-800 pl-4 py-2">
-                  <Text className="font-medium text-gray-900 mb-1">{edu.school}</Text>
-                  <Text className="text-sm text-gray-600">{edu.degree} · {edu.major}</Text>
-                  <Text className="text-xs text-gray-400 mt-1">
-                    {edu.startDate} - {edu.endDate}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View className="text-center py-6">
-              <GraduationCap size={40} color="#d1d5db" className="mx-auto mb-2" />
-              <Text className="text-sm text-gray-500">暂无教育背景</Text>
-            </View>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <View className="flex items-center justify-between">
-            <CardTitle>技能证书</CardTitle>
-            <Button size="sm" variant="outline">
-              <Plus size={16} color="#1e40af" />
-              <Text className="text-blue-800 ml-1">添加</Text>
-            </Button>
-          </View>
-        </CardHeader>
-        <CardContent>
-          {resumeData?.certifications && resumeData.certifications.length > 0 ? (
-            <View className="space-y-3">
-              {resumeData.certifications.map((cert, index) => (
-                <View key={index} className="flex items-start gap-3">
-                  <Award size={18} color="#d97706" className="mt-0.5" />
-                  <View>
-                    <Text className="font-medium text-gray-900">{cert.name}</Text>
-                    <Text className="text-sm text-gray-500">{cert.issuer} · {cert.date}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View className="text-center py-6">
-              <Award size={40} color="#d1d5db" className="mx-auto mb-2" />
-              <Text className="text-sm text-gray-500">暂无技能证书</Text>
-            </View>
-          )}
-        </CardContent>
-      </Card>
+                ))}
+              </View>
+            ) : (
+              <View 
+                className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center"
+                onClick={() => handleEditSection('other')}
+              >
+                <Plus size={24} color="#9ca3af" />
+                <Text className="text-sm text-gray-400 mt-2">添加其他信息</Text>
+              </View>
+            )}
+          </CardContent>
+        </Card>
+      </ScrollView>
     </View>
   )
 }
