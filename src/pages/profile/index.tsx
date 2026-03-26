@@ -4,7 +4,7 @@ import Taro from '@tarojs/taro'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useUserStore } from '@/stores/user'
-import { User, Mail, Phone, FileText, Shield, ChevronRight, LogOut, Settings, CircleAlert } from 'lucide-react-taro'
+import { User, Mail, Phone, FolderOpen, Shield, ChevronRight, LogOut, Settings, CircleAlert } from 'lucide-react-taro'
 
 const ProfilePage: FC = () => {
   const { userInfo, logout, isLoggedIn } = useUserStore()
@@ -29,8 +29,7 @@ const ProfilePage: FC = () => {
   }
 
   const menuItems = [
-    { icon: User, title: '基本信息', desc: '姓名、联系方式等', action: () => {} },
-    { icon: FileText, title: '工作履历', desc: '维护工作经历', action: () => {} },
+    { icon: FolderOpen, title: '资料管理', desc: '基本信息、工作履历、证书资质', action: () => Taro.navigateTo({ url: '/pages/work-history/index' }) },
     { icon: Shield, title: '隐私设置', desc: '数据授权管理', action: () => {} },
     { icon: Settings, title: '账户设置', desc: '密码、安全设置', action: () => {} },
     { icon: CircleAlert, title: '帮助中心', desc: '常见问题与反馈', action: () => {} }

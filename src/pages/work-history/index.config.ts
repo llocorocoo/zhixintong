@@ -1,3 +1,3 @@
 export default typeof definePageConfig === 'function'
-  ? definePageConfig({ navigationBarTitleText: '工作履历自证' })
-  : { navigationBarTitleText: '工作履历自证' }
+  ? definePageConfig({ navigationBarTitleText: '资料管理' })
+  : { navigationBarTitleText: '资料管理' }

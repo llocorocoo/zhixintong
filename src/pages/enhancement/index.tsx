@@ -191,7 +191,7 @@ const EnhancementPage: FC = () => {
               className="w-full mt-4 bg-blue-600" 
               onClick={() => handleNavigate('/pages/work-history/index')}
             >
-              <Text className="text-white">开始自证工作履历</Text>
+          <Text className="text-white ml-2">前往资料管理</Text>
               <ArrowRight size={18} color="#ffffff" className="ml-2" />
             </Button>
           </CardContent>
@@ -290,7 +290,7 @@ const EnhancementPage: FC = () => {
           onClick={() => handleNavigate('/pages/work-history/index')}
         >
           <Briefcase size={18} color="#ffffff" />
-          <Text className="text-white ml-2">开始自证工作履历</Text>
+          <Text className="text-white ml-2">前往资料管理</Text>
         </Button>
       </View>
     </View>

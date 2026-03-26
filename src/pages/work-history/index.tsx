@@ -9,6 +9,7 @@ import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import { 
   Briefcase, 
+  Award,
   Plus,
   Upload,
   Calendar,
@@ -41,12 +42,19 @@ interface Certificate {
 }
 
 const WorkHistoryPage: FC = () => {
-  const [activeTab, setActiveTab] = useState<'work' | 'cert'>('work')
+  const [activeTab, setActiveTab] = useState<'basic' | 'work' | 'cert'>('basic')
   const [workList, setWorkList] = useState<WorkExperience[]>([])
   const [certList, setCertList] = useState<Certificate[]>([])
   const [showWorkForm, setShowWorkForm] = useState(false)
   const [showCertForm, setShowCertForm] = useState(false)
   const [loading, setLoading] = useState(false)
+  
+  // 基本信息表单
+  const [basicForm, setBasicForm] = useState({
+    name: '',
+    phone: '',
+    email: ''
+  })
   
   const [workForm, setWorkForm] = useState<WorkExperience>({
     company: '',
@@ -70,9 +78,16 @@ const WorkHistoryPage: FC = () => {
   const { userInfo } = useUserStore()
 
   useEffect(() => {
+    if (userInfo) {
+      setBasicForm({
+        name: userInfo.name || '',
+        phone: userInfo.phone || '',
+        email: userInfo.email || ''
+      })
+    }
     fetchWorkHistory()
     fetchCertificates()
-  }, [])
+  }, [userInfo])
 
   const fetchWorkHistory = async () => {
     if (!userInfo?.id) return
@@ -103,6 +118,38 @@ const WorkHistoryPage: FC = () => {
       }
     } catch (error) {
       console.error('获取证书失败:', error)
+    }
+  }
+
+  const handleSaveBasic = async () => {
+    if (!basicForm.name) {
+      Taro.showToast({ title: '请填写姓名', icon: 'none' })
+      return
+    }
+
+    setLoading(true)
+    try {
+      const res = await Network.request({
+        url: '/api/user/update',
+        method: 'POST',
+        data: {
+          userId: userInfo?.id,
+          name: basicForm.name,
+          phone: basicForm.phone,
+          email: basicForm.email
+        }
+      })
+
+      if (res.data.code === 200) {
+        Taro.showToast({ title: '保存成功', icon: 'success' })
+      } else {
+        Taro.showToast({ title: '保存失败', icon: 'none' })
+      }
+    } catch (error) {
+      console.error('保存失败:', error)
+      Taro.showToast({ title: '保存失败', icon: 'none' })
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -270,6 +317,14 @@ const WorkHistoryPage: FC = () => {
       <View className="bg-white px-4 py-3 border-b border-gray-100">
         <View className="flex gap-4">
           <View
+            className={`pb-2 ${activeTab === 'basic' ? 'border-b-2 border-blue-500' : ''}`}
+            onClick={() => setActiveTab('basic')}
+          >
+            <Text className={`${activeTab === 'basic' ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+              基本信息
+            </Text>
+          </View>
+          <View
             className={`pb-2 ${activeTab === 'work' ? 'border-b-2 border-blue-500' : ''}`}
             onClick={() => setActiveTab('work')}
           >
@@ -289,6 +344,60 @@ const WorkHistoryPage: FC = () => {
       </View>
 
       <ScrollView className="flex-1 px-4 pt-4">
+        {/* 基本信息Tab */}
+        {activeTab === 'basic' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>基本信息</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0 space-y-4">
+              <View>
+                <Text className="block text-sm font-medium text-gray-700 mb-2">姓名 *</Text>
+                <View className="bg-gray-50 rounded-xl px-4 py-3">
+                  <Input
+                    className="w-full bg-transparent"
+                    placeholder="请输入姓名"
+                    value={basicForm.name}
+                    onInput={(e) => setBasicForm({ ...basicForm, name: e.detail.value })}
+                  />
+                </View>
+              </View>
+
+              <View>
+                <Text className="block text-sm font-medium text-gray-700 mb-2">手机号</Text>
+                <View className="bg-gray-50 rounded-xl px-4 py-3">
+                  <Input
+                    className="w-full bg-transparent"
+                    placeholder="请输入手机号"
+                    value={basicForm.phone}
+                    onInput={(e) => setBasicForm({ ...basicForm, phone: e.detail.value })}
+                  />
+                </View>
+              </View>
+
+              <View>
+                <Text className="block text-sm font-medium text-gray-700 mb-2">邮箱</Text>
+                <View className="bg-gray-50 rounded-xl px-4 py-3">
+                  <Input
+                    className="w-full bg-transparent"
+                    placeholder="请输入邮箱"
+                    value={basicForm.email}
+                    onInput={(e) => setBasicForm({ ...basicForm, email: e.detail.value })}
+                  />
+                </View>
+              </View>
+
+              <Button
+                className="w-full bg-blue-600 mt-4"
+                onClick={handleSaveBasic}
+                disabled={loading}
+              >
+                <Text className="text-white">{loading ? '保存中...' : '保存'}</Text>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* 工作履历Tab */}
         {activeTab === 'work' && (
           <View>
@@ -605,7 +714,7 @@ const WorkHistoryPage: FC = () => {
 
             {certList.length === 0 && !showCertForm && (
               <View className="text-center py-12">
-                <FileText size={48} color="#d1d5db" className="mx-auto mb-3" />
+                <Award size={48} color="#d1d5db" className="mx-auto mb-3" />
                 <Text className="block text-gray-500 mb-2">暂无证书资质</Text>
                 <Text className="block text-sm text-gray-400">添加证书，提升信用评分</Text>
               </View>
