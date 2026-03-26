@@ -66,7 +66,7 @@ const IndexPage: FC = () => {
 
   const quickActions = [
     { icon: Briefcase, title: 'AI自证', action: () => {} },
-    { icon: FileText, title: '样例报告', action: () => {} },
+    { icon: FileText, title: '样例报告', action: () => Taro.navigateTo({ url: '/pages/sample-report/index' }) },
     { icon: Wrench, title: '信用修复', action: () => {} }
   ]
 
