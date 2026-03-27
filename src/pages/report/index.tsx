@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { FileText, Download, Share, CircleCheck, CircleAlert, Clock, RefreshCw, Eye } from 'lucide-react-taro'
+import { FileText, Download, Share, CircleCheck, CircleAlert, Clock, RefreshCw, Eye, FileSearch, ArrowRight } from 'lucide-react-taro'
 
 interface ReportData {
   id: string
@@ -168,6 +168,33 @@ const ReportPage: FC = () => {
 
   return (
     <View className="min-h-screen bg-gray-50 p-4 pb-20">
+      {/* 暂无信用报告提示 */}
+      {!reportData && (
+        <Card className="mb-4 border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white shadow-md">
+          <CardContent className="p-5">
+            <View className="flex items-start gap-4">
+              <View className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <FileSearch size={28} color="#3b82f6" />
+              </View>
+              <View className="flex-1">
+                <Text className="block text-lg font-bold text-gray-900 mb-2">暂无信用报告</Text>
+                <Text className="block text-sm text-gray-600 mb-4 leading-relaxed">
+                  您尚未生成职业信用报告。生成报告后，您将获得完整的职业信用评估，可用于求职、背调等场景。
+                </Text>
+                <Button 
+                  className="bg-blue-600 w-full" 
+                  onClick={handleCreateReport}
+                >
+                  <FileText size={18} color="#ffffff" />
+                  <Text className="text-white ml-2">立即生成信用报告</Text>
+                  <ArrowRight size={18} color="#ffffff" className="ml-2" />
+                </Button>
+              </View>
+            </View>
+          </CardContent>
+        </Card>
+      )}
+
       {/* 报告状态卡片 */}
       <Card className="mb-4">
         <CardHeader>
@@ -184,17 +211,37 @@ const ReportPage: FC = () => {
         </CardHeader>
         <CardContent>
           {!reportData ? (
-            <View className="text-center py-6">
-              <View className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-                <FileText size={32} color="#3b82f6" />
+            <View>
+              <View className="mb-4">
+                <Text className="block text-sm font-medium text-gray-900 mb-2">什么是职业信用报告？</Text>
+                <Text className="block text-sm text-gray-600 leading-relaxed">
+                  职业信用报告是记录您个人职业信用信息的权威文件，包含身份认证、学历信息、职业资格、工作履历等多维度数据，是您职场信用的「通行证」。
+                </Text>
               </View>
-              <Text className="block text-base font-medium text-gray-900 mb-2">生成职业信用报告</Text>
-              <Text className="block text-sm text-gray-500 mb-4">
-                授权平台查询您的职业信用信息，生成完整报告
-              </Text>
-              <Button className="bg-blue-600" onClick={handleCreateReport}>
-                <Text className="text-white">开始生成</Text>
-              </Button>
+              
+              <View className="mb-4">
+                <Text className="block text-sm font-medium text-gray-900 mb-2">报告用途</Text>
+                <View className="space-y-2">
+                  <View className="flex items-center gap-2">
+                    <CircleCheck size={16} color="#10b981" />
+                    <Text className="text-sm text-gray-600">求职应聘，展示个人信用</Text>
+                  </View>
+                  <View className="flex items-center gap-2">
+                    <CircleCheck size={16} color="#10b981" />
+                    <Text className="text-sm text-gray-600">背景调查，快速通过核验</Text>
+                  </View>
+                  <View className="flex items-center gap-2">
+                    <CircleCheck size={16} color="#10b981" />
+                    <Text className="text-sm text-gray-600">职业发展，建立信用档案</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View className="p-3 bg-blue-50 rounded-lg">
+                <Text className="text-sm text-blue-700">
+                  💡 生成报告前，请先完善您的个人资料，以提高报告完整度。
+                </Text>
+              </View>
             </View>
           ) : reportData.status === 'processing' ? (
             <View>

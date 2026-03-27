@@ -22,8 +22,7 @@ import {
   Zap,
   UserCheck,
   Building,
-  Medal,
-  FileSearch
+  Medal
 } from 'lucide-react-taro'
 
 interface EnhancementSuggestion {
@@ -346,36 +345,8 @@ const EnhancementPage: FC = () => {
         </Text>
       </View>
 
-      {/* 暂无信用报告提示 */}
-      {creditProfile && !creditProfile.reportGenerated && (
-        <View className="px-4 -mt-3">
-          <Card className="shadow-md border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
-            <CardContent className="p-4">
-              <View className="flex items-start gap-3">
-                <View className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <FileSearch size={24} color="#3b82f6" />
-                </View>
-                <View className="flex-1">
-                  <Text className="block text-base font-semibold text-gray-900 mb-1">暂无信用报告</Text>
-                  <Text className="block text-sm text-gray-600 mb-3">
-                    您尚未生成职业信用报告，生成后可获得完整的信用评估，并解锁更多增信建议。
-                  </Text>
-                  <Button 
-                    className="bg-blue-600 w-full" 
-                    onClick={() => handleNavigate('/pages/report/index')}
-                  >
-                    <FileText size={18} color="#ffffff" />
-                    <Text className="text-white ml-2">立即生成信用报告</Text>
-                  </Button>
-                </View>
-              </View>
-            </CardContent>
-          </Card>
-        </View>
-      )}
-
       {/* 个性化增信建议 */}
-      <View className={`px-4 ${creditProfile && !creditProfile.reportGenerated ? 'mt-4' : '-mt-3'}`}>
+      <View className="px-4 -mt-3">
         <Card className="shadow-md">
           <CardHeader className="pb-3">
             <View className="flex items-center justify-between">
