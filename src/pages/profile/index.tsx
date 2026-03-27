@@ -1,10 +1,10 @@
 import { View, Text } from '@tarojs/components'
 import { FC, useEffect } from 'react'
 import Taro from '@tarojs/taro'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useUserStore } from '@/stores/user'
-import { User, Mail, Phone, FolderOpen, Shield, ChevronRight, LogOut, Settings, CircleAlert } from 'lucide-react-taro'
+import { User, FolderOpen, Shield, ChevronRight, LogOut, Settings, CircleAlert } from 'lucide-react-taro'
 
 const ProfilePage: FC = () => {
   const { userInfo, logout, isLoggedIn } = useUserStore()
@@ -52,35 +52,6 @@ const ProfilePage: FC = () => {
             <Button size="sm" variant="outline">
               <Text>编辑</Text>
             </Button>
-          </View>
-        </CardContent>
-      </Card>
-
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>个人信息</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <View className="flex items-center justify-between py-2">
-            <View className="flex items-center gap-3">
-              <Phone size={18} color="#6b7280" />
-              <Text className="text-sm text-gray-600">手机号</Text>
-            </View>
-            <Text className="text-sm font-medium text-gray-900">{userInfo?.phone || '未设置'}</Text>
-          </View>
-          <View className="flex items-center justify-between py-2">
-            <View className="flex items-center gap-3">
-              <Mail size={18} color="#6b7280" />
-              <Text className="text-sm text-gray-600">邮箱</Text>
-            </View>
-            <Text className="text-sm font-medium text-gray-900">{userInfo?.email || '未设置'}</Text>
-          </View>
-          <View className="flex items-center justify-between py-2">
-            <View className="flex items-center gap-3">
-              <User size={18} color="#6b7280" />
-              <Text className="text-sm text-gray-600">姓名</Text>
-            </View>
-            <Text className="text-sm font-medium text-gray-900">{userInfo?.name || '未设置'}</Text>
           </View>
         </CardContent>
       </Card>
