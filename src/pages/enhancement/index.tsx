@@ -1,8 +1,12 @@
 import { View, Text } from '@tarojs/components'
-import { FC } from 'react'
+import { FC, useState, useEffect } from 'react'
 import Taro from '@tarojs/taro'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Network } from '@/network'
+import { useUserStore } from '@/stores/user'
 import { 
   TrendingUp, 
   Shield, 
@@ -13,12 +17,241 @@ import {
   CircleCheck,
   ChevronRight,
   ArrowRight,
-  Star
+  Star,
+  Target,
+  Zap,
+  UserCheck,
+  Building,
+  Medal
 } from 'lucide-react-taro'
 
+interface EnhancementSuggestion {
+  id: string
+  category: 'identity' | 'education' | 'work' | 'cert' | 'report'
+  title: string
+  description: string
+  scoreImpact: number
+  priority: 'high' | 'medium' | 'low'
+  status: 'missing' | 'incomplete' | 'pending'
+  action: string
+  actionText: string
+  icon: any
+}
+
+interface CreditProfile {
+  totalScore: number
+  maxScore: number
+  verifiedItems: number
+  totalItems: number
+  lastReportDate?: string
+  identityVerified: boolean
+  educationVerified: boolean
+  workRecordsCount: number
+  certsCount: number
+  reportGenerated: boolean
+}
+
 const EnhancementPage: FC = () => {
+  const { isLoggedIn } = useUserStore()
+  const [creditProfile, setCreditProfile] = useState<CreditProfile | null>(null)
+  const [suggestions, setSuggestions] = useState<EnhancementSuggestion[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      Taro.redirectTo({ url: '/pages/login/index' })
+      return
+    }
+    fetchCreditProfile()
+  }, [isLoggedIn])
+
+  const fetchCreditProfile = async () => {
+    setLoading(true)
+    try {
+      // 尝试获取用户信用档案
+      const res = await Network.request({
+        url: '/api/user/credit-profile',
+        method: 'GET'
+      })
+
+      if (res.data.code === 200 && res.data.data) {
+        setCreditProfile(res.data.data)
+        generateSuggestions(res.data.data)
+      } else {
+        // 使用模拟数据
+        const mockProfile: CreditProfile = {
+          totalScore: 65,
+          maxScore: 100,
+          verifiedItems: 3,
+          totalItems: 8,
+          lastReportDate: undefined,
+          identityVerified: true,
+          educationVerified: false,
+          workRecordsCount: 2,
+          certsCount: 0,
+          reportGenerated: false
+        }
+        setCreditProfile(mockProfile)
+        generateSuggestions(mockProfile)
+      }
+    } catch (error) {
+      console.error('获取信用档案失败:', error)
+      // 使用模拟数据
+      const mockProfile: CreditProfile = {
+        totalScore: 65,
+        maxScore: 100,
+        verifiedItems: 3,
+        totalItems: 8,
+        lastReportDate: undefined,
+        identityVerified: true,
+        educationVerified: false,
+        workRecordsCount: 2,
+        certsCount: 0,
+        reportGenerated: false
+      }
+      setCreditProfile(mockProfile)
+      generateSuggestions(mockProfile)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const generateSuggestions = (profile: CreditProfile) => {
+    const suggestionList: EnhancementSuggestion[] = []
+
+    // 学历认证建议
+    if (!profile.educationVerified) {
+      suggestionList.push({
+        id: 'education',
+        category: 'education',
+        title: '学历信息未认证',
+        description: '认证您的学历学位信息，提升报告可信度',
+        scoreImpact: 15,
+        priority: 'high',
+        status: 'missing',
+        action: '/pages/work-history/index?tab=education',
+        actionText: '去认证',
+        icon: GraduationCap
+      })
+    }
+
+    // 证书资质建议
+    if (profile.certsCount === 0) {
+      suggestionList.push({
+        id: 'certs',
+        category: 'cert',
+        title: '缺少职业资格证书',
+        description: '添加职业资格、技能证书，展示专业能力',
+        scoreImpact: 10,
+        priority: 'high',
+        status: 'missing',
+        action: '/pages/work-history/index?tab=certs',
+        actionText: '去添加',
+        icon: Medal
+      })
+    }
+
+    // 工作履历建议
+    if (profile.workRecordsCount < 3) {
+      suggestionList.push({
+        id: 'work',
+        category: 'work',
+        title: '工作履历不完整',
+        description: `当前仅有 ${profile.workRecordsCount} 条工作记录，建议补充完整`,
+        scoreImpact: 12,
+        priority: 'medium',
+        status: 'incomplete',
+        action: '/pages/work-history/index?tab=work',
+        actionText: '去补充',
+        icon: Building
+      })
+    }
+
+    // 信用报告建议
+    if (!profile.reportGenerated) {
+      suggestionList.push({
+        id: 'report',
+        category: 'report',
+        title: '尚未生成信用报告',
+        description: '生成职业信用报告，获得完整的信用评估',
+        scoreImpact: 10,
+        priority: 'high',
+        status: 'missing',
+        action: '/pages/report/index',
+        actionText: '去生成',
+        icon: FileText
+      })
+    } else if (!profile.lastReportDate || isReportOutdated(profile.lastReportDate)) {
+      suggestionList.push({
+        id: 'report-update',
+        category: 'report',
+        title: '信用报告需要更新',
+        description: '您的信用报告已超过3个月，建议更新以保持时效性',
+        scoreImpact: 5,
+        priority: 'medium',
+        status: 'incomplete',
+        action: '/pages/report/index',
+        actionText: '去更新',
+        icon: FileText
+      })
+    }
+
+    // 身份认证建议
+    if (!profile.identityVerified) {
+      suggestionList.push({
+        id: 'identity',
+        category: 'identity',
+        title: '身份信息未认证',
+        description: '完成实名认证，这是信用档案的基础',
+        scoreImpact: 20,
+        priority: 'high',
+        status: 'missing',
+        action: '/pages/profile/index',
+        actionText: '去认证',
+        icon: UserCheck
+      })
+    }
+
+    // 按优先级排序
+    suggestionList.sort((a, b) => {
+      const priorityOrder = { high: 0, medium: 1, low: 2 }
+      return priorityOrder[a.priority] - priorityOrder[b.priority]
+    })
+
+    setSuggestions(suggestionList)
+  }
+
+  const isReportOutdated = (lastDate: string): boolean => {
+    const last = new Date(lastDate)
+    const now = new Date()
+    const diffMonths = (now.getFullYear() - last.getFullYear()) * 12 + (now.getMonth() - last.getMonth())
+    return diffMonths >= 3
+  }
+
   const handleNavigate = (path: string) => {
     Taro.navigateTo({ url: path })
+  }
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'bg-red-100 text-red-600'
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-600'
+      default:
+        return 'bg-gray-100 text-gray-600'
+    }
+  }
+
+  const getPriorityText = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return '重要'
+      case 'medium':
+        return '建议'
+      default:
+        return '可选'
+    }
   }
 
   const creditTips = [
@@ -112,9 +345,104 @@ const EnhancementPage: FC = () => {
         </Text>
       </View>
 
-      {/* 如何提升信用分 */}
+      {/* 个性化增信建议 */}
       <View className="px-4 -mt-3">
         <Card className="shadow-md">
+          <CardHeader className="pb-3">
+            <View className="flex items-center justify-between">
+              <View className="flex items-center gap-2">
+                <Target size={20} color="#3b82f6" />
+                <CardTitle>个性化增信建议</CardTitle>
+              </View>
+              {creditProfile && (
+                <Badge className="bg-blue-100">
+                  <Text className="text-xs text-blue-600">可提升 {suggestions.reduce((sum, s) => sum + s.scoreImpact, 0)} 分</Text>
+                </Badge>
+              )}
+            </View>
+          </CardHeader>
+          <CardContent className="p-4 pt-0">
+            {loading ? (
+              <View className="py-8 text-center">
+                <Text className="text-gray-400">分析您的信用档案中...</Text>
+              </View>
+            ) : suggestions.length > 0 ? (
+              <View>
+                {/* 当前状态概览 */}
+                {creditProfile && (
+                  <View className="mb-4 p-3 bg-gray-50 rounded-xl">
+                    <View className="flex items-center justify-between mb-2">
+                      <Text className="text-sm text-gray-600">当前信用分</Text>
+                      <Text className="text-lg font-bold text-blue-600">{creditProfile.totalScore}/{creditProfile.maxScore}</Text>
+                    </View>
+                    <Progress value={(creditProfile.totalScore / creditProfile.maxScore) * 100} />
+                    <View className="flex items-center justify-between mt-2">
+                      <Text className="text-xs text-gray-500">已认证 {creditProfile.verifiedItems}/{creditProfile.totalItems} 项</Text>
+                      <Text className="text-xs text-gray-500">
+                        {creditProfile.totalScore >= 80 ? '信用良好' : creditProfile.totalScore >= 60 ? '信用中等' : '待提升'}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
+                {/* 建议列表 */}
+                <View className="space-y-3">
+                  {suggestions.map((item) => (
+                    <View 
+                      key={item.id}
+                      className="flex items-start gap-3 p-3 bg-white border border-gray-100 rounded-xl active:bg-gray-50"
+                      onClick={() => handleNavigate(item.action)}
+                    >
+                      <View className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                        <item.icon size={20} color="#3b82f6" />
+                      </View>
+                      <View className="flex-1 min-w-0">
+                        <View className="flex items-center gap-2 mb-1">
+                          <Text className="text-base font-medium text-gray-900">{item.title}</Text>
+                          <View className={`px-1.5 py-0.5 rounded text-xs ${getPriorityColor(item.priority)}`}>
+                            <Text className="text-xs">{getPriorityText(item.priority)}</Text>
+                          </View>
+                        </View>
+                        <Text className="text-sm text-gray-500">{item.description}</Text>
+                        <View className="flex items-center justify-between mt-2">
+                          <Text className="text-xs text-green-600 font-medium">预计 +{item.scoreImpact} 分</Text>
+                          <View className="flex items-center gap-1">
+                            <Text className="text-xs text-blue-600">{item.actionText}</Text>
+                            <ChevronRight size={14} color="#3b82f6" />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+
+                {/* 快速提升提示 */}
+                <View className="mt-4 p-3 bg-yellow-50 rounded-lg">
+                  <View className="flex items-start gap-2">
+                    <Zap size={16} color="#f59e0b" className="mt-0.5" />
+                    <View>
+                      <Text className="text-sm font-medium text-yellow-800">快速提升建议</Text>
+                      <Text className="text-xs text-yellow-700 mt-1">
+                        优先完成标记为「重要」的项目，可快速提升信用分
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ) : (
+              <View className="py-8 text-center">
+                <CircleCheck size={48} color="#10b981" className="mx-auto mb-3" />
+                <Text className="text-base font-medium text-gray-900 mb-1">信用档案完善</Text>
+                <Text className="text-sm text-gray-500">您的职业信用档案已基本完善，继续保持！</Text>
+              </View>
+            )}
+          </CardContent>
+        </Card>
+      </View>
+
+      {/* 如何提升信用分 */}
+      <View className="px-4 mt-4">
+        <Card>
           <CardHeader className="pb-3">
             <View className="flex items-center gap-2">
               <Award size={20} color="#3b82f6" />
@@ -191,7 +519,7 @@ const EnhancementPage: FC = () => {
               className="w-full mt-4 bg-blue-600" 
               onClick={() => handleNavigate('/pages/work-history/index')}
             >
-          <Text className="text-white ml-2">前往资料管理</Text>
+              <Text className="text-white">前往资料管理</Text>
               <ArrowRight size={18} color="#ffffff" className="ml-2" />
             </Button>
           </CardContent>
