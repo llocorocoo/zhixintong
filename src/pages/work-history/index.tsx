@@ -9,11 +9,6 @@ import {
   GraduationCap,
   Briefcase,
   IdCard,
-  Building,
-  Car,
-  Building2,
-  HeartPulse,
-  Receipt,
   ChevronRight,
   Plus,
   Award
@@ -22,7 +17,6 @@ import {
 interface MaterialItem {
   id: string
   name: string
-  desc?: string
   uploaded: boolean
   icon: any
 }
@@ -40,40 +34,31 @@ const WorkHistoryPage: FC = () => {
       title: '身份证明',
       items: [
         { id: 'idcard', name: '身份证', uploaded: true, icon: CreditCard },
-        { id: 'passport', name: '护照', desc: '芝麻名片展示信息', uploaded: false, icon: Plane }
+        { id: 'passport', name: '护照', uploaded: false, icon: Plane }
       ]
     },
     {
       id: 'education',
       title: '学历证明',
       items: [
-        { id: 'diploma', name: '学历学籍', desc: '芝麻名片展示信息', uploaded: true, icon: GraduationCap }
+        { id: 'diploma', name: '学历学籍', uploaded: true, icon: GraduationCap }
       ]
     },
     {
       id: 'work',
       title: '工作证明',
       items: [
-        { id: 'workinfo', name: '工作信息', desc: '芝麻名片展示信息', uploaded: false, icon: Briefcase },
+        { id: 'workinfo', name: '工作信息', uploaded: false, icon: Briefcase },
         { id: 'career', name: '职业信息', uploaded: false, icon: IdCard }
-      ]
-    },
-    {
-      id: 'asset',
-      title: '资产证明',
-      items: [
-        { id: 'house', name: '房产信息', desc: '芝麻名片展示信息', uploaded: false, icon: Building },
-        { id: 'car', name: '车产信息', desc: '芝麻名片展示信息', uploaded: false, icon: Car },
-        { id: 'housingfund', name: '公积金', desc: '芝麻名片展示信息', uploaded: false, icon: Building2 },
-        { id: 'social', name: '社保', desc: '芝麻名片展示信息', uploaded: false, icon: Shield },
-        { id: 'tax', name: '个人所得税', uploaded: false, icon: Receipt },
-        { id: 'medical', name: '医保', uploaded: false, icon: HeartPulse }
       ]
     },
     {
       id: 'ability',
       title: '能力资质',
-      items: []
+      items: [
+        { id: 'cert1', name: '教师资格证', uploaded: true, icon: Award },
+        { id: 'cert2', name: '法律职业资格证', uploaded: true, icon: Award }
+      ]
     }
   ])
 
@@ -149,16 +134,11 @@ const WorkHistoryPage: FC = () => {
                           <item.icon size={24} color={item.uploaded ? '#3b82f6' : '#9ca3af'} />
                         </View>
 
-                        {/* 名称和描述 */}
+                        {/* 名称 */}
                         <View className="flex-1">
                           <Text className="block text-base font-medium text-gray-900">
                             {item.name}
                           </Text>
-                          {item.desc && (
-                            <Text className="block text-xs text-gray-400 mt-0.5">
-                              {item.desc}
-                            </Text>
-                          )}
                         </View>
                       </View>
 
