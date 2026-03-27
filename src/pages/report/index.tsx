@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { FileText, Download, Share, CircleCheck, CircleAlert, Clock, RefreshCw, Eye, FileSearch, ArrowRight } from 'lucide-react-taro'
+import { FileText, Download, Share, CircleCheck, CircleAlert, Clock, RefreshCw, Eye, FileSearch, ArrowRight, RotateCcw } from 'lucide-react-taro'
 
 interface ReportData {
   id: string
@@ -23,6 +23,7 @@ interface ReportData {
 const ReportPage: FC = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [syncing, setSyncing] = useState(false)
+  const [updating, setUpdating] = useState(false)
   const { isLoggedIn, userInfo } = useUserStore()
 
   useEffect(() => {
@@ -55,6 +56,16 @@ const ReportPage: FC = () => {
 
   const handleCreateReport = () => {
     Taro.navigateTo({ url: '/pages/authorize/index' })
+  }
+
+  const handleUpdateReport = async () => {
+    setUpdating(true)
+    try {
+      // 重新生成报告
+      await handleCreateReport()
+    } finally {
+      setUpdating(false)
+    }
   }
 
   const handleDownload = async () => {
@@ -285,17 +296,36 @@ const ReportPage: FC = () => {
               </View>
 
               <View className="space-y-3">
+                {/* 预览报告按钮 */}
                 <Button className="w-full bg-blue-600" onClick={handlePreview}>
                   <FileText size={18} color="#ffffff" />
                   <Text className="text-white ml-2">预览报告</Text>
                 </Button>
-                <Button className="w-full" variant="outline" onClick={handleDownload}>
-                  <Download size={18} color="#3b82f6" />
-                  <Text className="text-blue-600 ml-2">下载报告</Text>
-                </Button>
-                <Button className="w-full" variant="outline" onClick={handleShare}>
-                  <Share size={18} color="#3b82f6" />
-                  <Text className="text-blue-600 ml-2">分享报告</Text>
+
+                {/* 下载和分享按钮放在同一行 */}
+                <View className="flex flex-row gap-2">
+                  <View className="flex-1">
+                    <Button className="w-full" variant="outline" onClick={handleDownload}>
+                      <Download size={16} color="#3b82f6" />
+                      <Text className="text-blue-600 ml-1 text-sm">下载</Text>
+                    </Button>
+                  </View>
+                  <View className="flex-1">
+                    <Button className="w-full" variant="outline" onClick={handleShare}>
+                      <Share size={16} color="#3b82f6" />
+                      <Text className="text-blue-600 ml-1 text-sm">分享</Text>
+                    </Button>
+                  </View>
+                </View>
+
+                {/* 更新信用报告按钮 */}
+                <Button 
+                  className="w-full bg-orange-500" 
+                  onClick={handleUpdateReport}
+                  disabled={updating}
+                >
+                  <RotateCcw size={18} color="#ffffff" className={updating ? 'animate-spin' : ''} />
+                  <Text className="text-white ml-2">{updating ? '更新中...' : '更新信用报告'}</Text>
                 </Button>
 
                 {/* 更新可信简历按钮 */}
