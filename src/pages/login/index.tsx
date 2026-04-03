@@ -95,7 +95,7 @@ const LoginPage: FC = () => {
           <View className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-800 mb-4">
             <User size={32} color="#ffffff" />
           </View>
-          <Text className="block text-2xl font-bold text-gray-900 mb-2">职业信用管理平台</Text>
+          <Text className="block text-2xl font-bold text-gray-900 mb-2">职信通</Text>
           <Text className="block text-sm text-gray-500">建立您的职业信用档案</Text>
         </View>
 

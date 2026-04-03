@@ -1,4 +1,6 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import Taro from '@tarojs/taro'
 
 interface UserState {
   userInfo: UserInfo | null
@@ -17,11 +19,31 @@ interface UserInfo {
   email?: string
 }
 
-export const useUserStore = create<UserState>((set) => ({
-  userInfo: null,
-  token: '',
-  isLoggedIn: false,
-  setUserInfo: (info) => set({ userInfo: info, isLoggedIn: true }),
-  setToken: (token) => set({ token }),
-  logout: () => set({ userInfo: null, token: '', isLoggedIn: false }),
-}))
+const taroStorage = {
+  getItem: (name: string) => {
+    return Taro.getStorageSync(name) || null
+  },
+  setItem: (name: string, value: string) => {
+    Taro.setStorageSync(name, value)
+  },
+  removeItem: (name: string) => {
+    Taro.removeStorageSync(name)
+  },
+}
+
+export const useUserStore = create<UserState>()(
+  persist(
+    (set) => ({
+      userInfo: null,
+      token: '',
+      isLoggedIn: false,
+      setUserInfo: (info) => set({ userInfo: info, isLoggedIn: true }),
+      setToken: (token) => set({ token }),
+      logout: () => set({ userInfo: null, token: '', isLoggedIn: false }),
+    }),
+    {
+      name: 'zhixintong-user',
+      storage: createJSONStorage(() => taroStorage),
+    }
+  )
+)

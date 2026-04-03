@@ -3,8 +3,9 @@ import { FC, useEffect } from 'react'
 import Taro from '@tarojs/taro'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { User, FolderOpen, Shield, ChevronRight, LogOut, Settings, CircleAlert } from 'lucide-react-taro'
+import { User, Shield, ChevronRight, LogOut, Settings, CircleAlert } from 'lucide-react-taro'
 
 const ProfilePage: FC = () => {
   const { userInfo, logout, isLoggedIn } = useUserStore()
@@ -19,8 +20,18 @@ const ProfilePage: FC = () => {
     Taro.showModal({
       title: '退出登录',
       content: '确定要退出登录吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
+          // 清除服务端用户数据（方便演示）
+          if (userInfo?.id) {
+            try {
+              await Network.request({
+                url: '/api/auth/logout',
+                method: 'POST',
+                data: { userId: userInfo.id }
+              })
+            } catch {}
+          }
           logout()
           Taro.redirectTo({ url: '/pages/login/index' })
         }
@@ -29,7 +40,6 @@ const ProfilePage: FC = () => {
   }
 
   const menuItems = [
-    { icon: FolderOpen, title: '资料管理', desc: '基本信息、工作履历、证书资质', action: () => Taro.navigateTo({ url: '/pages/work-history/index' }) },
     { icon: Shield, title: '隐私设置', desc: '数据授权管理', action: () => {} },
     { icon: Settings, title: '账户设置', desc: '密码、安全设置', action: () => {} },
     { icon: CircleAlert, title: '帮助中心', desc: '常见问题与反馈', action: () => {} }

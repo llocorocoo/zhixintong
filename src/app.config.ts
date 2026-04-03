@@ -10,6 +10,8 @@ export default defineAppConfig({
     'pages/resume-edit/index',
     'pages/enhancement/index',
     'pages/work-history/index',
+    'pages/credit-repair/index',
+    'pages/payment/index',
     'pages/profile/index'
   ],
   window: {

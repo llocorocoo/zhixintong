@@ -1,56 +1,37 @@
 import { Injectable } from '@nestjs/common'
-import { getSupabaseClient } from '@/storage/database/supabase-client'
+import { randomUUID } from 'crypto'
+
+interface Resume {
+  id: string
+  user_id: string
+  avatar?: string
+  name: string
+  gender: string
+  age: string
+  phone: string
+  email: string
+  workRecords: any[]
+  education: any[]
+  skills: any[]
+  certifications: any[]
+  languages: any[]
+  projects: any[]
+  other: any[]
+  created_at: string
+  updated_at: string
+}
 
 @Injectable()
 export class ResumeService {
+  private resumes = new Map<string, Resume>()
+
   async getResume(userId: string) {
-    const client = getSupabaseClient()
-    
-    const { data, error } = await client
-      .from('resumes')
-      .select('*')
-      .eq('user_id', userId)
-      .single()
-
-    if (error && error.code !== 'PGRST116') {
-      console.error('获取简历失败:', error)
-      throw new Error('获取简历失败')
-    }
-
-    // 如果没有简历，创建一个空的
-    if (!data) {
-      const { data: newResume, error: createError } = await client
-        .from('resumes')
-        .insert({
-          user_id: userId,
-          name: '',
-          gender: '',
-          age: '',
-          phone: '',
-          email: '',
-          workRecords: [],
-          education: [],
-          skills: [],
-          certifications: [],
-          languages: [],
-          projects: [],
-          other: []
-        })
-        .select()
-        .single()
-
-      if (createError) {
-        console.error('创建简历失败:', createError)
-        throw new Error('创建简历失败')
-      }
-
-      return this.transformResume(newResume)
-    }
-
-    return this.transformResume(data)
+    const resume = this.resumes.get(userId)
+    if (!resume) return null
+    return this.transformResume(resume)
   }
 
-  private transformResume(data: any) {
+  private transformResume(data: Resume) {
     return {
       id: data.id,
       avatar: data.avatar,
@@ -59,7 +40,7 @@ export class ResumeService {
       age: data.age || '',
       phone: data.phone || '',
       email: data.email || '',
-      workRecords: data.work_records || [],
+      workRecords: data.workRecords || [],
       education: data.education || [],
       skills: data.skills || [],
       certifications: data.certifications || [],
@@ -67,245 +48,128 @@ export class ResumeService {
       projects: data.projects || [],
       other: data.other || [],
       createdAt: data.created_at,
-      updatedAt: data.updated_at
+      updatedAt: data.updated_at,
     }
   }
 
   async syncFromReport(userId: string) {
-    const client = getSupabaseClient()
-    
-    // 获取用户基本信息
-    const { data: userInfo } = await client
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single()
-
-    // 获取已核验的工作履历
-    const { data: workHistories } = await client
-      .from('work_histories')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_verified', true)
-
-    // 获取已核验的证书
-    const { data: certificates } = await client
-      .from('certificates')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_verified', true)
-
-    // 获取报告中的身份和学历信息
-    const { data: report } = await client
-      .from('credit_reports')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single()
-
-    // 构建简历数据
-    const resumeData: any = {}
-
-    if (userInfo) {
-      resumeData.name = userInfo.name
-      resumeData.phone = userInfo.phone
-      resumeData.email = userInfo.email
+    const now = new Date().toISOString()
+    const resume: Resume = {
+      id: randomUUID(),
+      user_id: userId,
+      name: '小王',
+      gender: '男',
+      age: '26岁',
+      phone: '133****3333',
+      email: '1234@123.com',
+      workRecords: [
+        {
+          id: '1',
+          company: '某某科技有限公司',
+          position: '高级前端工程师',
+          startDate: '2022.03',
+          endDate: '至今',
+          description: '负责公司核心产品的前端架构设计与开发',
+          isVerified: true,
+        },
+        {
+          id: '2',
+          company: '互联网科技股份有限公司',
+          position: '前端开发工程师',
+          startDate: '2020.07',
+          endDate: '2022.02',
+          description: '参与电商平台前端开发，优化用户体验',
+          isVerified: true,
+        },
+      ],
+      skills: [
+        { id: '1', name: 'JavaScript/TypeScript', level: '精通', isVerified: true },
+        { id: '2', name: 'React/Vue', level: '精通', isVerified: true },
+        { id: '3', name: 'Node.js', level: '熟练', isVerified: false },
+        { id: '4', name: 'Python', level: '熟练', isVerified: false },
+      ],
+      certifications: [
+        { id: '1', name: '教师资格证', issuer: '教育部', date: '2021.06', isVerified: true },
+        { id: '2', name: '法律职业资格证', issuer: '司法部', date: '2022.09', isVerified: true },
+      ],
+      education: [
+        {
+          id: '1',
+          school: '中国xx大学',
+          degree: '硕士',
+          major: '计算机科学与技术',
+          startDate: '2017.09',
+          endDate: '2020.06',
+          isVerified: true,
+        },
+        {
+          id: '2',
+          school: '中国xx大学',
+          degree: '本科',
+          major: '计算机科学与技术',
+          startDate: '2013.09',
+          endDate: '2017.06',
+          isVerified: true,
+        },
+      ],
+      languages: [
+        { id: '1', name: '英语', level: 'CET-6', isVerified: true },
+        { id: '2', name: '日语', level: 'N2', isVerified: false },
+      ],
+      projects: [
+        {
+          id: '1',
+          name: '企业级管理系统',
+          role: '前端负责人',
+          description: '负责整体架构设计和核心模块开发',
+          isVerified: true,
+        },
+        {
+          id: '2',
+          name: '电商平台小程序',
+          role: '核心开发',
+          description: '独立完成小程序端全部功能开发',
+          isVerified: false,
+        },
+      ],
+      other: [
+        { id: '1', title: 'GitHub开源项目', content: '参与多个开源项目，累计Star 500+', isVerified: false },
+      ],
+      created_at: now,
+      updated_at: now,
     }
-
-    if (workHistories && workHistories.length > 0) {
-      resumeData.workRecords = workHistories.map(w => ({
-        id: w.id,
-        company: w.company,
-        position: w.position,
-        startDate: w.start_date,
-        endDate: w.end_date,
-        description: w.description,
-        isVerified: true
-      }))
-    }
-
-    if (certificates && certificates.length > 0) {
-      resumeData.certifications = certificates.map(c => ({
-        id: c.id,
-        name: c.name,
-        issuer: c.issuer,
-        date: c.issue_date,
-        isVerified: true
-      }))
-    }
-
-    if (report) {
-      if (report.identity_info) {
-        resumeData.name = report.identity_info.realName || resumeData.name
-      }
-      if (report.education_info) {
-        resumeData.education = [{
-          id: 'edu_report',
-          school: report.education_info.school,
-          degree: report.education_info.education,
-          major: report.education_info.major,
-          isVerified: true
-        }]
-      }
-    }
-
-    // 更新或创建简历
-    const { data: existingResume } = await client
-      .from('resumes')
-      .select('id')
-      .eq('user_id', userId)
-      .single()
-
-    if (existingResume) {
-      const { data, error } = await client
-        .from('resumes')
-        .update({
-          ...resumeData,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId)
-        .select()
-        .single()
-
-      if (error) {
-        console.error('同步简历失败:', error)
-        throw new Error('同步简历失败')
-      }
-
-      return this.transformResume(data)
-    } else {
-      const { data, error } = await client
-        .from('resumes')
-        .insert({
-          user_id: userId,
-          ...resumeData,
-          workRecords: resumeData.workRecords || [],
-          education: resumeData.education || [],
-          skills: [],
-          certifications: resumeData.certifications || [],
-          languages: [],
-          projects: [],
-          other: []
-        })
-        .select()
-        .single()
-
-      if (error) {
-        console.error('创建简历失败:', error)
-        throw new Error('创建简历失败')
-      }
-
-      return this.transformResume(data)
-    }
+    this.resumes.set(userId, resume)
+    return this.transformResume(resume)
   }
 
   async updateBasicInfo(userId: string, basicInfo: any) {
-    const client = getSupabaseClient()
-    
-    const { data: existingResume } = await client
-      .from('resumes')
-      .select('id')
-      .eq('user_id', userId)
-      .single()
+    let resume = this.resumes.get(userId)
+    if (!resume) return null
 
-    if (existingResume) {
-      const { data, error } = await client
-        .from('resumes')
-        .update({
-          name: basicInfo.name,
-          gender: basicInfo.gender,
-          age: basicInfo.age,
-          phone: basicInfo.phone,
-          email: basicInfo.email,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId)
-        .select()
-        .single()
+    resume.name = basicInfo.name ?? resume.name
+    resume.gender = basicInfo.gender ?? resume.gender
+    resume.age = basicInfo.age ?? resume.age
+    resume.phone = basicInfo.phone ?? resume.phone
+    resume.email = basicInfo.email ?? resume.email
+    resume.updated_at = new Date().toISOString()
 
-      if (error) {
-        throw new Error('更新基本信息失败')
-      }
-
-      return this.transformResume(data)
-    } else {
-      const { data, error } = await client
-        .from('resumes')
-        .insert({
-          user_id: userId,
-          name: basicInfo.name,
-          gender: basicInfo.gender,
-          age: basicInfo.age,
-          phone: basicInfo.phone,
-          email: basicInfo.email,
-          workRecords: [],
-          education: [],
-          skills: [],
-          certifications: [],
-          languages: [],
-          projects: [],
-          other: []
-        })
-        .select()
-        .single()
-
-      if (error) {
-        throw new Error('创建简历失败')
-      }
-
-      return this.transformResume(data)
-    }
+    return this.transformResume(resume)
   }
 
   async addItem(userId: string, section: string, item: any) {
-    const client = getSupabaseClient()
-    
-    // 获取当前简历
-    const resume = await this.getResume(userId)
-    
-    // 获取当前列表
-    let items = resume[section] || []
-    
-    // 添加新项
-    const newItem = {
-      ...item,
-      id: `${section}_${Date.now()}`
-    }
+    let resume = this.resumes.get(userId)
+    if (!resume) return null
+
+    const newItem = { ...item, id: `${section}_${Date.now()}` }
+    const items = resume[section] || []
     items.push(newItem)
-
-    // 转换字段名（驼峰转下划线）
-    const dbField = this.sectionToDbField(section)
-    
-    // 更新简历
-    const { data, error } = await client
-      .from('resumes')
-      .update({ 
-        [dbField]: items,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', userId)
-      .select()
-      .single()
-
-    if (error) {
-      console.error('添加失败:', error)
-      throw new Error('添加失败')
-    }
+    resume[section] = items
+    resume.updated_at = new Date().toISOString()
 
     return newItem
   }
 
-  private sectionToDbField(section: string): string {
-    const mapping: Record<string, string> = {
-      workRecords: 'work_records',
-      education: 'education',
-      skills: 'skills',
-      certifications: 'certifications',
-      languages: 'languages',
-      projects: 'projects',
-      other: 'other'
-    }
-    return mapping[section] || section
+  clearUserData(userId: string) {
+    this.resumes.delete(userId)
   }
 }

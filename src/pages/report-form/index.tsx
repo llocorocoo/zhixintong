@@ -235,13 +235,15 @@ const ReportFormPage: FC = () => {
         }
       })
 
-      console.log('提交响应:', res.data)
-
       if (res.data.code === 200) {
-        Taro.showToast({ title: '提交成功', icon: 'success' })
+        Taro.showLoading({ title: '职业信用报告生成中...' })
+        // 等待报告生成（后端5秒后自动完成）
+        await new Promise(resolve => setTimeout(resolve, 3000))
+        Taro.hideLoading()
+        Taro.showToast({ title: '报告已生成', icon: 'success' })
         setTimeout(() => {
-          Taro.redirectTo({ url: '/pages/report/index?status=processing' })
-        }, 1500)
+          Taro.switchTab({ url: '/pages/report/index' })
+        }, 1000)
       } else {
         Taro.showToast({ title: res.data.message || '提交失败', icon: 'none' })
       }
@@ -621,7 +623,7 @@ const ReportFormPage: FC = () => {
               onClick={handleSubmit}
               disabled={loading}
             >
-              <Text className="text-white">{loading ? '提交中...' : '提交报告'}</Text>
+              <Text className="text-white">{loading ? '生成中...' : '提交信息'}</Text>
             </Button>
           )}
         </View>

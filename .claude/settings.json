@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__claude_ai_Figma__use_figma",
+      "mcp__claude_ai_Figma__get_screenshot",
+      "mcp__claude_ai_Figma__get_design_context",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //F //PID 28692)",
+      "Bash(npx kill-port:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(find e:/claude/zhixintong -name *.js -path *credit*)",
+      "Bash(find e:/claude/zhixintong -name *.html -not -path */node_modules/*)"
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 import { View, Text } from '@tarojs/components'
-import { FC, useState, useEffect } from 'react'
-import Taro from '@tarojs/taro'
+import { FC, useState, useEffect, useCallback } from 'react'
+import Taro, { useDidShow } from '@tarojs/taro'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -23,18 +23,9 @@ interface ReportData {
 const ReportPage: FC = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [syncing, setSyncing] = useState(false)
-  const [updating, setUpdating] = useState(false)
   const { isLoggedIn, userInfo } = useUserStore()
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      Taro.redirectTo({ url: '/pages/login/index' })
-      return
-    }
-    fetchLatestReport()
-  }, [isLoggedIn])
-
-  const fetchLatestReport = async () => {
+  const fetchLatestReport = useCallback(async () => {
     if (!userInfo?.id) return
 
     try {
@@ -44,28 +35,36 @@ const ReportPage: FC = () => {
         data: { userId: userInfo.id }
       })
 
-      console.log('报告数据响应:', res.data)
-
       if (res.data.code === 200 && res.data.data) {
         setReportData(res.data.data)
       }
     } catch (error) {
       console.error('获取报告失败:', error)
     }
-  }
+  }, [userInfo?.id])
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      Taro.redirectTo({ url: '/pages/login/index' })
+      return
+    }
+    fetchLatestReport()
+  }, [isLoggedIn, fetchLatestReport])
+
+  // 每次页面显示时重新获取报告（tabBar切换回来时触发）
+  useDidShow(() => {
+    if (isLoggedIn) {
+      fetchLatestReport()
+    }
+  })
 
   const handleCreateReport = () => {
-    Taro.navigateTo({ url: '/pages/authorize/index' })
+    Taro.navigateTo({ url: '/pages/payment/index?price=50&type=create' })
   }
 
-  const handleUpdateReport = async () => {
-    setUpdating(true)
-    try {
-      // 重新生成报告
-      await handleCreateReport()
-    } finally {
-      setUpdating(false)
-    }
+  const handleUpdateReport = () => {
+    // 更新报告需支付9.9元
+    Taro.navigateTo({ url: '/pages/payment/index?price=9.9&type=update' })
   }
 
   const handleDownload = async () => {
@@ -129,7 +128,6 @@ const ReportPage: FC = () => {
 
       if (res.data.code === 200) {
         Taro.showToast({ title: '同步成功', icon: 'success' })
-        // 跳转到可信简历页面
         setTimeout(() => {
           Taro.switchTab({ url: '/pages/resume/index' })
         }, 1000)
@@ -192,13 +190,14 @@ const ReportPage: FC = () => {
                 <Text className="block text-sm text-gray-600 mb-4 leading-relaxed">
                   您尚未生成职业信用报告。生成报告后，您将获得完整的职业信用评估，可用于求职、背调等场景。
                 </Text>
-                <Button 
-                  className="bg-blue-600 w-full" 
+                <Button
+                  className="bg-blue-600 w-full"
                   onClick={handleCreateReport}
                 >
                   <FileText size={18} color="#ffffff" />
                   <Text className="text-white ml-2">立即生成信用报告</Text>
-                  <ArrowRight size={18} color="#ffffff" className="ml-2" />
+                  <Text className="text-yellow-300 ml-1 text-sm font-bold">¥50</Text>
+                  <ArrowRight size={18} color="#ffffff" className="ml-1" />
                 </Button>
               </View>
             </View>
@@ -229,7 +228,7 @@ const ReportPage: FC = () => {
                   职业信用报告是记录您个人职业信用信息的权威文件，包含身份认证、学历信息、职业资格、工作履历等多维度数据，是您职场信用的「通行证」。
                 </Text>
               </View>
-              
+
               <View className="mb-4">
                 <Text className="block text-sm font-medium text-gray-900 mb-2">报告用途</Text>
                 <View className="space-y-2">
@@ -248,11 +247,6 @@ const ReportPage: FC = () => {
                 </View>
               </View>
 
-              <View className="p-3 bg-blue-50 rounded-lg">
-                <Text className="text-sm text-blue-700">
-                  💡 生成报告前，请先完善您的个人资料，以提高报告完整度。
-                </Text>
-              </View>
             </View>
           ) : reportData.status === 'processing' ? (
             <View>
@@ -318,24 +312,25 @@ const ReportPage: FC = () => {
                   </View>
                 </View>
 
-                {/* 更新信用报告按钮 */}
-                <Button 
-                  className="w-full bg-orange-500" 
+                {/* 更新信用报告按钮 - 需付费9.9元 */}
+                <Button
+                  className="w-full bg-orange-500"
                   onClick={handleUpdateReport}
-                  disabled={updating}
                 >
-                  <RotateCcw size={18} color="#ffffff" className={updating ? 'animate-spin' : ''} />
-                  <Text className="text-white ml-2">{updating ? '更新中...' : '更新信用报告'}</Text>
+                  <RotateCcw size={18} color="#ffffff" />
+                  <Text className="text-white ml-2">更新信用报告</Text>
+                  <Text className="text-yellow-200 ml-1 text-sm font-bold">¥9.9</Text>
                 </Button>
 
-                {/* 更新可信简历按钮 */}
-                <Button 
-                  className="w-full bg-green-600" 
+                {/* 更新可信简历按钮 - 免费 */}
+                <Button
+                  className="w-full bg-green-600"
                   onClick={handleSyncToResume}
                   disabled={syncing}
                 >
                   <RefreshCw size={18} color="#ffffff" className={syncing ? 'animate-spin' : ''} />
                   <Text className="text-white ml-2">{syncing ? '同步中...' : '更新可信简历'}</Text>
+                  <Text className="text-green-200 ml-1 text-xs">免费</Text>
                 </Button>
               </View>
             </View>
@@ -350,6 +345,7 @@ const ReportPage: FC = () => {
               </Text>
               <Button className="bg-blue-600" onClick={handleCreateReport}>
                 <Text className="text-white">重新生成</Text>
+                <Text className="text-yellow-300 ml-1 text-sm font-bold">¥50</Text>
               </Button>
             </View>
           )}
@@ -359,8 +355,8 @@ const ReportPage: FC = () => {
       {/* 样例报告按钮 */}
       <Card>
         <CardContent className="p-4">
-          <Button 
-            className="w-full bg-blue-600" 
+          <Button
+            className="w-full bg-blue-600"
             onClick={handleViewSample}
           >
             <Eye size={18} color="#ffffff" />

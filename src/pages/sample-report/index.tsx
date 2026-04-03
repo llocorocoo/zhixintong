@@ -1,22 +1,10 @@
 import { View, Text, ScrollView } from '@tarojs/components'
 import { FC } from 'react'
-import Taro from '@tarojs/taro'
-import { ChevronLeft, CircleCheck } from 'lucide-react-taro'
+import { CircleCheck } from 'lucide-react-taro'
 
 const SampleReportPage: FC = () => {
-  const handleBack = () => {
-    Taro.navigateBack()
-  }
-
   return (
     <View className="min-h-screen bg-gray-100">
-      {/* 顶部导航栏 */}
-      <View className="bg-white px-4 py-4 flex items-center border-b border-gray-100">
-        <View className="w-8 h-8 flex items-center justify-center" onClick={handleBack}>
-          <ChevronLeft size={24} color="#333" />
-        </View>
-        <Text className="flex-1 text-center text-lg font-bold text-gray-900 pr-8">职业信用报告</Text>
-      </View>
 
       <ScrollView className="flex-1 px-4 py-4 pb-8">
         {/* 个人基础信息卡片 */}
@@ -148,6 +136,48 @@ const SampleReportPage: FC = () => {
             <View className="flex items-center gap-1">
               <CircleCheck size={14} color="#3b82f6" />
               <Text className="text-xs text-blue-500">已核查</Text>
+            </View>
+          </View>
+
+          {/* 诉讼记录详情 */}
+          <View className="px-4 pb-4 space-y-3">
+            <View className="bg-gray-50 rounded-lg p-3">
+              <View className="flex items-center justify-between mb-2">
+                <Text className="text-sm font-medium text-gray-900">民事纠纷 — 合同纠纷</Text>
+                <View className="bg-orange-100 rounded-full px-2 py-0.5">
+                  <Text className="text-xs text-orange-600">已结案</Text>
+                </View>
+              </View>
+              <View className="space-y-1.5">
+                <View className="flex items-start">
+                  <Text className="text-xs text-gray-500 w-16 flex-shrink-0">案号</Text>
+                  <Text className="text-xs text-gray-700">（2023）京0105民初12856号</Text>
+                </View>
+                <View className="flex items-start">
+                  <Text className="text-xs text-gray-500 w-16 flex-shrink-0">审理法院</Text>
+                  <Text className="text-xs text-gray-700">北京市朝阳区人民法院</Text>
+                </View>
+                <View className="flex items-start">
+                  <Text className="text-xs text-gray-500 w-16 flex-shrink-0">立案日期</Text>
+                  <Text className="text-xs text-gray-700">2023-06-15</Text>
+                </View>
+                <View className="flex items-start">
+                  <Text className="text-xs text-gray-500 w-16 flex-shrink-0">结案日期</Text>
+                  <Text className="text-xs text-gray-700">2023-11-20</Text>
+                </View>
+                <View className="flex items-start">
+                  <Text className="text-xs text-gray-500 w-16 flex-shrink-0">当事人身份</Text>
+                  <Text className="text-xs text-gray-700">原告</Text>
+                </View>
+                <View className="flex items-start">
+                  <Text className="text-xs text-gray-500 w-16 flex-shrink-0">案由</Text>
+                  <Text className="text-xs text-gray-700">因房屋租赁合同提前解除，主张退还押金及赔偿违约金</Text>
+                </View>
+                <View className="flex items-start">
+                  <Text className="text-xs text-gray-500 w-16 flex-shrink-0">判决结果</Text>
+                  <Text className="text-xs text-gray-700">调解结案，被告退还押金8,000元</Text>
+                </View>
+              </View>
             </View>
           </View>
         </View>

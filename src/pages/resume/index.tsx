@@ -1,9 +1,9 @@
 import { View, Text, ScrollView } from '@tarojs/components'
-import { FC, useEffect } from 'react'
-import Taro from '@tarojs/taro'
-import { Card, CardContent } from '@/components/ui/card'
+import { FC, useState, useCallback } from 'react'
+import Taro, { useDidShow } from '@tarojs/taro'
+import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { CircleAlert } from 'lucide-react-taro'
+import { FileSearch, ArrowRight } from 'lucide-react-taro'
 
 interface ResumeData {
   avatar?: string
@@ -64,396 +64,255 @@ interface ResumeData {
   }>
 }
 
-const ResumePage: FC = () => {
-  const { isLoggedIn } = useUserStore()
-  
-  // 示例简历数据
-  const resumeData: ResumeData = {
-    name: '小王',
-    gender: '男',
-    age: '26岁',
-    phone: '133****3333',
-    email: '1234@123.com',
-    workRecords: [
-      {
-        id: '1',
-        company: '某某科技有限公司',
-        position: '高级前端工程师',
-        startDate: '2022.03',
-        endDate: '至今',
-        description: '负责公司核心产品的前端架构设计与开发',
-        isVerified: true
-      },
-      {
-        id: '2',
-        company: '互联网科技股份有限公司',
-        position: '前端开发工程师',
-        startDate: '2020.07',
-        endDate: '2022.02',
-        description: '参与电商平台前端开发，优化用户体验',
-        isVerified: true
-      }
-    ],
-    skills: [
-      { id: '1', name: 'JavaScript/TypeScript', level: '精通', isVerified: true },
-      { id: '2', name: 'React/Vue', level: '精通', isVerified: true },
-      { id: '3', name: 'Node.js', level: '熟练', isVerified: false },
-      { id: '4', name: 'Python', level: '熟练', isVerified: false }
-    ],
-    certifications: [
-      { id: '1', name: '教师资格证', issuer: '教育部', date: '2021.06', isVerified: true },
-      { id: '2', name: '法律职业资格证', issuer: '司法部', date: '2022.09', isVerified: true }
-    ],
-    education: [
-      { 
-        id: '1', 
-        school: '中国xx大学', 
-        degree: '硕士', 
-        major: '计算机科学与技术',
-        startDate: '2017.09',
-        endDate: '2020.06',
-        isVerified: true 
-      },
-      { 
-        id: '2', 
-        school: '中国xx大学', 
-        degree: '本科', 
-        major: '计算机科学与技术',
-        startDate: '2013.09',
-        endDate: '2017.06',
-        isVerified: true 
-      }
-    ],
-    languages: [
-      { id: '1', name: '英语', level: 'CET-6', isVerified: true },
-      { id: '2', name: '日语', level: 'N2', isVerified: false }
-    ],
-    projects: [
-      { 
-        id: '1', 
-        name: '企业级管理系统', 
-        role: '前端负责人',
-        description: '负责整体架构设计和核心模块开发',
-        isVerified: true 
-      },
-      { 
-        id: '2', 
-        name: '电商平台小程序', 
-        role: '核心开发',
-        description: '独立完成小程序端全部功能开发',
-        isVerified: false 
-      }
-    ],
-    other: [
-      { id: '1', title: 'GitHub开源项目', content: '参与多个开源项目，累计Star 500+', isVerified: false }
-    ]
-  }
+const Badge: FC<{ verified: boolean }> = ({ verified }) => (
+  <View
+    className={`flex items-center justify-center px-2 py-0.5 rounded-full flex-shrink-0 ${
+      verified ? 'bg-blue-500' : 'bg-gray-300'
+    }`}
+  >
+    <Text className="text-white text-xs">{verified ? '已认证' : '待认证'}</Text>
+  </View>
+)
 
-  useEffect(() => {
+const SectionCard: FC<{ title: string; sub?: string; children: React.ReactNode }> = ({ title, sub, children }) => (
+  <View className="mx-4 mb-3 bg-white rounded-xl p-4">
+    <View className="flex items-center gap-2 mb-3">
+      <Text className="text-base font-medium text-gray-900">{title}</Text>
+      {sub && <Text className="text-sm text-gray-400">{sub}</Text>}
+    </View>
+    {children}
+  </View>
+)
+
+const ResumePage: FC = () => {
+  const [resumeData, setResumeData] = useState<ResumeData | null>(null)
+  const { isLoggedIn, userInfo } = useUserStore()
+
+  const fetchResume = useCallback(async () => {
+    if (!userInfo?.id) return
+    try {
+      const res = await Network.request({
+        url: '/api/resume',
+        method: 'POST',
+        data: { userId: userInfo.id }
+      })
+      if (res.data.code === 200) {
+        setResumeData(res.data.data)
+      }
+    } catch (error) {
+      console.error('获取简历失败:', error)
+    }
+  }, [userInfo?.id])
+
+  useDidShow(() => {
     if (!isLoggedIn) {
       Taro.redirectTo({ url: '/pages/login/index' })
+      return
     }
-  }, [isLoggedIn])
+    fetchResume()
+  })
 
   return (
     <View className="min-h-screen bg-gray-50">
-      {/* 顶部导航栏 */}
-      <View className="bg-blue-500 px-4 py-3 flex items-center">
-        <Text className="flex-1 text-center text-white text-lg font-semibold">可信简历</Text>
+      {/* 导航栏 */}
+      <View className="bg-blue-500 px-4 py-3 flex items-center justify-center">
+        <Text className="text-white text-lg font-medium">可信简历</Text>
       </View>
 
-      <ScrollView className="flex-1 p-4 pb-20">
-        {/* 个人基础信息区 */}
-        <Card className="mb-4 bg-white">
-          <CardContent className="p-4">
+      {/* 空状态 */}
+      {!resumeData && (
+        <View className="p-4 pt-6">
+          <View className="bg-white rounded-xl p-5 border-2 border-blue-100">
             <View className="flex items-start gap-4">
-              {/* 头像 */}
-              <View className="w-16 h-16 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-white">
-                {resumeData?.avatar ? (
-                  <View className="w-full h-full rounded-lg bg-gray-100" />
-                ) : (
-                  <Text className="text-gray-400 text-sm">头像</Text>
-                )}
+              <View className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <FileSearch size={28} color="#3b82f6" />
               </View>
-              
-              {/* 用户信息 */}
               <View className="flex-1">
-                <View className="flex items-center mb-2">
-                  <Text className="text-lg font-semibold text-gray-900">
-                    {resumeData?.name || '用户user'}
-                  </Text>
+                <Text className="block text-base font-medium text-gray-900 mb-2">暂无可信简历</Text>
+                <Text className="block text-sm text-gray-500 mb-4 leading-relaxed">
+                  您尚未生成职业信用报告。生成报告并选择「更新可信简历」后，您的可信简历将在此展示。
+                </Text>
+                <View
+                  className="bg-blue-600 rounded-xl px-4 py-3 flex items-center justify-center active:bg-blue-700"
+                  onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
+                >
+                  <FileSearch size={16} color="#ffffff" />
+                  <Text className="text-white text-sm font-medium ml-2">前往生成职业信用报告</Text>
+                  <ArrowRight size={14} color="#ffffff" className="ml-1" />
                 </View>
-                
-                {/* 补充信息 */}
-                <View className="rounded-lg border-2 border-dashed border-gray-300 p-3 bg-white">
-                  <Text className="text-sm text-gray-400">
-                    {resumeData?.gender || resumeData?.age || resumeData?.phone || resumeData?.email
-                      ? `${resumeData?.gender || ''} ${resumeData?.age || ''} ${resumeData?.phone || ''} ${resumeData?.email || ''}`.trim()
-                      : '性别、年龄、手机号、邮箱等'}
+              </View>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* 有数据时展示简历 */}
+      {resumeData && (
+        <ScrollView scrollY className="flex-1" style={{ paddingBottom: '80px' }}>
+
+          {/* 个人基础信息 */}
+          <View className="mx-4 mt-3 mb-3 bg-white rounded-xl p-4">
+            <View className="flex items-start gap-4">
+              {/* 头像框 */}
+              <View className="w-16 h-16 rounded-lg border border-dashed border-gray-300 flex items-center justify-center flex-shrink-0 bg-white">
+                <Text className="text-gray-400 text-xs">头像</Text>
+              </View>
+              {/* 信息区 */}
+              <View className="flex-1 flex flex-col gap-2">
+                <Text className="text-lg font-medium text-gray-900">{resumeData.name || '用户'}</Text>
+                <View className="border border-dashed border-gray-300 rounded-lg px-3 py-2">
+                  <Text className="text-xs text-gray-400">
+                    {[resumeData.gender, resumeData.age, resumeData.phone, resumeData.email].filter(Boolean).join('  ') || '性别、年龄、手机号、邮箱等'}
                   </Text>
                 </View>
               </View>
             </View>
-          </CardContent>
-        </Card>
+          </View>
 
-        {/* 各资料区块 */}
-        {/* 工作记录 */}
-        <Card className="mb-4 bg-white">
-          <CardContent className="p-4">
-            <View className="flex items-center justify-between mb-3">
-              <Text className="text-base font-semibold text-gray-900">工作记录</Text>
-            </View>
-            {resumeData?.workRecords && resumeData.workRecords.length > 0 ? (
+          {/* 工作记录 */}
+          {resumeData.workRecords?.length > 0 && (
+            <SectionCard title="工作记录">
               <View className="space-y-3">
-                {resumeData.workRecords.map((item, index) => (
-                  <View key={item.id || index} className="bg-gray-50 rounded-lg p-3">
-                    <View className="flex items-center justify-between mb-2">
-                      <Text className="text-sm font-medium text-gray-900">{item.company}</Text>
-                      {item.isVerified ? (
-                        <View className="bg-blue-500 rounded-full px-2 py-0.5">
-                          <Text className="text-xs text-white">已认证</Text>
-                        </View>
-                      ) : (
-                        <View className="flex items-center gap-1">
-                          <CircleAlert size={12} color="#3b82f6" />
-                          <Text className="text-xs text-blue-500">待认证</Text>
-                        </View>
-                      )}
+                {resumeData.workRecords.map((item, i) => (
+                  <View key={item.id || i} className="bg-gray-50 rounded-lg p-3">
+                    <View className="flex items-center justify-between mb-1">
+                      <Text className="text-sm font-medium text-gray-900 flex-1 mr-2">{item.company}</Text>
+                      <Badge verified={item.isVerified} />
                     </View>
-                    <View className="flex items-center gap-2 mb-1">
-                      <Text className="text-xs text-gray-600">{item.position}</Text>
-                      <Text className="text-xs text-gray-400">|</Text>
-                      <Text className="text-xs text-gray-500">{item.startDate} - {item.endDate || '至今'}</Text>
-                    </View>
+                    <Text className="block text-xs text-gray-500 mb-1">
+                      {item.position}  |  {item.startDate} - {item.endDate || '至今'}
+                    </Text>
                     {item.description && (
-                      <Text className="text-xs text-gray-500">{item.description}</Text>
+                      <Text className="block text-xs text-gray-400">{item.description}</Text>
                     )}
                   </View>
                 ))}
               </View>
-            ) : (
-              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
-                <Text className="text-sm text-gray-400">暂无工作记录</Text>
-              </View>
-            )}
-          </CardContent>
-        </Card>
+            </SectionCard>
+          )}
 
-        {/* 技能证书 */}
-        <Card className="mb-4 bg-white">
-          <CardContent className="p-4">
-            <View className="flex items-center justify-between mb-3">
-              <View className="flex items-center gap-2">
-                <Text className="text-base font-semibold text-gray-900">技能证书</Text>
-                {resumeData?.certifications && resumeData.certifications.length > 0 && (
-                  <Text className="text-sm text-gray-500">| {resumeData.certifications.length}个</Text>
-                )}
-              </View>
-            </View>
-            {resumeData?.certifications && resumeData.certifications.length > 0 ? (
+          {/* 技能证书 */}
+          {resumeData.certifications?.length > 0 && (
+            <SectionCard title="技能证书" sub={`| ${resumeData.certifications.length}个`}>
               <View className="flex flex-row flex-wrap gap-3">
-                {resumeData.certifications.map((item, index) => (
-                  <View key={item.id || index} className="bg-white border border-gray-200 rounded-lg px-4 py-3 flex flex-col items-center">
-                    <View className="bg-blue-500 rounded-full px-2 py-0.5 mb-2">
-                      <Text className="text-xs text-white">已认证</Text>
-                    </View>
-                    <Text className="text-sm text-gray-700">{item.name}</Text>
+                {resumeData.certifications.map((item, i) => (
+                  <View key={item.id || i} className="bg-white border border-gray-200 rounded-lg px-4 py-3 flex flex-col items-center">
+                    <Badge verified={item.isVerified} />
+                    <Text className="text-sm text-gray-700 mt-2">{item.name}</Text>
                     {item.issuer && (
                       <Text className="text-xs text-gray-400 mt-1">{item.issuer}</Text>
                     )}
                   </View>
                 ))}
               </View>
-            ) : (
-              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
-                <Text className="text-sm text-gray-400">暂无技能证书</Text>
-              </View>
-            )}
-          </CardContent>
-        </Card>
+            </SectionCard>
+          )}
 
-        {/* 职业技能 */}
-        <Card className="mb-4 bg-white">
-          <CardContent className="p-4">
-            <View className="flex items-center justify-between mb-3">
-              <Text className="text-base font-semibold text-gray-900">职业技能</Text>
-            </View>
-            {resumeData?.skills && resumeData.skills.length > 0 ? (
+          {/* 职业技能 */}
+          {resumeData.skills?.length > 0 && (
+            <SectionCard title="职业技能">
               <View className="space-y-2">
-                {resumeData.skills.map((item, index) => (
-                  <View key={item.id || index} className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
-                    <View className="flex items-center gap-2">
+                {resumeData.skills.map((item, i) => (
+                  <View key={item.id || i} className="bg-gray-50 rounded-lg px-3 py-2.5 flex items-center justify-between">
+                    <View className="flex items-center gap-2 flex-1">
                       <Text className="text-sm text-gray-900">{item.name}</Text>
                       {item.level && (
                         <>
                           <Text className="text-xs text-gray-400">|</Text>
-                          <Text className="text-xs text-gray-600">{item.level}</Text>
+                          <Text className="text-xs text-gray-500">{item.level}</Text>
                         </>
                       )}
                     </View>
-                    {item.isVerified ? (
-                      <View className="bg-blue-500 rounded-full px-2 py-0.5">
-                        <Text className="text-xs text-white">已认证</Text>
-                      </View>
-                    ) : (
-                      <View className="flex items-center gap-1">
-                        <CircleAlert size={12} color="#3b82f6" />
-                        <Text className="text-xs text-blue-500">待认证</Text>
-                      </View>
-                    )}
+                    <Badge verified={item.isVerified} />
                   </View>
                 ))}
               </View>
-            ) : (
-              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
-                <Text className="text-sm text-gray-400">暂无职业技能</Text>
-              </View>
-            )}
-          </CardContent>
-        </Card>
+            </SectionCard>
+          )}
 
-        {/* 学历学籍 */}
-        <Card className="mb-4 bg-white">
-          <CardContent className="p-4">
-            <View className="flex items-center justify-between mb-3">
-              <Text className="text-base font-semibold text-gray-900">学历学籍</Text>
-            </View>
-            {resumeData?.education && resumeData.education.length > 0 ? (
+          {/* 学历学籍 */}
+          {resumeData.education?.length > 0 && (
+            <SectionCard title="学历学籍">
               <View className="space-y-3">
-                {resumeData.education.map((item, index) => (
-                  <View key={item.id || index} className="bg-gray-50 rounded-lg p-3">
-                    <View className="flex items-center justify-between mb-2">
-                      <View className="flex items-center gap-2">
-                        <Text className="text-sm font-medium text-gray-900">{item.school}</Text>
-                        <Text className="text-xs text-gray-400">|</Text>
-                        <Text className="text-xs text-gray-600">{item.degree}</Text>
-                      </View>
-                      {item.isVerified ? (
-                        <View className="bg-blue-500 rounded-full px-2 py-0.5">
-                          <Text className="text-xs text-white">已认证</Text>
-                        </View>
-                      ) : (
-                        <View className="bg-gray-300 rounded-full px-2 py-0.5">
-                          <Text className="text-xs text-white">待认证</Text>
-                        </View>
-                      )}
+                {resumeData.education.map((item, i) => (
+                  <View key={item.id || i} className="bg-gray-50 rounded-lg p-3">
+                    <View className="flex items-center justify-between mb-1">
+                      <Text className="text-sm font-medium text-gray-900 flex-1 mr-2">
+                        {item.school}  |  {item.degree}
+                      </Text>
+                      <Badge verified={item.isVerified} />
                     </View>
                     {item.major && (
-                      <Text className="text-xs text-gray-500">{item.major}</Text>
+                      <Text className="block text-xs text-gray-500 mb-0.5">{item.major}</Text>
                     )}
                     {(item.startDate || item.endDate) && (
-                      <Text className="text-xs text-gray-400 mt-1">{item.startDate} - {item.endDate}</Text>
+                      <Text className="block text-xs text-gray-400">{item.startDate} - {item.endDate}</Text>
                     )}
                   </View>
                 ))}
               </View>
-            ) : (
-              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
-                <Text className="text-sm text-gray-400">暂无学历信息</Text>
-              </View>
-            )}
-          </CardContent>
-        </Card>
+            </SectionCard>
+          )}
 
-        {/* 项目经历 */}
-        <Card className="mb-4 bg-white">
-          <CardContent className="p-4">
-            <View className="flex items-center justify-between mb-3">
-              <Text className="text-base font-semibold text-gray-900">项目经历</Text>
-            </View>
-            {resumeData?.projects && resumeData.projects.length > 0 ? (
+          {/* 项目经历 */}
+          {resumeData.projects?.length > 0 && (
+            <SectionCard title="项目经历">
               <View className="space-y-3">
-                {resumeData.projects.map((item, index) => (
-                  <View key={item.id || index} className="bg-gray-50 rounded-lg p-3">
-                    <View className="flex items-center justify-between mb-2">
-                      <Text className="text-sm font-medium text-gray-900">{item.name}</Text>
-                      {item.isVerified ? (
-                        <View className="bg-blue-500 rounded-full px-2 py-0.5">
-                          <Text className="text-xs text-white">已认证</Text>
-                        </View>
-                      ) : (
-                        <View className="flex items-center gap-1">
-                          <CircleAlert size={12} color="#3b82f6" />
-                          <Text className="text-xs text-blue-500">待认证</Text>
-                        </View>
-                      )}
+                {resumeData.projects.map((item, i) => (
+                  <View key={item.id || i} className="bg-gray-50 rounded-lg p-3">
+                    <View className="flex items-center justify-between mb-1">
+                      <Text className="text-sm font-medium text-gray-900 flex-1 mr-2">{item.name}</Text>
+                      <Badge verified={item.isVerified} />
                     </View>
                     {item.role && (
-                      <Text className="text-xs text-gray-600 mb-1">{item.role}</Text>
+                      <Text className="block text-xs text-gray-500 mb-0.5">{item.role}</Text>
                     )}
                     {item.description && (
-                      <Text className="text-xs text-gray-500">{item.description}</Text>
+                      <Text className="block text-xs text-gray-400">{item.description}</Text>
                     )}
                   </View>
                 ))}
               </View>
-            ) : (
-              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
-                <Text className="text-sm text-gray-400">暂无项目经历</Text>
-              </View>
-            )}
-          </CardContent>
-        </Card>
+            </SectionCard>
+          )}
 
-        {/* 语言能力 */}
-        <Card className="mb-4 bg-white">
-          <CardContent className="p-4">
-            <View className="flex items-center justify-between mb-3">
-              <Text className="text-base font-semibold text-gray-900">语言能力</Text>
-            </View>
-            {resumeData?.languages && resumeData.languages.length > 0 ? (
+          {/* 语言能力 */}
+          {resumeData.languages?.length > 0 && (
+            <SectionCard title="语言能力">
               <View className="space-y-2">
-                {resumeData.languages.map((item, index) => (
-                  <View key={item.id || index} className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
-                    <View className="flex items-center gap-2">
+                {resumeData.languages.map((item, i) => (
+                  <View key={item.id || i} className="bg-gray-50 rounded-lg px-3 py-2.5 flex items-center justify-between">
+                    <View className="flex items-center gap-2 flex-1">
                       <Text className="text-sm text-gray-900">{item.name}</Text>
                       <Text className="text-xs text-gray-400">|</Text>
-                      <Text className="text-xs text-gray-600">{item.level}</Text>
+                      <Text className="text-xs text-gray-500">{item.level}</Text>
                     </View>
-                    {item.isVerified ? (
-                      <View className="bg-blue-500 rounded-full px-2 py-0.5">
-                        <Text className="text-xs text-white">已认证</Text>
-                      </View>
-                    ) : (
-                      <View className="flex items-center gap-1">
-                        <CircleAlert size={12} color="#3b82f6" />
-                        <Text className="text-xs text-blue-500">待认证</Text>
-                      </View>
+                    <Badge verified={item.isVerified} />
+                  </View>
+                ))}
+              </View>
+            </SectionCard>
+          )}
+
+          {/* 其他 */}
+          {resumeData.other?.length > 0 && (
+            <SectionCard title="其他">
+              <View className="space-y-2">
+                {resumeData.other.map((item, i) => (
+                  <View key={item.id || i} className="bg-gray-50 rounded-lg px-3 py-2.5">
+                    <Text className="text-sm text-gray-900">{item.title}</Text>
+                    {item.content && (
+                      <Text className="block text-xs text-gray-400 mt-0.5">{item.content}</Text>
                     )}
                   </View>
                 ))}
               </View>
-            ) : (
-              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
-                <Text className="text-sm text-gray-400">暂无语言能力</Text>
-              </View>
-            )}
-          </CardContent>
-        </Card>
+            </SectionCard>
+          )}
 
-        {/* 其他信息区块 */}
-        <Card className="mb-4 bg-white">
-          <CardContent className="p-4">
-            <View className="flex items-center justify-between mb-3">
-              <Text className="text-base font-semibold text-gray-900">其他</Text>
-            </View>
-            {resumeData?.other && resumeData.other.length > 0 ? (
-              <View className="space-y-2">
-                {resumeData.other.map((item, index) => (
-                  <View key={item.id || index} className="bg-gray-50 rounded-lg p-3">
-                    <Text className="text-sm text-gray-900">{item.title}</Text>
-                  </View>
-                ))}
-              </View>
-            ) : (
-              <View className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
-                <Text className="text-sm text-gray-400">暂无其他信息</Text>
-              </View>
-            )}
-          </CardContent>
-        </Card>
-      </ScrollView>
+          <View className="h-8" />
+        </ScrollView>
+      )}
     </View>
   )
 }
