@@ -120,6 +120,7 @@ await figma.loadFontAsync({ family: 'Noto Sans SC', style: 'Medium' })
 await figma.loadFontAsync({ family: 'Noto Sans SC', style: 'Bold' })
 ```
 
+
 字重映射：
 
 | 用途 | 禁止 | 必须使用 |

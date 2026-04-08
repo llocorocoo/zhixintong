@@ -40,9 +40,9 @@ const ProfilePage: FC = () => {
   }
 
   const menuItems = [
-    { icon: Shield, title: '隐私设置', desc: '数据授权管理', action: () => {} },
-    { icon: Settings, title: '账户设置', desc: '密码、安全设置', action: () => {} },
-    { icon: CircleAlert, title: '帮助中心', desc: '常见问题与反馈', action: () => {} }
+    { icon: Shield, title: '隐私设置', desc: '数据授权管理', action: () => Taro.navigateTo({ url: '/pages/privacy/index' }) },
+    { icon: Settings, title: '账户设置', desc: '密码、安全设置', action: () => Taro.navigateTo({ url: '/pages/account-settings/index' }) },
+    { icon: CircleAlert, title: '帮助中心', desc: '常见问题与反馈', action: () => Taro.navigateTo({ url: '/pages/help-center/index' }) }
   ]
 
   return (
@@ -59,7 +59,7 @@ const ProfilePage: FC = () => {
               </Text>
               <Text className="text-sm text-gray-500">{userInfo?.phone || '未设置手机号'}</Text>
             </View>
-            <Button size="sm" variant="outline">
+            <Button size="sm" variant="outline" onClick={() => Taro.navigateTo({ url: '/pages/profile-edit/index' })}>
               <Text>编辑</Text>
             </Button>
           </View>

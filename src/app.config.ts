@@ -11,6 +11,10 @@ export default defineAppConfig({
     'pages/enhancement/index',
     'pages/work-history/index',
     'pages/credit-repair/index',
+    'pages/profile-edit/index',
+    'pages/privacy/index',
+    'pages/account-settings/index',
+    'pages/help-center/index',
     'pages/payment/index',
     'pages/profile/index'
   ],
