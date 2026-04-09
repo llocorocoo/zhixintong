@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cp src/network.mock.ts src/network.ts && pnpm build:web",
+  "buildCommand": "node -e \"require('fs').copyFileSync('src/network.mock.ts','src/network.ts')\" && npx taro build --type h5",
   "outputDirectory": "dist-web",
   "installCommand": "pnpm install",
   "rewrites": [
