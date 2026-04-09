@@ -8,12 +8,51 @@ import { Lock, Phone, ChevronRight, CircleAlert } from 'lucide-react-taro'
 import { useUserStore } from '@/stores/user'
 
 const AccountSettingsPage: FC = () => {
-  const { userInfo } = useUserStore()
+  const { userInfo, setUserInfo } = useUserStore()
   const [showChangePwd, setShowChangePwd] = useState(false)
+  const [showChangePhone, setShowChangePhone] = useState(false)
   const [oldPwd, setOldPwd] = useState('')
   const [newPwd, setNewPwd] = useState('')
   const [confirmPwd, setConfirmPwd] = useState('')
+  const [newPhone, setNewPhone] = useState('')
+  const [smsCode, setSmsCode] = useState('')
+  const [codeSent, setCodeSent] = useState(false)
+  const [countdown, setCountdown] = useState(0)
   const [saving, setSaving] = useState(false)
+
+  const handleSendCode = async () => {
+    if (!newPhone || newPhone.length !== 11) {
+      Taro.showToast({ title: '请输入正确的手机号', icon: 'none' })
+      return
+    }
+    setCodeSent(true)
+    setCountdown(60)
+    Taro.showToast({ title: '验证码已发送', icon: 'success' })
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) { clearInterval(timer); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  const handleChangePhone = async () => {
+    if (!newPhone || newPhone.length !== 11) {
+      Taro.showToast({ title: '请输入正确的手机号', icon: 'none' })
+      return
+    }
+    if (!smsCode) {
+      Taro.showToast({ title: '请输入验证码', icon: 'none' })
+      return
+    }
+    setSaving(true)
+    await new Promise(resolve => setTimeout(resolve, 800))
+    setUserInfo({ ...userInfo!, phone: newPhone })
+    setSaving(false)
+    setNewPhone(''); setSmsCode(''); setCodeSent(false)
+    setShowChangePhone(false)
+    Taro.showToast({ title: '手机号更换成功', icon: 'success' })
+  }
 
   const handleChangePwd = async () => {
     if (!oldPwd || !newPwd || !confirmPwd) {
@@ -55,7 +94,10 @@ const AccountSettingsPage: FC = () => {
       {/* 账号信息 */}
       <Card className="mx-4 mt-4 mb-4">
         <CardContent className="p-0">
-          <View className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+          <View
+            className="flex items-center justify-between px-4 py-4 border-b border-gray-100 active:bg-gray-50"
+            onClick={() => { setShowChangePhone(!showChangePhone); setShowChangePwd(false) }}
+          >
             <View className="flex items-center gap-3">
               <Phone size={18} color="#6b7280" />
               <View>
@@ -63,7 +105,7 @@ const AccountSettingsPage: FC = () => {
                 <Text className="block text-xs text-gray-500 mt-0.5">{userInfo?.phone || '未绑定'}</Text>
               </View>
             </View>
-            <View className="flex items-center gap-1 active:opacity-70">
+            <View className="flex items-center gap-1">
               <Text className="text-xs text-blue-500">更换</Text>
               <ChevronRight size={14} color="#3b82f6" />
             </View>
@@ -87,6 +129,61 @@ const AccountSettingsPage: FC = () => {
           </View>
         </CardContent>
       </Card>
+
+      {/* 更换手机号表单 */}
+      {showChangePhone && (
+        <Card className="mx-4 mb-4">
+          <CardContent className="p-4 space-y-3">
+            <Text className="block text-sm font-medium text-gray-900 mb-2">更换手机号</Text>
+
+            <View className="bg-gray-50 rounded-xl px-4 py-3 flex items-center gap-2">
+              <Phone size={16} color="#9ca3af" />
+              <Input
+                className="flex-1 bg-transparent text-sm"
+                placeholder="请输入新手机号"
+                type="number"
+                maxlength={11}
+                value={newPhone}
+                onInput={e => setNewPhone(e.detail.value)}
+              />
+            </View>
+
+            <View className="flex gap-2">
+              <View className="flex-1 bg-gray-50 rounded-xl px-4 py-3 flex items-center gap-2">
+                <Input
+                  className="flex-1 bg-transparent text-sm"
+                  placeholder="请输入验证码"
+                  type="number"
+                  maxlength={6}
+                  value={smsCode}
+                  onInput={e => setSmsCode(e.detail.value)}
+                />
+              </View>
+              <View
+                className={`px-4 py-3 rounded-xl flex items-center justify-center ${countdown > 0 ? 'bg-gray-100' : 'bg-blue-50 active:bg-blue-100'}`}
+                onClick={countdown === 0 ? handleSendCode : undefined}
+              >
+                <Text className={`text-sm font-medium ${countdown > 0 ? 'text-gray-400' : 'text-blue-500'}`}>
+                  {countdown > 0 ? `${countdown}s` : '获取验证码'}
+                </Text>
+              </View>
+            </View>
+
+            <View className="flex gap-3 pt-1">
+              <Button
+                className="flex-1"
+                variant="outline"
+                onClick={() => { setShowChangePhone(false); setNewPhone(''); setSmsCode(''); setCodeSent(false) }}
+              >
+                <Text className="text-gray-600">取消</Text>
+              </Button>
+              <Button className="flex-1 bg-blue-600" onClick={handleChangePhone} disabled={saving}>
+                <Text className="text-white">{saving ? '提交中...' : '确认更换'}</Text>
+              </Button>
+            </View>
+          </CardContent>
+        </Card>
+      )}
 
       {/* 修改密码表单 */}
       {showChangePwd && (
