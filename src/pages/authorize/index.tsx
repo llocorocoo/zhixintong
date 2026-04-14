@@ -1,58 +1,9 @@
-import { View, Text, ScrollView, Checkbox } from '@tarojs/components'
+import { View, Text, ScrollView } from '@tarojs/components'
 import { FC, useState, useEffect, useRef } from 'react'
 import Taro from '@tarojs/taro'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Shield, CircleAlert } from 'lucide-react-taro'
+import { ShieldCheck, CircleCheck } from 'lucide-react-taro'
 
-const AuthorizePage: FC = () => {
-  const [countdown, setCountdown] = useState(10)
-  const [canAgree, setCanAgree] = useState(false)
-  const [isChecked, setIsChecked] = useState(false)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
-
-  useEffect(() => {
-    // 10秒倒计时
-    timerRef.current = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          if (timerRef.current) {
-            clearInterval(timerRef.current)
-          }
-          setCanAgree(true)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current)
-      }
-    }
-  }, [])
-
-  const handleAgree = () => {
-    if (!canAgree || !isChecked) return
-
-    Taro.navigateTo({ url: '/pages/report-form/index' })
-  }
-
-  const handleCancel = () => {
-    Taro.showModal({
-      title: '取消授权',
-      content: '取消授权将无法生成职业信用报告，确定取消吗？',
-      success: (res) => {
-        if (res.confirm) {
-          Taro.navigateBack()
-        }
-      }
-    })
-  }
-
-  const agreementContent = `
-《信息核查授权书》
+const AGREEMENT = `《信息核查授权书》
 
 尊敬的用户：
 
@@ -61,12 +12,12 @@ const AuthorizePage: FC = () => {
 一、授权范围
 1. 授权平台查询并验证您的身份信息、学历学位信息、职业资格证书等。
 2. 授权平台通过合法渠道获取您的信用信息，包括但不限于：
-   - 身份学历信息
-   - 职业资格信息
-   - 诉讼记录信息
-   - 投资任职信息
-   - 金融信用信息
-   - 黑名单信息
+   · 身份学历信息
+   · 职业资格信息
+   · 诉讼记录信息
+   · 投资任职信息
+   · 金融信用信息
+   · 黑名单信息
 
 二、信息使用
 1. 您授权的信息仅用于生成职业信用报告，不会用于其他商业用途。
@@ -83,95 +34,145 @@ const AuthorizePage: FC = () => {
 五、特别提示
 1. 请确保您提供的信息真实、准确、完整。
 2. 虚假信息将影响您的信用评分，并可能导致法律风险。
-3. 如有疑问，请联系客服咨询。
+3. 如有疑问，请联系客服咨询。`
 
-请您阅读完毕后，勾选确认并点击"同意授权"按钮。
-`
+const SCOPE_ITEMS = [
+  '身份信息（公安接口核实）',
+  '学历学位信息（学信网核实）',
+  '职业资格证书（行业协会）',
+  '司法及诉讼记录',
+  '金融征信信息（授权后）',
+  '行业黑名单核查',
+]
+
+const AuthorizePage: FC = () => {
+  const [countdown, setCountdown] = useState(10)
+  const [canAgree, setCanAgree] = useState(false)
+  const [isChecked, setIsChecked] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!)
+          setCanAgree(true)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [])
+
+  const handleAgree = () => {
+    if (!canAgree || !isChecked) return
+    Taro.navigateTo({ url: '/pages/report-form/index' })
+  }
+
+  const handleCancel = () => {
+    Taro.showModal({
+      title: '取消授权',
+      content: '取消授权将无法生成职业信用报告，确定取消吗？',
+      success: res => { if (res.confirm) Taro.navigateBack() }
+    })
+  }
+
+  const active = canAgree && isChecked
 
   return (
-    <View className="min-h-screen bg-gray-50 p-4">
-      {/* 提示卡片 */}
-      <Card className="mb-4 border-blue-200 bg-blue-50">
-        <CardContent className="p-4">
-          <View className="flex items-start gap-3">
-            <CircleAlert size={20} color="#3b82f6" className="mt-0.5" />
-            <View className="flex-1">
-              <Text className="block text-base font-medium text-gray-900 mb-1">
-                请仔细阅读授权书
-              </Text>
-              <Text className="block text-sm text-gray-600">
-                需阅读满10秒后方可授权，请确保您已充分了解授权内容。
-              </Text>
-            </View>
-          </View>
-        </CardContent>
-      </Card>
+    <View className="fixed inset-0 flex flex-col" style={{ background: '#f0f4f8' }}>
 
-      {/* 授权书内容 */}
-      <Card className="mb-4">
-        <CardHeader>
-          <View className="flex items-center gap-2">
-            <Shield size={20} color="#3b82f6" />
-            <CardTitle>信息核查授权书</CardTitle>
+      {/* 顶部 */}
+      <View style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', padding: '48px 16px 24px' }}>
+        <View className="flex items-center gap-3 mb-3">
+          <View className="w-10 h-10 rounded-2xl bg-white bg-opacity-20 flex items-center justify-center">
+            <ShieldCheck size={22} color="#ffffff" />
           </View>
-        </CardHeader>
-        <CardContent>
-          <ScrollView
-            className="bg-gray-50 rounded-lg p-4"
-            style={{ height: '300px' }}
-            scrollY
-          >
-            <Text className="block text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-              {agreementContent}
-            </Text>
-          </ScrollView>
-        </CardContent>
-      </Card>
-
-      {/* 倒计时提示 */}
-      {!canAgree && (
-        <View className="text-center mb-4">
-          <Text className="text-sm text-gray-500">
-            请继续阅读，剩余 {countdown} 秒
-          </Text>
+          <View>
+            <Text className="block text-white text-lg font-bold">信息核查授权</Text>
+            <Text className="block text-blue-200 text-xs">请仔细阅读并确认以下授权内容</Text>
+          </View>
         </View>
-      )}
 
-      {/* 勾选确认 */}
-      <View className="flex items-start gap-3 mb-6 px-2">
-        <Checkbox
-          value="agree"
-          checked={isChecked}
-          color="#3b82f6"
-          className="mt-0.5"
-          onClick={() => setIsChecked(!isChecked)}
-        />
-        <Text
-          className="text-sm text-gray-600 leading-relaxed"
-          onClick={() => canAgree && setIsChecked(!isChecked)}
-        >
-          我已仔细阅读并同意《信息核查授权书》的全部内容，授权平台查询我的相关信息。
-        </Text>
+        {/* 倒计时或已可授权 */}
+        {!canAgree ? (
+          <View className="flex items-center gap-2 bg-white bg-opacity-15 rounded-2xl px-4 py-3">
+            <View className="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+              <Text className="text-white font-bold text-sm">{countdown}</Text>
+            </View>
+            <Text className="text-white text-sm">请阅读完毕后方可授权，剩余 {countdown} 秒</Text>
+          </View>
+        ) : (
+          <View className="flex items-center gap-2 bg-white bg-opacity-15 rounded-2xl px-4 py-3">
+            <CircleCheck size={20} color="#86efac" />
+            <Text className="text-white text-sm">已阅读完毕，请勾选确认后授权</Text>
+          </View>
+        )}
       </View>
 
-      {/* 按钮组 */}
-      <View className="space-y-3">
-        <Button
-          className={`w-full ${canAgree && isChecked ? 'bg-blue-600' : 'bg-gray-300'}`}
-          disabled={!canAgree || !isChecked}
-          onClick={handleAgree}
+      {/* 授权范围概览 */}
+      <View className="mx-4 mt-4 bg-white rounded-2xl px-4 py-4" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+        <Text className="block text-sm font-semibold text-gray-900 mb-3">授权核查范围</Text>
+        <View className="flex flex-wrap gap-2">
+          {SCOPE_ITEMS.map((item, i) => (
+            <View key={i} className="flex items-center gap-1 bg-blue-50 rounded-full px-3 py-1">
+              <CircleCheck size={12} color="#3b82f6" />
+              <Text className="text-xs text-blue-600">{item}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* 授权书全文 */}
+      <View className="flex-1 mx-4 mt-3 min-h-0">
+        <View className="bg-white rounded-2xl overflow-hidden h-full flex flex-col" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+          <View className="px-4 py-3 border-b border-gray-50 flex-shrink-0">
+            <Text className="text-sm font-semibold text-gray-700">授权书全文</Text>
+          </View>
+          <ScrollView scrollY className="flex-1 px-4 py-3">
+            <Text className="text-xs text-gray-500 leading-relaxed whitespace-pre-wrap">{AGREEMENT}</Text>
+          </ScrollView>
+        </View>
+      </View>
+
+      {/* 底部勾选 + 按钮 */}
+      <View className="mx-4 mt-3 mb-6">
+        {/* 勾选框 */}
+        <View
+          className="flex items-start gap-3 bg-white rounded-2xl px-4 py-3.5 mb-3 active:bg-gray-50"
+          style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}
+          onClick={() => canAgree && setIsChecked(!isChecked)}
         >
-          <Text className="text-white font-medium">
-            {canAgree ? '同意授权' : `请阅读 (${countdown}s)`}
+          <View className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${isChecked ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
+            {isChecked && <Text className="text-white text-xs font-bold leading-none">✓</Text>}
+          </View>
+          <Text className="text-sm text-gray-600 leading-relaxed flex-1">
+            我已仔细阅读并同意《信息核查授权书》的全部内容，授权平台查询我的相关信息。
           </Text>
-        </Button>
-        <Button
-          className="w-full"
-          variant="outline"
-          onClick={handleCancel}
-        >
-          <Text className="text-gray-600">取消</Text>
-        </Button>
+        </View>
+
+        {/* 按钮组 */}
+        <View className="flex gap-3">
+          <View
+            className="flex-1 rounded-2xl py-3.5 flex items-center justify-center border border-gray-200 bg-white active:bg-gray-50"
+            onClick={handleCancel}
+          >
+            <Text className="text-sm font-medium text-gray-500">取消</Text>
+          </View>
+          <View
+            className="flex-1 rounded-2xl py-3.5 flex items-center justify-center active:opacity-80"
+            style={{
+              background: active ? 'linear-gradient(135deg, #1e40af, #3b82f6)' : '#e5e7eb',
+              boxShadow: active ? '0 4px 16px rgba(59,130,246,0.35)' : 'none'
+            }}
+            onClick={handleAgree}
+          >
+            <Text className={`text-sm font-semibold ${active ? 'text-white' : 'text-gray-400'}`}>
+              {canAgree ? '同意授权' : `请阅读 (${countdown}s)`}
+            </Text>
+          </View>
+        </View>
       </View>
     </View>
   )
