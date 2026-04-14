@@ -172,21 +172,6 @@ const IndexPage: FC = () => {
             {!creditScore && (
               <Text className="block text-xs text-gray-400 mt-2">生成信用报告后将自动同步评分</Text>
             )}
-
-            {/* 6维度进度条（有评分时显示） */}
-            {creditScore?.factors && (
-              <View className="mt-4 space-y-2">
-                {Object.entries(creditScore.factors).map(([key, val]) => (
-                  <View key={key} className="flex items-center gap-2">
-                    <Text className="text-xs text-gray-400 w-10 flex-shrink-0">{FACTOR_LABELS[key]}</Text>
-                    <View className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <View className="h-full rounded-full" style={{ width: `${val}%`, backgroundColor: FACTOR_COLORS[key] || '#3b82f6' }} />
-                    </View>
-                    <Text className="text-xs font-medium text-gray-600 w-6 text-right">{val}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
           </View>
 
           {/* 展开详情 toggle */}
