@@ -3,7 +3,10 @@ import { FC, useState, useEffect, useCallback } from 'react'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { FileText, Download, Share, CircleCheck, CircleAlert, Clock, RefreshCw, Eye, FileSearch, ArrowRight, RotateCcw, ChevronRight } from 'lucide-react-taro'
+import {
+  FileText, Download, Share, CircleCheck, CircleAlert,
+  Clock, RefreshCw, Eye, FileSearch, ArrowRight, RotateCcw, ChevronRight
+} from 'lucide-react-taro'
 
 interface ReportData {
   id: string
@@ -19,6 +22,7 @@ interface ReportData {
 const ReportPage: FC = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [syncing, setSyncing] = useState(false)
+  const [pressedBtn, setPressedBtn] = useState<string | null>(null)
   const { isLoggedIn, userInfo } = useUserStore()
 
   const fetchLatestReport = useCallback(async () => {
@@ -50,7 +54,9 @@ const ReportPage: FC = () => {
     } catch { Taro.hideLoading(); Taro.showToast({ title: '下载失败', icon: 'none' }) }
   }
 
-  const handleShare = () => { if (reportData?.reportUrl) Taro.showShareMenu({ withShareTicket: true }) }
+  const handleShare = () => {
+    if (reportData?.reportUrl) Taro.showShareMenu({ withShareTicket: true })
+  }
 
   const handlePreview = () => {
     if (!reportData?.reportUrl) return
@@ -70,226 +76,277 @@ const ReportPage: FC = () => {
   }
 
   const verificationSteps = [
-    { id: 'identity', title: '身份信息核实', status: reportData?.identityInfo ? 'completed' : 'pending' },
-    { id: 'education', title: '学历信息核实', status: reportData?.educationInfo ? 'completed' : 'pending' },
-    { id: 'qualification', title: '职业资格核实', status: reportData?.qualificationInfo ? 'completed' : 'pending' },
+    { id: 'identity',      title: '身份信息核实', done: !!reportData?.identityInfo },
+    { id: 'education',     title: '学历信息核实', done: !!reportData?.educationInfo },
+    { id: 'qualification', title: '职业资格核实', done: !!reportData?.qualificationInfo },
   ]
 
-  return (
-    <View className="min-h-screen" style={{ background: '#f0f4f8' }}>
+  const btn = (id: string) => ({
+    transform: pressedBtn === id ? 'scale(0.97)' : 'scale(1)',
+    transition: 'all 0.2s ease',
+  })
 
-      {/* 顶部渐变头 */}
-      <View style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', paddingTop: '48px', paddingBottom: '72px', paddingLeft: '16px', paddingRight: '16px' }}>
-        <Text className="block text-white text-xl font-bold mb-1">职业信用报告</Text>
-        <Text className="block text-blue-200 text-sm">记录您的职业信用，成为职场通行证</Text>
+  const press = (id: string) => setPressedBtn(id)
+  const release = () => setPressedBtn(null)
+
+  return (
+    <View style={{ background: '#f6f8fc', minHeight: '100vh', paddingBottom: '88px' }}>
+
+      {/* ── 蓝色渐变头部 ── */}
+      <View style={{
+        background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)',
+        padding: '48px 20px 72px',
+        position: 'relative', overflow: 'hidden',
+      }}>
+        {/* 装饰光晕 */}
+        <View style={{ position: 'absolute', top: '-40px', right: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <Text style={{ fontSize: '22px', fontWeight: '800', color: '#fff', display: 'block', lineHeight: '1.3', letterSpacing: '0.5px' }}>职业信用报告</Text>
+        <Text style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', display: 'block', marginTop: '4px', lineHeight: '1.5' }}>记录您的职业信用，成为职场通行证</Text>
       </View>
 
-      <View className="px-4 -mt-10 pb-8 space-y-4">
+      {/* ── 主内容（上移覆盖头部底部） ── */}
+      <View style={{ padding: '0 16px', marginTop: '-44px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-        {/* ── 空状态 ── */}
+        {/* ══ 空状态 ══ */}
         {!reportData && (
-          <View className="bg-white rounded-3xl overflow-hidden" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
-            <View className="px-6 pt-8 pb-6 flex flex-col items-center text-center">
-              <View className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-4">
-                <FileSearch size={36} color="#3b82f6" />
+          <View style={{ background: '#fff', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.08)' }}>
+            {/* 插画区 */}
+            <View style={{ padding: '36px 24px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <View style={{
+                width: '88px', height: '88px', borderRadius: '50%',
+                background: 'linear-gradient(135deg, #1e40af, #3b82f6)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                marginBottom: '20px',
+                boxShadow: '0 8px 24px rgba(37,99,235,0.35)',
+              }}>
+                <FileSearch size={40} color="#fff" />
               </View>
-              <Text className="text-lg font-bold text-gray-900 mb-2">暂无信用报告</Text>
-              <Text className="text-sm text-gray-500 leading-relaxed mb-6">
-                生成职业信用报告后，您将获得完整的职业信用评估，可用于求职、背调等场景。
+              <Text style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', display: 'block', lineHeight: '1.4', marginBottom: '8px' }}>暂无信用报告</Text>
+              <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', lineHeight: '1.7', textAlign: 'center' }}>
+                生成报告后获得完整职业信用评估，可用于求职、背调等场景
               </Text>
-              <View className="w-full space-y-2">
-                {[
-                  { text: '求职应聘，展示个人信用' },
-                  { text: '背景调查，快速通过核验' },
-                  { text: '职业发展，建立信用档案' },
-                ].map((item, i) => (
-                  <View key={i} className="flex items-center gap-2 bg-green-50 rounded-xl px-3 py-2">
-                    <CircleCheck size={16} color="#10b981" />
-                    <Text className="text-sm text-gray-600">{item.text}</Text>
-                  </View>
-                ))}
-              </View>
             </View>
-            <View className="px-6 pb-6">
+
+            {/* 用途卡片 */}
+            <View style={{ display: 'flex', gap: '8px', padding: '0 20px 20px' }}>
+              {[
+                { icon: '🎯', text: '求职应聘' },
+                { icon: '🔍', text: '背景调查' },
+                { icon: '📋', text: '职业档案' },
+              ].map((item, i) => (
+                <View key={i} style={{ flex: 1, background: '#f8fafc', borderRadius: '14px', padding: '12px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                  <Text style={{ fontSize: '20px', lineHeight: '1' }}>{item.icon}</Text>
+                  <Text style={{ fontSize: '11px', color: '#64748b', fontWeight: '500', lineHeight: '1.5' }}>{item.text}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* CTA */}
+            <View style={{ padding: '0 20px 24px' }}>
               <View
-                className="w-full rounded-2xl py-4 flex items-center justify-center gap-2 active:opacity-80"
-                style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', boxShadow: '0 4px 16px rgba(59,130,246,0.35)' }}
+                style={{
+                  ...btn('create'),
+                  borderRadius: '16px', padding: '15px 0',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                  background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
+                  boxShadow: '0 6px 20px rgba(37,99,235,0.4)',
+                }}
+                onTouchStart={() => press('create')}
+                onTouchEnd={release} onTouchCancel={release}
                 onClick={handleCreateReport}
               >
-                <FileText size={18} color="#ffffff" />
-                <Text className="text-white font-semibold">立即生成信用报告</Text>
-                <View className="bg-white bg-opacity-20 rounded-full px-2 py-0.5 ml-1">
-                  <Text className="text-yellow-200 text-xs font-bold">¥50</Text>
+                <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>立即生成信用报告</Text>
+                <View style={{ background: 'rgba(255,255,255,0.18)', borderRadius: '20px', padding: '2px 8px' }}>
+                  <Text style={{ color: '#fde68a', fontSize: '12px', fontWeight: '700', lineHeight: '1.5' }}>¥50</Text>
                 </View>
               </View>
             </View>
           </View>
         )}
 
-        {/* ── 报告状态卡片 ── */}
+        {/* ══ 报告状态卡片 ══ */}
         {reportData && (
-          <View className="bg-white rounded-3xl overflow-hidden" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+          <View style={{ background: '#fff', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.08)' }}>
 
-            {/* 报告头部信息 */}
-            <View className="px-5 pt-5 pb-4 border-b border-gray-50">
-              <View className="flex items-center justify-between mb-1">
-                <View className="flex items-center gap-2">
-                  <FileText size={18} color="#3b82f6" />
-                  <Text className="text-base font-bold text-gray-900">职业信用报告</Text>
+            {/* 报告头信息 */}
+            <View style={{ padding: '20px 20px 16px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <View style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <FileText size={18} color="#2563eb" />
                 </View>
-                {/* 状态标签 */}
-                <View className={`px-3 py-1 rounded-full ${
-                  reportData.status === 'completed' ? 'bg-green-50' :
-                  reportData.status === 'processing' ? 'bg-blue-50' : 'bg-red-50'
-                }`}>
-                  <Text className={`text-xs font-medium ${
-                    reportData.status === 'completed' ? 'text-green-600' :
-                    reportData.status === 'processing' ? 'text-blue-600' : 'text-red-500'
-                  }`}>
-                    {reportData.status === 'completed' ? '已完成' :
-                     reportData.status === 'processing' ? '核查中' : '生成失败'}
-                  </Text>
+                <View>
+                  <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', display: 'block', lineHeight: '1.4' }}>职业信用报告</Text>
+                  <Text style={{ fontSize: '11px', color: '#94a3b8', display: 'block', lineHeight: '1.5' }}>{reportData.reportNo}</Text>
                 </View>
               </View>
-              <Text className="text-xs text-gray-400">报告编号：{reportData.reportNo}</Text>
+              <View style={{
+                padding: '4px 12px', borderRadius: '20px',
+                background: reportData.status === 'completed' ? 'rgba(5,150,105,0.1)' : reportData.status === 'processing' ? 'rgba(37,99,235,0.1)' : 'rgba(220,38,38,0.1)',
+              }}>
+                <Text style={{
+                  fontSize: '12px', fontWeight: '600', lineHeight: '1.5',
+                  color: reportData.status === 'completed' ? '#059669' : reportData.status === 'processing' ? '#2563eb' : '#dc2626',
+                }}>
+                  {reportData.status === 'completed' ? '已完成' : reportData.status === 'processing' ? '核查中' : '生成失败'}
+                </Text>
+              </View>
             </View>
 
-            {/* 核查中状态 */}
+            {/* ─ 核查中 ─ */}
             {reportData.status === 'processing' && (
-              <View className="px-5 py-5">
-                <View className="flex items-center justify-between mb-3">
-                  <Text className="text-sm text-gray-500">核查进度</Text>
-                  <Text className="text-sm font-medium text-blue-600">核查中...</Text>
+              <View style={{ padding: '20px' }}>
+                <View style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <Text style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>核查进度</Text>
+                  <Text style={{ fontSize: '13px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>核查中...</Text>
                 </View>
                 {/* 进度条 */}
-                <View className="h-2 bg-gray-100 rounded-full mb-5 overflow-hidden">
-                  <View className="h-full bg-blue-500 rounded-full" style={{ width: '50%' }} />
+                <View style={{ height: '6px', background: '#e2e8f0', borderRadius: '3px', marginBottom: '20px', overflow: 'hidden' }}>
+                  <View style={{ height: '100%', width: '50%', borderRadius: '3px', background: 'linear-gradient(90deg, #1e40af, #3b82f6)', transition: 'width 0.6s ease' }} />
                 </View>
-                <View className="space-y-3">
-                  {verificationSteps.map((step) => (
-                    <View key={step.id} className="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3">
-                      {step.status === 'completed'
-                        ? <CircleCheck size={20} color="#10b981" />
-                        : <Clock size={20} color="#f59e0b" />}
-                      <Text className="text-sm text-gray-700">{step.title}</Text>
+                {/* 时间轴步骤 */}
+                <View style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                  {verificationSteps.map((step, i) => (
+                    <View key={step.id} style={{ display: 'flex', gap: '12px' }}>
+                      {/* 左侧轴 */}
+                      <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '20px', flexShrink: 0 }}>
+                        <View style={{ width: '20px', height: '20px', borderRadius: '50%', background: step.done ? '#059669' : '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {step.done
+                            ? <CircleCheck size={14} color="#fff" />
+                            : <Clock size={12} color="#94a3b8" />}
+                        </View>
+                        {i < verificationSteps.length - 1 && (
+                          <View style={{ width: '2px', flex: 1, minHeight: '20px', background: step.done ? '#059669' : '#e2e8f0', margin: '2px 0' }} />
+                        )}
+                      </View>
+                      {/* 内容 */}
+                      <View style={{ paddingBottom: i < verificationSteps.length - 1 ? '16px' : '0', paddingTop: '1px' }}>
+                        <Text style={{ fontSize: '13px', color: step.done ? '#0f172a' : '#94a3b8', fontWeight: step.done ? '600' : '400', lineHeight: '1.5' }}>{step.title}</Text>
+                      </View>
                     </View>
                   ))}
                 </View>
-                <View className="mt-4 bg-blue-50 rounded-2xl p-4">
-                  <Text className="text-sm text-blue-600 leading-relaxed">预计 1-3 个工作日完成核查，届时将通知您查看报告。</Text>
+                <View style={{ marginTop: '16px', background: '#eff6ff', borderRadius: '12px', padding: '12px 14px' }}>
+                  <Text style={{ fontSize: '12px', color: '#2563eb', lineHeight: '1.7' }}>预计 1-3 个工作日完成核查，届时将通知您查看报告。</Text>
                 </View>
               </View>
             )}
 
-            {/* 已完成状态 */}
+            {/* ─ 已完成 ─ */}
             {reportData.status === 'completed' && (
-              <View className="px-5 py-5">
-                {/* 成功提示 */}
-                <View className="flex items-center gap-3 bg-green-50 rounded-2xl px-4 py-4 mb-5">
-                  <CircleCheck size={22} color="#10b981" />
+              <View style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {/* 成功横幅 */}
+                <View style={{ background: 'rgba(5,150,105,0.08)', borderRadius: '14px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '10px', borderLeft: '3px solid #059669' }}>
+                  <CircleCheck size={20} color="#059669" />
                   <View>
-                    <Text className="block text-sm font-semibold text-green-700">报告已生成</Text>
-                    <Text className="block text-xs text-green-600 mt-0.5">可预览、下载或分享您的信用报告</Text>
+                    <Text style={{ fontSize: '14px', fontWeight: '600', color: '#064e3b', display: 'block', lineHeight: '1.4' }}>报告已生成</Text>
+                    <Text style={{ fontSize: '12px', color: '#6ee7b7', display: 'block', lineHeight: '1.5', color: '#059669', opacity: 0.8 }}>可预览、下载或分享您的信用报告</Text>
                   </View>
                 </View>
 
-                {/* 主操作：预览 */}
+                {/* 主 CTA：预览 */}
                 <View
-                  className="w-full rounded-2xl py-4 flex items-center justify-center gap-2 mb-3 active:opacity-80"
-                  style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', boxShadow: '0 4px 16px rgba(59,130,246,0.3)' }}
+                  style={{ ...btn('preview'), borderRadius: '16px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)', boxShadow: '0 6px 20px rgba(37,99,235,0.35)' }}
+                  onTouchStart={() => press('preview')} onTouchEnd={release} onTouchCancel={release}
                   onClick={handlePreview}
                 >
-                  <Eye size={18} color="#ffffff" />
-                  <Text className="text-white font-semibold">预览报告</Text>
+                  <Eye size={17} color="#fff" />
+                  <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>预览报告</Text>
                 </View>
 
-                {/* 次操作：下载 + 分享 */}
-                <View className="flex gap-3 mb-3">
-                  <View
-                    className="flex-1 flex items-center justify-center gap-1.5 bg-gray-50 rounded-2xl py-3 active:bg-gray-100"
-                    onClick={handleDownload}
-                  >
-                    <Download size={16} color="#3b82f6" />
-                    <Text className="text-sm font-medium text-blue-600">下载</Text>
-                  </View>
-                  <View
-                    className="flex-1 flex items-center justify-center gap-1.5 bg-gray-50 rounded-2xl py-3 active:bg-gray-100"
-                    onClick={handleShare}
-                  >
-                    <Share size={16} color="#3b82f6" />
-                    <Text className="text-sm font-medium text-blue-600">分享</Text>
-                  </View>
+                {/* 下载 + 分享 */}
+                <View style={{ display: 'flex', gap: '10px' }}>
+                  {[
+                    { id: 'download', icon: Download, label: '下载', onClick: handleDownload },
+                    { id: 'share',    icon: Share,    label: '分享', onClick: handleShare },
+                  ].map(item => (
+                    <View
+                      key={item.id}
+                      style={{ ...btn(item.id), flex: 1, borderRadius: '14px', padding: '12px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f8fafc', border: '1.5px solid #e2e8f0' }}
+                      onTouchStart={() => press(item.id)} onTouchEnd={release} onTouchCancel={release}
+                      onClick={item.onClick}
+                    >
+                      <item.icon size={16} color="#2563eb" />
+                      <Text style={{ fontSize: '14px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>{item.label}</Text>
+                    </View>
+                  ))}
                 </View>
 
                 {/* 更新报告 */}
                 <View
-                  className="flex items-center justify-between bg-orange-50 rounded-2xl px-4 py-3.5 mb-3 active:bg-orange-100"
+                  style={{ ...btn('update'), background: '#fffbeb', borderRadius: '14px', padding: '14px 16px', display: 'flex', alignItems: 'center' }}
+                  onTouchStart={() => press('update')} onTouchEnd={release} onTouchCancel={release}
                   onClick={handleUpdateReport}
                 >
-                  <View className="flex items-center gap-2">
-                    <RotateCcw size={18} color="#f59e0b" />
-                    <Text className="text-sm font-medium text-gray-800">更新信用报告</Text>
+                  <RotateCcw size={18} color="#d97706" />
+                  <Text style={{ flex: 1, fontSize: '14px', fontWeight: '500', color: '#0f172a', marginLeft: '10px', lineHeight: '1.5' }}>更新信用报告</Text>
+                  <View style={{ background: '#fde68a', borderRadius: '20px', padding: '2px 10px', marginRight: '6px' }}>
+                    <Text style={{ fontSize: '12px', fontWeight: '700', color: '#92400e', lineHeight: '1.5' }}>¥9.9</Text>
                   </View>
-                  <View className="flex items-center gap-1.5">
-                    <Text className="text-sm font-bold text-orange-500">¥9.9</Text>
-                    <ChevronRight size={16} color="#f59e0b" />
-                  </View>
+                  <ChevronRight size={16} color="#d97706" />
                 </View>
 
                 {/* 同步简历 */}
                 <View
-                  className="flex items-center justify-between bg-green-50 rounded-2xl px-4 py-3.5 active:bg-green-100"
+                  style={{ ...btn('sync'), background: 'rgba(5,150,105,0.07)', borderRadius: '14px', padding: '14px 16px', display: 'flex', alignItems: 'center' }}
+                  onTouchStart={() => press('sync')} onTouchEnd={release} onTouchCancel={release}
                   onClick={handleSyncToResume}
                 >
-                  <View className="flex items-center gap-2">
-                    <RefreshCw size={18} color="#10b981" />
-                    <Text className="text-sm font-medium text-gray-800">{syncing ? '同步中...' : '更新可信简历'}</Text>
+                  <RefreshCw size={18} color="#059669" />
+                  <Text style={{ flex: 1, fontSize: '14px', fontWeight: '500', color: '#0f172a', marginLeft: '10px', lineHeight: '1.5' }}>{syncing ? '同步中...' : '更新可信简历'}</Text>
+                  <View style={{ background: 'rgba(5,150,105,0.15)', borderRadius: '20px', padding: '2px 10px', marginRight: '6px' }}>
+                    <Text style={{ fontSize: '12px', fontWeight: '600', color: '#059669', lineHeight: '1.5' }}>免费</Text>
                   </View>
-                  <View className="flex items-center gap-1.5">
-                    <View className="bg-green-100 rounded-full px-2 py-0.5">
-                      <Text className="text-xs font-medium text-green-600">免费</Text>
-                    </View>
-                    <ChevronRight size={16} color="#10b981" />
-                  </View>
+                  <ChevronRight size={16} color="#059669" />
                 </View>
               </View>
             )}
 
-            {/* 失败状态 */}
+            {/* ─ 失败 ─ */}
             {reportData.status === 'failed' && (
-              <View className="px-5 py-8 flex flex-col items-center">
-                <View className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
-                  <CircleAlert size={32} color="#ef4444" />
+              <View style={{ padding: '32px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <View style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'rgba(220,38,38,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+                  <CircleAlert size={34} color="#dc2626" />
                 </View>
-                <Text className="text-base font-semibold text-gray-900 mb-2">报告生成失败</Text>
-                <Text className="text-sm text-gray-500 mb-6 text-center">请重新提交信息或联系客服</Text>
+                <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '6px', lineHeight: '1.4' }}>报告生成失败</Text>
+                <Text style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '24px', lineHeight: '1.6', textAlign: 'center' }}>请重新提交信息或联系客服</Text>
                 <View
-                  className="rounded-2xl px-6 py-3 flex items-center gap-2 active:opacity-80"
-                  style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)' }}
+                  style={{ ...btn('retry'), borderRadius: '14px', padding: '12px 28px', display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.3)' }}
+                  onTouchStart={() => press('retry')} onTouchEnd={release} onTouchCancel={release}
                   onClick={handleCreateReport}
                 >
-                  <Text className="text-white font-semibold">重新生成</Text>
-                  <Text className="text-yellow-200 text-sm font-bold">¥50</Text>
+                  <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>重新生成</Text>
+                  <View style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '20px', padding: '1px 8px' }}>
+                    <Text style={{ color: '#fde68a', fontSize: '12px', fontWeight: '700', lineHeight: '1.5' }}>¥50</Text>
+                  </View>
                 </View>
               </View>
             )}
           </View>
         )}
+      </View>
 
-        {/* ── 查看样例报告 ── */}
+      {/* ── 样例报告悬浮入口 ── */}
+      <View style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0,
+        padding: '10px 16px 24px',
+        background: 'rgba(246,248,252,0.9)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderTop: '1px solid rgba(0,0,0,0.06)',
+      }}>
         <View
-          className="bg-white rounded-2xl flex items-center px-5 py-4 active:opacity-90"
-          style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
+          style={{ ...btn('sample'), background: '#fff', borderRadius: '16px', padding: '13px 20px', display: 'flex', alignItems: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}
+          onTouchStart={() => press('sample')} onTouchEnd={release} onTouchCancel={release}
           onClick={() => Taro.navigateTo({ url: '/pages/sample-report/index' })}
         >
-          <View className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mr-4">
-            <Eye size={20} color="#8b5cf6" />
+          <View style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '12px', flexShrink: 0 }}>
+            <Eye size={18} color="#7c3aed" />
           </View>
-          <View className="flex-1">
-            <Text className="block text-sm font-semibold text-gray-900">查看样例报告</Text>
-            <Text className="block text-xs text-gray-400 mt-0.5">了解报告包含哪些内容</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', display: 'block', lineHeight: '1.4' }}>查看样例报告</Text>
+            <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', lineHeight: '1.5' }}>了解报告包含哪些内容</Text>
           </View>
-          <ChevronRight size={18} color="#9ca3af" />
+          <ChevronRight size={16} color="#94a3b8" />
         </View>
       </View>
     </View>
