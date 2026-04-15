@@ -84,7 +84,7 @@ const AuthorizePage: FC = () => {
     <View className="fixed inset-0 flex flex-col" style={{ background: '#f0f4f8' }}>
 
       {/* 顶部 */}
-      <View style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', padding: '48px 16px 24px' }}>
+      <View style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', padding: '16px 16px 24px' }}>
         <View className="flex items-center gap-3 mb-3">
           <View className="w-10 h-10 rounded-2xl bg-white bg-opacity-20 flex items-center justify-center">
             <ShieldCheck size={22} color="#ffffff" />
