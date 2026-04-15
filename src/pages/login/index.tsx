@@ -43,7 +43,7 @@ const S = {
     WebkitBackdropFilter: 'blur(12px)',
     border: '1px solid rgba(255,255,255,0.25)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    marginBottom: '20px',
+    marginBottom: '14px',
     boxShadow: '0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3)',
   },
   // 表单卡片
@@ -52,7 +52,7 @@ const S = {
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     borderRadius: '32px 32px 0 0',
-    padding: '32px 24px 40px',
+    padding: '24px 24px 32px',
     boxShadow: '0 -8px 40px rgba(0,0,0,0.15), 0 -2px 8px rgba(0,0,0,0.05)',
   },
   // Tab 容器
@@ -61,7 +61,7 @@ const S = {
     background: '#f1f5f9',
     borderRadius: '14px',
     padding: '4px',
-    marginBottom: '28px',
+    marginBottom: '20px',
   },
   // Tab 激活
   tabActive: {
@@ -86,7 +86,7 @@ const S = {
     display: 'flex', alignItems: 'center', gap: '12px',
     background: focused ? '#eff6ff' : '#f8fafc',
     borderRadius: '14px',
-    padding: '14px 16px',
+    padding: '11px 14px',
     border: `1.5px solid ${focused ? '#3b82f6' : 'transparent'}`,
     transition: 'all 0.3s ease',
     boxShadow: focused ? '0 0 0 4px rgba(59,130,246,0.08)' : 'none',
@@ -95,7 +95,7 @@ const S = {
   btnDefault: {
     width: '100%',
     borderRadius: '16px',
-    padding: '16px 0',
+    padding: '14px 0',
     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
     background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%)',
     boxShadow: '0 6px 24px rgba(37,99,235,0.45), 0 2px 8px rgba(37,99,235,0.3)',
@@ -168,7 +168,7 @@ const LoginPage: FC = () => {
       <View style={S.deco2} />
 
       {/* ── 品牌区 ── */}
-      <View style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 32px 32px' }}>
+      <View style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 32px 20px' }}>
         {/* Logo */}
         <View style={S.logoWrap}>
           <ShieldCheck size={38} color="#ffffff" />
@@ -205,7 +205,7 @@ const LoginPage: FC = () => {
         </View>
 
         {/* 表单字段 */}
-        <View style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+        <View style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
 
           {/* 手机号 */}
           <View>
@@ -280,7 +280,7 @@ const LoginPage: FC = () => {
         </View>
 
         {/* 切换登录/注册 */}
-        <View style={{ marginTop: '24px', textAlign: 'center', lineHeight: '1.5' }}>
+        <View style={{ marginTop: '16px', textAlign: 'center', lineHeight: '1.5' }}>
           <Text style={{ fontSize: '14px', color: '#94a3b8' }}>
             {isLogin ? '还没有账户？' : '已有账户？'}
           </Text>

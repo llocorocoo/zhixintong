@@ -3,7 +3,10 @@ import { FC, useState, useEffect, useMemo } from 'react'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { Briefcase, FileText, Wrench, ChevronRight, FileSearch, UserCheck, TrendingUp, Award, Bell } from 'lucide-react-taro'
+import {
+  Briefcase, FileText, Wrench, ChevronRight,
+  FileSearch, UserCheck, TrendingUp, Bell
+} from 'lucide-react-taro'
 
 interface CreditScoreData {
   score: number
@@ -12,28 +15,20 @@ interface CreditScoreData {
 }
 
 const FACTOR_LABELS: Record<string, string> = {
-  authenticity: '真实性',
-  stability: '稳定性',
-  compliance: '合规性',
-  safety: '安全性',
-  professionalism: '专业性',
-  reliability: '可靠性',
+  authenticity: '真实性', stability: '稳定性', compliance: '合规性',
+  safety: '安全性', professionalism: '专业性', reliability: '可靠性',
 }
 
 const FACTOR_COLORS: Record<string, string> = {
-  authenticity: '#3b82f6',
-  stability: '#8b5cf6',
-  compliance: '#f59e0b',
-  safety: '#ef4444',
-  professionalism: '#10b981',
-  reliability: '#06b6d4',
+  authenticity: '#3b82f6', stability: '#8b5cf6', compliance: '#f59e0b',
+  safety: '#ef4444', professionalism: '#10b981', reliability: '#06b6d4',
 }
 
 const getLevelInfo = (score: number) => {
-  if (score >= 800) return { label: '优秀', color: '#10b981', bg: '#dcfce7' }
-  if (score >= 700) return { label: '良好', color: '#3b82f6', bg: '#dbeafe' }
-  if (score >= 600) return { label: '中等', color: '#f59e0b', bg: '#fef3c7' }
-  return { label: '待提升', color: '#ef4444', bg: '#fee2e2' }
+  if (score >= 800) return { label: '优秀', color: '#059669', bg: 'rgba(5,150,105,0.1)' }
+  if (score >= 700) return { label: '良好', color: '#2563eb', bg: 'rgba(37,99,235,0.1)' }
+  if (score >= 600) return { label: '中等', color: '#d97706', bg: 'rgba(217,119,6,0.1)' }
+  return { label: '待提升', color: '#dc2626', bg: 'rgba(220,38,38,0.1)' }
 }
 
 const IndexPage: FC = () => {
@@ -41,35 +36,22 @@ const IndexPage: FC = () => {
   const [showDetail, setShowDetail] = useState(false)
   const [showModel, setShowModel] = useState(false)
   const [detailTab, setDetailTab] = useState(0)
+  const [pressedAction, setPressedAction] = useState<number | null>(null)
+  const [pressedMenu, setPressedMenu] = useState<number | null>(null)
   const { userInfo, isLoggedIn } = useUserStore()
 
   const radarSvg = useMemo(() => {
     if (!creditScore?.factors) return null
     const factors = creditScore.factors
-    const keys = Object.keys(factors)
-    const values = Object.values(factors)
-    const count = keys.length
-    const cx = 140, cy = 120, radius = 80
-    const step = (Math.PI * 2) / count
-    const start = -Math.PI / 2
+    const keys = Object.keys(factors), values = Object.values(factors), count = keys.length
+    const cx = 140, cy = 120, radius = 80, step = (Math.PI * 2) / count, start = -Math.PI / 2
     const pt = (a: number, r: number) => `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`
-    const grids = [1,2,3,4,5].map(l => {
-      const r = (radius/5)*l
-      const pts = Array.from({length:count},(_,i)=>pt(start+step*i,r))
-      return `<polygon points="${pts.join(' ')}" fill="none" stroke="#e5e7eb" stroke-width="0.5"/>`
-    })
-    const axes = Array.from({length:count},(_,i)=>{
-      const a=start+step*i
-      return `<line x1="${cx}" y1="${cy}" x2="${pt(a,radius).split(',')[0]}" y2="${pt(a,radius).split(',')[1]}" stroke="#e5e7eb" stroke-width="0.5"/>`
-    })
+    const grids = [1,2,3,4,5].map(l => { const r=(radius/5)*l; const pts=Array.from({length:count},(_,i)=>pt(start+step*i,r)); return `<polygon points="${pts.join(' ')}" fill="none" stroke="#e2e8f0" stroke-width="1"/>` })
+    const axes = Array.from({length:count},(_,i)=>{ const a=start+step*i; return `<line x1="${cx}" y1="${cy}" x2="${pt(a,radius).split(',')[0]}" y2="${pt(a,radius).split(',')[1]}" stroke="#e2e8f0" stroke-width="1"/>` })
     const dataPts = Array.from({length:count},(_,i)=>pt(start+step*i,(values[i]/100)*radius))
-    const poly = `<polygon points="${dataPts.join(' ')}" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="2"/>`
-    const dots = dataPts.map(p=>{const[x,y]=p.split(',');return `<circle cx="${x}" cy="${y}" r="4" fill="#3b82f6" stroke="#fff" stroke-width="2"/>`})
-    const lbls = Array.from({length:count},(_,i)=>{
-      const a=start+step*i
-      const lx=cx+(radius+24)*Math.cos(a), ly=cy+(radius+24)*Math.sin(a)
-      return `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#374151">${FACTOR_LABELS[keys[i]]||keys[i]} ${values[i]}</text>`
-    })
+    const poly = `<polygon points="${dataPts.join(' ')}" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="2"/>`
+    const dots = dataPts.map(p=>{ const[x,y]=p.split(','); return `<circle cx="${x}" cy="${y}" r="4" fill="#2563eb" stroke="#fff" stroke-width="2"/>` })
+    const lbls = Array.from({length:count},(_,i)=>{ const a=start+step*i; const lx=cx+(radius+26)*Math.cos(a),ly=cy+(radius+26)*Math.sin(a); return `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#475569">${FACTOR_LABELS[keys[i]]||keys[i]} ${values[i]}</text>` })
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 240" width="280" height="240">${grids.join('')}${axes.join('')}${poly}${dots.join('')}${lbls.join('')}</svg>`
   }, [creditScore])
 
@@ -77,7 +59,6 @@ const IndexPage: FC = () => {
     if (!isLoggedIn) { Taro.redirectTo({ url: '/pages/login/index' }); return }
     fetchCreditScore()
   }, [isLoggedIn])
-
   useDidShow(() => { if (isLoggedIn) fetchCreditScore() })
 
   const fetchCreditScore = async () => {
@@ -90,183 +71,289 @@ const IndexPage: FC = () => {
 
   const levelInfo = creditScore ? getLevelInfo(creditScore.score) : null
 
-  const quickActions = [
-    { icon: Briefcase, title: 'AI自证', color: '#3b82f6', bg: '#eff6ff', action: () => {} },
-    { icon: FileText, title: '样例报告', color: '#8b5cf6', bg: '#f5f3ff', action: () => Taro.navigateTo({ url: '/pages/sample-report/index' }) },
-    { icon: Wrench, title: '信用修复', color: '#f59e0b', bg: '#fffbeb', action: () => Taro.navigateTo({ url: '/pages/credit-repair/index' }) },
-  ]
-
-  const menuItems = [
-    { icon: FileSearch, title: '信用报告', desc: '授权查询并生成信用报告', path: '/pages/report/index', color: '#3b82f6', bg: '#eff6ff' },
-    { icon: UserCheck, title: '可信简历', desc: '生成和维护可信简历', path: '/pages/resume/index', color: '#8b5cf6', bg: '#f5f3ff' },
-    { icon: TrendingUp, title: '提升信用', desc: '提升信用分和报告可信度', path: '/pages/enhancement/index', color: '#10b981', bg: '#f0fdf4' },
-  ]
-
   const navigate = (path: string) => {
     const tabs = ['/pages/index/index', '/pages/report/index', '/pages/resume/index', '/pages/profile/index']
     tabs.some(t => path.startsWith(t)) ? Taro.switchTab({ url: path }) : Taro.navigateTo({ url: path })
   }
 
-  return (
-    <View className="min-h-screen" style={{ background: '#f0f4f8' }}>
+  const quickActions = [
+    { icon: Briefcase, title: 'AI自证',  color: '#2563eb', bg: '#eff6ff', action: () => {} },
+    { icon: FileText,  title: '样例报告', color: '#7c3aed', bg: '#f5f3ff', action: () => Taro.navigateTo({ url: '/pages/sample-report/index' }) },
+    { icon: Wrench,    title: '信用修复', color: '#d97706', bg: '#fffbeb', action: () => Taro.navigateTo({ url: '/pages/credit-repair/index' }) },
+  ]
 
-      {/* ── 顶部渐变头部 ── */}
-      <View style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', paddingTop: '48px', paddingBottom: '80px', paddingLeft: '16px', paddingRight: '16px' }}>
-        <View className="flex items-center justify-between">
+  const menuItems = [
+    { icon: FileSearch, title: '信用报告', desc: '授权查询并生成信用报告', path: '/pages/report/index',    color: '#2563eb', bg: '#eff6ff', accent: '#2563eb' },
+    { icon: UserCheck,  title: '可信简历', desc: '生成和维护可信简历',    path: '/pages/resume/index',    color: '#7c3aed', bg: '#f5f3ff', accent: '#7c3aed' },
+    { icon: TrendingUp, title: '提升信用', desc: '提升信用分和报告可信度', path: '/pages/enhancement/index', color: '#059669', bg: '#f0fdf4', accent: '#059669' },
+  ]
+
+  const SCORE_DIMENSIONS = [
+    { num: '1', name: '真实性', color: '#3b82f6', desc: '工作经历、身份等数据是否真实，是否存在造假行为', source: '公安网、学信网、前雇主核实' },
+    { num: '2', name: '稳定性', color: '#8b5cf6', desc: '入职后能否稳定产出，是否跳槽频繁、空窗期长', source: '简历、社保记录、背调报告' },
+    { num: '3', name: '合规性', color: '#f59e0b', desc: '过往职业生涯是否遵守规则，是否有竞业风险或工作违纪', source: '前雇主评价、公开数据' },
+    { num: '4', name: '安全性', color: '#ef4444', desc: '是否存在用工安全风险，如司法诉讼、劳动争议、黑名单等', source: '司法数据、执行信息公开网' },
+    { num: '5', name: '专业性', color: '#10b981', desc: '知识技能与岗位匹配度，包括职业资格、学历层次等', source: '简历、证书查询、公开信息' },
+    { num: '6', name: '可靠性', color: '#06b6d4', desc: '履约意愿及个人财务信用状况，包括征信、负债、欠税等', source: '前雇主评价、社保记录、征信报告' },
+  ]
+
+  return (
+    <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
+
+      {/* ── 毛玻璃吸顶导航 ── */}
+      <View style={{
+        position: 'sticky', top: 0, zIndex: 100,
+        background: 'rgba(246,248,252,0.88)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(0,0,0,0.06)',
+        padding: '44px 20px 14px',
+        transition: 'all 0.3s ease',
+      }}>
+        <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <View>
-            <Text className="block text-white text-xl font-bold mb-0.5">
+            <Text style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', display: 'block', lineHeight: '1.3' }}>
               Hi，{userInfo?.name || '用户'} 👋
             </Text>
-            <Text className="block text-blue-200 text-sm">管理您的职业信用档案</Text>
+            <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginTop: '2px', lineHeight: '1.5' }}>
+              管理您的职业信用档案
+            </Text>
           </View>
-          <View className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center active:opacity-70">
-            <Bell size={20} color="#ffffff" />
+          <View style={{
+            width: '38px', height: '38px', borderRadius: '50%',
+            background: '#fff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.2s ease',
+          }}>
+            <Bell size={18} color="#64748b" />
           </View>
         </View>
       </View>
 
-      {/* ── 信用评分主卡片 ── */}
-      <View className="px-4 -mt-14">
-        <View className="bg-white rounded-3xl overflow-hidden" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.10)' }}>
+      {/* ── 主内容区 ── */}
+      <View style={{ padding: '16px 16px 88px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-          {/* 评分区 */}
-          <View className="px-5 pt-5 pb-4">
-            <View className="flex items-center justify-between mb-4">
-              <Text className="text-sm font-medium text-gray-500">职业信用评分</Text>
+        {/* ── 信用评分卡片 ── */}
+        <View style={{
+          background: '#fff',
+          borderRadius: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 6px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.08)',
+          overflow: 'hidden',
+        }}>
+          <View style={{ padding: '20px 20px 16px' }}>
+
+            {/* 标签行 */}
+            <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <Text style={{ fontSize: '13px', color: '#94a3b8', fontWeight: '500', lineHeight: '1.5' }}>职业信用评分</Text>
               {levelInfo && (
-                <View className="px-2.5 py-1 rounded-full" style={{ backgroundColor: levelInfo.bg }}>
-                  <Text className="text-xs font-medium" style={{ color: levelInfo.color }}>{levelInfo.label}</Text>
+                <View style={{ padding: '3px 10px', borderRadius: '20px', background: levelInfo.bg }}>
+                  <Text style={{ fontSize: '12px', fontWeight: '600', color: levelInfo.color }}>{levelInfo.label}</Text>
                 </View>
               )}
             </View>
 
-            <View className="flex items-end justify-between">
-              <View className="flex items-end gap-2">
-                <Text className="font-bold leading-none" style={{ fontSize: creditScore ? '56px' : '48px', color: creditScore ? '#1e40af' : '#d1d5db' }}>
+            {/* 分数 + 按钮行 */}
+            <View style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+              <View style={{ display: 'flex', alignItems: 'flex-end', gap: '6px' }}>
+                <Text style={{
+                  fontSize: '64px', fontWeight: '800', lineHeight: '1',
+                  color: creditScore ? '#0f172a' : '#e2e8f0',
+                  letterSpacing: '-2px',
+                }}>
                   {creditScore ? creditScore.score : '—'}
                 </Text>
-                {creditScore && <Text className="text-sm text-gray-400 mb-2">/ 940</Text>}
+                {creditScore && (
+                  <Text style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '6px', lineHeight: '1.5' }}>/ 940</Text>
+                )}
               </View>
 
-              {creditScore ? (
-                <View
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl active:opacity-80"
-                  style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', boxShadow: '0 2px 12px rgba(59,130,246,0.4)' }}
-                  onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
-                >
-                  <Text className="text-white text-sm font-medium">查看报告</Text>
-                  <ChevronRight size={16} color="#ffffff" />
-                </View>
-              ) : (
-                <View
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl active:opacity-80"
-                  style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', boxShadow: '0 2px 12px rgba(59,130,246,0.4)' }}
-                  onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
-                >
-                  <FileText size={16} color="#ffffff" />
-                  <Text className="text-white text-sm font-medium">立即生成</Text>
-                </View>
-              )}
+              <View
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '4px',
+                  padding: '10px 16px', borderRadius: '14px',
+                  background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
+                  boxShadow: '0 4px 14px rgba(37,99,235,0.38)',
+                  transition: 'all 0.2s ease',
+                }}
+                onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
+              >
+                {!creditScore && <FileText size={15} color="#fff" />}
+                <Text style={{ color: '#fff', fontSize: '13px', fontWeight: '600', lineHeight: '1.5' }}>
+                  {creditScore ? '查看报告' : '立即生成'}
+                </Text>
+                <ChevronRight size={14} color="rgba(255,255,255,0.8)" />
+              </View>
             </View>
 
             {!creditScore && (
-              <Text className="block text-xs text-gray-400 mt-2">生成信用报告后将自动同步评分</Text>
+              <Text style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '6px', display: 'block', lineHeight: '1.6' }}>
+                生成信用报告后将自动同步评分
+              </Text>
             )}
           </View>
 
-          {/* 展开详情 toggle */}
+          {/* 展开 toggle */}
           {creditScore && (
             <View
-              className="flex items-center justify-center py-2.5 border-t border-gray-100 active:bg-gray-50"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
+                padding: '10px 0',
+                borderTop: '1px solid #f1f5f9',
+                transition: 'background 0.2s ease',
+              }}
               onClick={() => { setShowDetail(!showDetail); setDetailTab(0) }}
             >
-              <Text className="text-xs text-blue-500 font-medium mr-1">{showDetail ? '收起详情' : '查看详情'}</Text>
-              <ChevronRight size={14} color="#3b82f6" style={{ transform: showDetail ? 'rotate(90deg)' : 'rotate(0deg)' }} />
+              <Text style={{ fontSize: '12px', color: '#3b82f6', fontWeight: '500', lineHeight: '1.5' }}>
+                {showDetail ? '收起详情' : '查看详情'}
+              </Text>
+              <ChevronRight
+                size={13}
+                color="#3b82f6"
+                style={{ transform: showDetail ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
+              />
             </View>
           )}
 
           {/* 展开内容 */}
-          {showDetail && (
-            <View className="border-t border-gray-100 bg-gray-50">
-              <View className="flex items-center justify-center gap-3 pt-3 pb-1">
+          {showDetail && creditScore && (
+            <View style={{ borderTop: '1px solid #f1f5f9', background: '#fafbfc' }}>
+              {/* Tab */}
+              <View style={{ display: 'flex', justifyContent: 'center', gap: '8px', padding: '12px 20px 8px' }}>
                 {['评分明细', '雷达图'].map((tab, i) => (
                   <View
                     key={i}
-                    className={`px-4 py-1.5 rounded-full ${detailTab === i ? 'bg-blue-600' : 'bg-gray-200'}`}
+                    style={{
+                      padding: '5px 16px', borderRadius: '20px',
+                      background: detailTab === i ? '#2563eb' : '#e2e8f0',
+                      transition: 'all 0.3s ease',
+                    }}
                     onClick={() => setDetailTab(i)}
                   >
-                    <Text className={`text-xs font-medium ${detailTab === i ? 'text-white' : 'text-gray-500'}`}>{tab}</Text>
+                    <Text style={{ fontSize: '12px', fontWeight: '500', color: detailTab === i ? '#fff' : '#64748b', lineHeight: '1.5' }}>{tab}</Text>
                   </View>
                 ))}
               </View>
-              <Swiper current={detailTab} onChange={e => setDetailTab(e.detail.current)} style={{ height: '260px' }}>
+
+              <Swiper current={detailTab} onChange={e => setDetailTab(e.detail.current)} style={{ height: '248px' }}>
                 <SwiperItem>
-                  <View className="p-4 space-y-2">
+                  <View style={{ padding: '8px 20px 12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     {creditScore?.factors && Object.entries(creditScore.factors).map(([key, val]) => (
-                      <View key={key} className="flex items-center justify-between py-1">
-                        <View className="flex items-center gap-2">
-                          <View className="w-2 h-2 rounded-full" style={{ backgroundColor: FACTOR_COLORS[key] || '#3b82f6' }} />
-                          <Text className="text-sm text-gray-600">{FACTOR_LABELS[key]}</Text>
+                      <View key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 0' }}>
+                        <View style={{ width: '8px', height: '8px', borderRadius: '50%', background: FACTOR_COLORS[key] || '#3b82f6', flexShrink: 0 }} />
+                        <Text style={{ fontSize: '13px', color: '#475569', width: '42px', lineHeight: '1.5' }}>{FACTOR_LABELS[key]}</Text>
+                        <View style={{ flex: 1, height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                          <View style={{ height: '100%', borderRadius: '3px', background: FACTOR_COLORS[key] || '#3b82f6', width: `${val}%`, transition: 'width 0.6s ease' }} />
                         </View>
-                        <View className="flex items-center gap-2">
-                          <View className="w-20 h-1.5 bg-gray-200 rounded-full">
-                            <View className="h-full rounded-full" style={{ width: `${val}%`, backgroundColor: FACTOR_COLORS[key] || '#3b82f6' }} />
-                          </View>
-                          <Text className="text-sm font-medium text-gray-900 w-7 text-right">{val}</Text>
-                        </View>
+                        <Text style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', width: '26px', textAlign: 'right', lineHeight: '1.5' }}>{val}</Text>
                       </View>
                     ))}
                   </View>
                 </SwiperItem>
                 <SwiperItem>
-                  <View className="flex items-center justify-center h-full">
+                  <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                     {radarSvg && <Image src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(radarSvg)}`} style={{ width: '280px', height: '220px' }} mode="aspectFit" />}
                   </View>
                 </SwiperItem>
               </Swiper>
-              <View className="px-4 pb-3 flex items-center justify-between">
-                <Text className="text-xs text-gray-400">更新时间：{new Date().toLocaleDateString('zh-CN')}</Text>
-                <View className="px-3 py-1 bg-blue-50 rounded-full active:bg-blue-100" onClick={() => setShowModel(true)}>
-                  <Text className="text-xs text-blue-500 font-medium">评分说明</Text>
+
+              <View style={{ padding: '0 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text style={{ fontSize: '11px', color: '#cbd5e1', lineHeight: '1.5' }}>更新时间：{new Date().toLocaleDateString('zh-CN')}</Text>
+                <View
+                  style={{ padding: '4px 12px', borderRadius: '20px', background: '#eff6ff' }}
+                  onClick={() => setShowModel(true)}
+                >
+                  <Text style={{ fontSize: '11px', color: '#2563eb', fontWeight: '500', lineHeight: '1.5' }}>评分说明</Text>
                 </View>
               </View>
             </View>
           )}
         </View>
-      </View>
 
-      {/* ── 快捷功能 ── */}
-      <View className="px-4 mt-4">
-        <View className="bg-white rounded-2xl p-4 flex justify-around" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+        {/* ── 快捷功能 ── */}
+        <View style={{
+          background: '#fff', borderRadius: '20px',
+          padding: '16px 8px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)',
+          display: 'flex', justifyContent: 'space-around',
+        }}>
           {quickActions.map((item, i) => (
-            <View key={i} className="flex flex-col items-center gap-2 active:opacity-70" onClick={item.action}>
-              <View className="w-13 h-13 rounded-2xl flex items-center justify-center" style={{ width: '52px', height: '52px', backgroundColor: item.bg }}>
+            <View
+              key={i}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+                padding: '4px 12px',
+                transform: pressedAction === i ? 'scale(0.92)' : 'scale(1)',
+                transition: 'transform 0.2s ease',
+              }}
+              onTouchStart={() => setPressedAction(i)}
+              onTouchEnd={() => setPressedAction(null)}
+              onTouchCancel={() => setPressedAction(null)}
+              onClick={item.action}
+            >
+              <View style={{
+                width: '52px', height: '52px', borderRadius: '50%',
+                background: item.bg,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: `0 4px 12px ${item.color}22`,
+              }}>
                 <item.icon size={24} color={item.color} />
               </View>
-              <Text className="text-xs font-medium" style={{ color: '#4b5563' }}>{item.title}</Text>
+              <Text style={{ fontSize: '12px', fontWeight: '500', color: '#475569', lineHeight: '1.5' }}>{item.title}</Text>
             </View>
           ))}
         </View>
-      </View>
 
-      {/* ── 核心功能列表 ── */}
-      <View className="px-4 mt-4 space-y-3 pb-6">
+        {/* ── 核心功能列表 ── */}
         {menuItems.map((item, i) => (
           <View
             key={i}
-            className="bg-white rounded-2xl flex items-center px-4 py-4 active:opacity-90"
-            style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
+            style={{
+              background: '#fff', borderRadius: '20px',
+              display: 'flex', alignItems: 'center',
+              padding: '18px 16px',
+              position: 'relative', overflow: 'hidden',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)',
+              transform: pressedMenu === i ? 'scale(0.99)' : 'scale(1)',
+              transition: 'all 0.2s ease',
+            }}
+            onTouchStart={() => setPressedMenu(i)}
+            onTouchEnd={() => setPressedMenu(null)}
+            onTouchCancel={() => setPressedMenu(null)}
             onClick={() => navigate(item.path)}
           >
-            <View className="w-11 h-11 rounded-xl flex items-center justify-center mr-4 flex-shrink-0" style={{ backgroundColor: item.bg }}>
+            {/* 右侧彩色渐变细条 */}
+            <View style={{
+              position: 'absolute', right: 0, top: '14px', bottom: '14px',
+              width: '3px', borderRadius: '3px 0 0 3px',
+              background: `linear-gradient(to bottom, ${item.accent}, ${item.accent}55)`,
+            }} />
+
+            {/* 图标 */}
+            <View style={{
+              width: '46px', height: '46px', borderRadius: '14px',
+              background: item.bg,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginRight: '14px', flexShrink: 0,
+              boxShadow: `0 4px 12px ${item.color}20`,
+            }}>
               <item.icon size={22} color={item.color} />
             </View>
-            <View className="flex-1">
-              <Text className="block text-base font-semibold text-gray-900">{item.title}</Text>
-              <Text className="block text-xs text-gray-400 mt-0.5">{item.desc}</Text>
+
+            {/* 文字 */}
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: '15px', fontWeight: '600', color: '#0f172a', display: 'block', lineHeight: '1.4' }}>{item.title}</Text>
+              <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginTop: '2px', lineHeight: '1.5' }}>{item.desc}</Text>
             </View>
-            <View className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
-              <ChevronRight size={16} color="#9ca3af" />
+
+            {/* 箭头 */}
+            <View style={{
+              width: '30px', height: '30px', borderRadius: '50%',
+              background: '#f8fafc',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <ChevronRight size={15} color="#94a3b8" />
             </View>
           </View>
         ))}
@@ -274,49 +361,65 @@ const IndexPage: FC = () => {
 
       {/* ── 评分说明弹窗 ── */}
       {showModel && (
-        <View className="fixed inset-0 bg-black bg-opacity-50 flex flex-col z-50" onClick={() => setShowModel(false)}>
-          <View className="bg-white flex-1 flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
-            <View className="px-5 pt-5 pb-4 flex-shrink-0 flex items-center justify-between">
-              <Text className="text-lg font-bold text-gray-900">职业信用评分说明</Text>
-              <View className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200" onClick={() => setShowModel(false)}>
-                <Text className="text-gray-500 text-lg leading-none">×</Text>
+        <View
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', display: 'flex', flexDirection: 'column', zIndex: 200 }}
+          onClick={() => setShowModel(false)}
+        >
+          <View
+            style={{ background: '#fff', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', marginTop: '60px', borderRadius: '24px 24px 0 0' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <View style={{ padding: '20px 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, borderBottom: '1px solid #f1f5f9' }}>
+              <Text style={{ fontSize: '17px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>职业信用评分说明</Text>
+              <View
+                style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={() => setShowModel(false)}
+              >
+                <Text style={{ color: '#64748b', fontSize: '18px', lineHeight: '1' }}>×</Text>
               </View>
             </View>
-            <View className="h-px bg-gray-100 flex-shrink-0" />
-            <View className="flex-1 overflow-y-auto">
-              <View className="p-5 space-y-4">
-                <View className="border border-gray-100 rounded-2xl overflow-hidden">
-                  {[
-                    { num: '1', name: '真实性', color: '#3b82f6', desc: '工作经历、身份等数据是否真实，是否存在造假行为', source: '公安网、学信网、前雇主核实' },
-                    { num: '2', name: '稳定性', color: '#8b5cf6', desc: '入职后能否稳定产出，是否跳槽频繁、空窗期长', source: '简历、社保记录、背调报告' },
-                    { num: '3', name: '合规性', color: '#f59e0b', desc: '过往职业生涯是否遵守规则，是否有竞业风险或工作违纪', source: '前雇主评价、公开数据' },
-                    { num: '4', name: '安全性', color: '#ef4444', desc: '是否存在用工安全风险，如司法诉讼、劳动争议、黑名单等', source: '司法数据、执行信息公开网' },
-                    { num: '5', name: '专业性', color: '#10b981', desc: '知识技能与岗位匹配度，包括职业资格、学历层次等', source: '简历、证书查询、公开信息' },
-                    { num: '6', name: '可靠性', color: '#06b6d4', desc: '履约意愿及个人财务信用状况，包括征信、负债、欠税等', source: '前雇主评价、社保记录、征信报告' },
-                  ].map((item, idx, arr) => (
-                    <View key={item.num} className={`p-4 ${idx < arr.length - 1 ? 'border-b border-gray-50' : ''}`}>
-                      <View className="flex items-center gap-2 mb-1.5">
-                        <View className="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: item.color }}>
-                          <Text className="text-white text-xs font-bold">{item.num}</Text>
-                        </View>
-                        <Text className="text-sm font-semibold text-gray-900">{item.name}</Text>
+
+            <View style={{ flex: 1, overflowY: 'auto' }}>
+              <View style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                {SCORE_DIMENSIONS.map((item, idx) => (
+                  <View
+                    key={item.num}
+                    style={{
+                      padding: '14px 16px',
+                      background: '#fafbfc',
+                      borderRadius: '14px',
+                      marginBottom: '6px',
+                      borderLeft: `3px solid ${item.color}`,
+                    }}
+                  >
+                    <View style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <View style={{ width: '20px', height: '20px', borderRadius: '6px', background: item.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <Text style={{ color: '#fff', fontSize: '11px', fontWeight: '700', lineHeight: '1' }}>{item.num}</Text>
                       </View>
-                      <Text className="block text-xs text-gray-500 mb-1 leading-relaxed">{item.desc}</Text>
-                      <Text className="block text-xs text-gray-300">数据来源：{item.source}</Text>
+                      <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.5' }}>{item.name}</Text>
                     </View>
-                  ))}
-                </View>
-                <View className="p-3 bg-blue-50 rounded-xl">
-                  <Text className="text-xs text-blue-600 leading-relaxed">评分范围约 350–940 分，结果仅供参考，不作为任何法律依据。</Text>
+                    <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.6', marginBottom: '4px' }}>{item.desc}</Text>
+                    <Text style={{ fontSize: '11px', color: '#94a3b8', display: 'block', lineHeight: '1.5' }}>数据来源：{item.source}</Text>
+                  </View>
+                ))}
+                <View style={{ padding: '12px 16px', background: '#eff6ff', borderRadius: '12px', marginTop: '4px' }}>
+                  <Text style={{ fontSize: '12px', color: '#2563eb', lineHeight: '1.6' }}>评分范围约 350–940 分，结果仅供参考，不作为任何法律依据。</Text>
                 </View>
               </View>
             </View>
-            <View className="h-px bg-gray-100 flex-shrink-0" />
-            <View className="px-4 pt-4 pb-8 flex-shrink-0">
-              <View className="w-full rounded-2xl py-3.5 flex items-center justify-center active:opacity-80"
-                style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)' }}
-                onClick={() => setShowModel(false)}>
-                <Text className="text-white font-semibold">我知道了</Text>
+
+            <View style={{ padding: '16px 20px 32px', flexShrink: 0, borderTop: '1px solid #f1f5f9' }}>
+              <View
+                style={{
+                  borderRadius: '16px', padding: '14px 0',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
+                  boxShadow: '0 4px 16px rgba(37,99,235,0.3)',
+                  transition: 'all 0.2s ease',
+                }}
+                onClick={() => setShowModel(false)}
+              >
+                <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '600', lineHeight: '1.5' }}>我知道了</Text>
               </View>
             </View>
           </View>
