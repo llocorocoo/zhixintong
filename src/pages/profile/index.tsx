@@ -47,7 +47,7 @@ const ProfilePage: FC = () => {
       {/* ── 蓝色渐变用户信息区 ── */}
       <View style={{
         background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)',
-        padding: '20px 20px 40px',
+        padding: '20px 20px 24px',
         position: 'relative', overflow: 'hidden',
       }}>
         {/* 装饰光晕 */}
@@ -96,7 +96,7 @@ const ProfilePage: FC = () => {
       </View>
 
       {/* ── 主内容（上移与头部衔接）── */}
-      <View style={{ padding: '0 16px 32px', marginTop: '-20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <View style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
         {/* 菜单列表 */}
         <View style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
