@@ -49,6 +49,7 @@ const AuthorizePage: FC = () => {
   const [countdown, setCountdown] = useState(10)
   const [canAgree, setCanAgree] = useState(false)
   const [isChecked, setIsChecked] = useState(false)
+  const [btnPressed, setBtnPressed] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
@@ -81,94 +82,170 @@ const AuthorizePage: FC = () => {
   const active = canAgree && isChecked
 
   return (
-    <View className="fixed inset-0 flex flex-col" style={{ background: '#f0f4f8' }}>
+    <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
 
-      {/* 顶部 */}
-      <View style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', padding: '16px 16px 24px' }}>
-        <View className="flex items-center gap-3 mb-3">
-          <View className="w-10 h-10 rounded-2xl bg-white bg-opacity-20 flex items-center justify-center">
-            <ShieldCheck size={22} color="#ffffff" />
+      {/* ── 蓝色渐变头部（与 report 页一致，padding-top 留给导航栏） ── */}
+      <View style={{
+        background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)',
+        padding: '20px 20px 28px',
+        position: 'relative', overflow: 'hidden',
+      }}>
+        {/* 装饰光晕 */}
+        <View style={{ position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+        {/* 图标 + 说明 */}
+        <View style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <View style={{
+            width: '44px', height: '44px', borderRadius: '14px',
+            background: 'rgba(255,255,255,0.15)',
+            border: '1px solid rgba(255,255,255,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <ShieldCheck size={24} color="#fff" />
           </View>
           <View>
-            <Text className="block text-white text-lg font-bold">信息核查授权</Text>
-            <Text className="block text-blue-200 text-xs">请仔细阅读并确认以下授权内容</Text>
+            <Text style={{ fontSize: '18px', fontWeight: '800', color: '#fff', display: 'block', lineHeight: '1.3', letterSpacing: '0.5px' }}>
+              信息核查授权
+            </Text>
+            <Text style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', display: 'block', marginTop: '3px', lineHeight: '1.5' }}>
+              请仔细阅读并确认以下授权内容
+            </Text>
           </View>
         </View>
 
-        {/* 倒计时或已可授权 */}
-        {!canAgree ? (
-          <View className="flex items-center gap-2 bg-white bg-opacity-15 rounded-2xl px-4 py-3">
-            <View className="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
-              <Text className="text-white font-bold text-sm">{countdown}</Text>
-            </View>
-            <Text className="text-white text-sm">请阅读完毕后方可授权，剩余 {countdown} 秒</Text>
-          </View>
-        ) : (
-          <View className="flex items-center gap-2 bg-white bg-opacity-15 rounded-2xl px-4 py-3">
-            <CircleCheck size={20} color="#86efac" />
-            <Text className="text-white text-sm">已阅读完毕，请勾选确认后授权</Text>
-          </View>
-        )}
-      </View>
-
-      {/* 授权范围概览 */}
-      <View className="mx-4 mt-4 bg-white rounded-2xl px-4 py-4" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-        <Text className="block text-sm font-semibold text-gray-900 mb-3">授权核查范围</Text>
-        <View className="flex flex-wrap gap-2">
-          {SCOPE_ITEMS.map((item, i) => (
-            <View key={i} className="flex items-center gap-1 bg-blue-50 rounded-full px-3 py-1">
-              <CircleCheck size={12} color="#3b82f6" />
-              <Text className="text-xs text-blue-600">{item}</Text>
-            </View>
-          ))}
+        {/* 倒计时提示条 */}
+        <View style={{
+          display: 'flex', alignItems: 'center', gap: '10px',
+          background: 'rgba(255,255,255,0.12)',
+          borderRadius: '14px', padding: '10px 16px',
+          border: '1px solid rgba(255,255,255,0.15)',
+        }}>
+          {!canAgree ? (
+            <>
+              <View style={{
+                width: '32px', height: '32px', borderRadius: '50%',
+                background: 'rgba(255,255,255,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1' }}>{countdown}</Text>
+              </View>
+              <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: '13px', lineHeight: '1.5' }}>
+                请阅读完毕后方可授权，剩余 <Text style={{ color: '#fde68a', fontWeight: '700' }}>{countdown}</Text> 秒
+              </Text>
+            </>
+          ) : (
+            <>
+              <CircleCheck size={22} color="#86efac" />
+              <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: '13px', lineHeight: '1.5' }}>
+                已阅读完毕，请勾选确认后授权
+              </Text>
+            </>
+          )}
         </View>
       </View>
 
-      {/* 授权书全文 */}
-      <View className="flex-1 mx-4 mt-3 min-h-0">
-        <View className="bg-white rounded-2xl overflow-hidden h-full flex flex-col" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-          <View className="px-4 py-3 border-b border-gray-50 flex-shrink-0">
-            <Text className="text-sm font-semibold text-gray-700">授权书全文</Text>
+      {/* ── 主内容区 ── */}
+      <View style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+        {/* 授权范围标签 */}
+        <View style={{
+          background: '#fff', borderRadius: '20px', padding: '16px 18px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)',
+        }}>
+          <Text style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', display: 'block', marginBottom: '12px', lineHeight: '1.5' }}>
+            授权核查范围
+          </Text>
+          <View style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {SCOPE_ITEMS.map((item, i) => (
+              <View key={i} style={{
+                display: 'flex', alignItems: 'center', gap: '4px',
+                background: '#eff6ff', borderRadius: '20px',
+                padding: '4px 10px',
+              }}>
+                <CircleCheck size={12} color="#2563eb" />
+                <Text style={{ fontSize: '11px', color: '#2563eb', lineHeight: '1.5' }}>{item}</Text>
+              </View>
+            ))}
           </View>
-          <ScrollView scrollY className="flex-1 px-4 py-3">
-            <Text className="text-xs text-gray-500 leading-relaxed whitespace-pre-wrap">{AGREEMENT}</Text>
+        </View>
+
+        {/* 授权书全文 */}
+        <View style={{
+          background: '#fff', borderRadius: '20px', overflow: 'hidden',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)',
+        }}>
+          <View style={{ padding: '14px 18px 10px', borderBottom: '1px solid #f1f5f9' }}>
+            <Text style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', lineHeight: '1.5' }}>授权书全文</Text>
+          </View>
+          <ScrollView scrollY style={{ height: '240px', padding: '12px 18px' }}>
+            <Text style={{ fontSize: '12px', color: '#64748b', lineHeight: '1.8' }}>
+              {AGREEMENT}
+            </Text>
           </ScrollView>
         </View>
-      </View>
 
-      {/* 底部勾选 + 按钮 */}
-      <View className="mx-4 mt-3 mb-6">
-        {/* 勾选框 */}
+        {/* 勾选确认 */}
         <View
-          className="flex items-start gap-3 bg-white rounded-2xl px-4 py-3.5 mb-3 active:bg-gray-50"
-          style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}
+          style={{
+            display: 'flex', alignItems: 'flex-start', gap: '12px',
+            background: '#fff', borderRadius: '16px', padding: '14px 16px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05)',
+            transition: 'all 0.2s ease',
+          }}
           onClick={() => canAgree && setIsChecked(!isChecked)}
         >
-          <View className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${isChecked ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
-            {isChecked && <Text className="text-white text-xs font-bold leading-none">✓</Text>}
+          <View style={{
+            width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0,
+            marginTop: '1px',
+            background: isChecked ? '#2563eb' : '#fff',
+            border: `2px solid ${isChecked ? '#2563eb' : '#d1d5db'}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.2s ease',
+          }}>
+            {isChecked && <Text style={{ color: '#fff', fontSize: '12px', fontWeight: '700', lineHeight: '1' }}>✓</Text>}
           </View>
-          <Text className="text-sm text-gray-600 leading-relaxed flex-1">
+          <Text style={{ fontSize: '13px', color: '#475569', lineHeight: '1.7', flex: 1 }}>
             我已仔细阅读并同意《信息核查授权书》的全部内容，授权平台查询我的相关信息。
           </Text>
         </View>
 
         {/* 按钮组 */}
-        <View className="flex gap-3">
+        <View style={{ display: 'flex', gap: '12px', paddingBottom: '16px' }}>
           <View
-            className="flex-1 rounded-2xl py-3.5 flex items-center justify-center border border-gray-200 bg-white active:bg-gray-50"
+            style={{
+              flex: 1, borderRadius: '16px', padding: '14px 0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: '#fff',
+              border: '1.5px solid #e2e8f0',
+              transition: 'all 0.2s ease',
+            }}
             onClick={handleCancel}
           >
-            <Text className="text-sm font-medium text-gray-500">取消</Text>
+            <Text style={{ fontSize: '14px', fontWeight: '500', color: '#64748b', lineHeight: '1.5' }}>取消</Text>
           </View>
+
           <View
-            className="flex-1 rounded-2xl py-3.5 flex items-center justify-center active:opacity-80"
             style={{
-              background: active ? 'linear-gradient(135deg, #1e40af, #3b82f6)' : '#e5e7eb',
-              boxShadow: active ? '0 4px 16px rgba(59,130,246,0.35)' : 'none'
+              flex: 2, borderRadius: '16px', padding: '14px 0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: active
+                ? 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)'
+                : '#e2e8f0',
+              boxShadow: active ? '0 6px 20px rgba(37,99,235,0.35)' : 'none',
+              transform: btnPressed && active ? 'scale(0.97)' : 'scale(1)',
+              transition: 'all 0.2s ease',
             }}
+            onTouchStart={() => setBtnPressed(true)}
+            onTouchEnd={() => setBtnPressed(false)}
+            onTouchCancel={() => setBtnPressed(false)}
             onClick={handleAgree}
           >
-            <Text className={`text-sm font-semibold ${active ? 'text-white' : 'text-gray-400'}`}>
+            <Text style={{
+              fontSize: '14px', fontWeight: '700', lineHeight: '1.5',
+              color: active ? '#fff' : '#94a3b8',
+            }}>
               {canAgree ? '同意授权' : `请阅读 (${countdown}s)`}
             </Text>
           </View>
