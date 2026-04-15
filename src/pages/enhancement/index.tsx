@@ -1,28 +1,12 @@
 import { View, Text } from '@tarojs/components'
 import { FC, useState, useEffect, useCallback } from 'react'
 import Taro, { useDidShow } from '@tarojs/taro'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { FileSearch } from 'lucide-react-taro'
 import {
-  Shield,
-  Award, 
-  Briefcase, 
-  GraduationCap, 
-  FileText,
-  CircleCheck,
-  ChevronRight,
-  ArrowRight,
-  Star,
-  Target,
-  Zap,
-  UserCheck,
-  Building,
-  Medal
+  Shield, Award, Briefcase, GraduationCap, FileText,
+  CircleCheck, ChevronRight, ArrowRight, Target, Zap,
+  UserCheck, Building, Medal, FileSearch, Star
 } from 'lucide-react-taro'
 
 interface EnhancementSuggestion {
@@ -375,315 +359,234 @@ const EnhancementPage: FC = () => {
     }
   ]
 
+  const [pressedId, setPressedId] = useState<string | null>(null)
+  const press = (id: string) => setPressedId(id)
+  const release = () => setPressedId(null)
+
+  const PRIORITY_STYLE: Record<string, { bg: string; color: string; label: string }> = {
+    high:   { bg: 'rgba(220,38,38,0.1)',  color: '#dc2626', label: '重要' },
+    medium: { bg: 'rgba(217,119,6,0.1)',  color: '#d97706', label: '建议' },
+    low:    { bg: 'rgba(100,116,139,0.1)', color: '#64748b', label: '可选' },
+  }
+
+  const TIP_COLORS = ['#2563eb','#7c3aed','#d97706','#dc2626','#059669','#0891b2']
+
   return (
-    <View className="min-h-screen bg-gray-50 pb-6">
-      {/* 头部卡片 */}
-      <View className="bg-gradient-to-br from-blue-500 to-blue-600 px-4 pt-12 pb-6">
+    <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
+
+      {/* ── 蓝色渐变头部 ── */}
+      <View style={{ background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)', padding: '20px 20px 24px', position: 'relative', overflow: 'hidden' }}>
+        <View style={{ position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <Text style={{ fontSize: '22px', fontWeight: '800', color: '#fff', display: 'block', lineHeight: '1.3', letterSpacing: '0.5px' }}>提升信用</Text>
+        <Text style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', display: 'block', marginTop: '4px', lineHeight: '1.5' }}>完善信用档案，提升职业竞争力</Text>
       </View>
 
-      {/* 个性化增信建议 */}
-      <View className="px-4 -mt-3">
-        <Card className="shadow-md">
-          <CardHeader className="pb-3">
-            <View className="flex items-center justify-between">
-              <View className="flex items-center gap-2">
-                <Target size={20} color="#3b82f6" />
-                <CardTitle>个性化增信建议</CardTitle>
-              </View>
-              {creditProfile && suggestions.length > 0 && (
-                <Badge className="bg-blue-100">
-                  <Text className="text-xs text-blue-600">{suggestions.filter(s => s.priority === 'high').length} 项重要待完成</Text>
-                </Badge>
-              )}
+      <View style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+        {/* ── 个性化增信建议 ── */}
+        <View style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
+          <View style={{ padding: '18px 18px 14px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Target size={18} color="#2563eb" />
+              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>个性化增信建议</Text>
             </View>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
+            {creditProfile && suggestions.length > 0 && (
+              <View style={{ background: 'rgba(37,99,235,0.1)', borderRadius: '20px', padding: '3px 10px' }}>
+                <Text style={{ fontSize: '11px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>
+                  {suggestions.filter(s => s.priority === 'high').length} 项重要
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <View style={{ padding: '16px 18px' }}>
             {loading ? (
-              <View className="py-8 text-center">
-                <Text className="text-gray-400">分析您的信用档案中...</Text>
+              <View style={{ padding: '24px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: '13px', color: '#94a3b8', lineHeight: '1.5' }}>分析您的信用档案中...</Text>
               </View>
             ) : !creditProfile ? (
-              <View className="py-6">
-                <View className="flex items-start gap-4 mb-4">
-                  <View className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <FileSearch size={24} color="#3b82f6" />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="block text-base font-medium text-gray-900 mb-1">暂无个性化建议</Text>
-                    <Text className="block text-sm text-gray-500 leading-relaxed">
-                      生成职业信用报告后，系统将根据您的信用档案为您提供专属的增信建议。
-                    </Text>
-                  </View>
+              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 0 8px' }}>
+                <View style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e40af, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', boxShadow: '0 6px 20px rgba(37,99,235,0.3)' }}>
+                  <FileSearch size={32} color="#fff" />
                 </View>
+                <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', display: 'block', marginBottom: '8px', lineHeight: '1.4' }}>暂无个性化建议</Text>
+                <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', lineHeight: '1.7', textAlign: 'center', marginBottom: '20px' }}>
+                  生成职业信用报告后，系统将根据您的信用档案提供专属增信建议。
+                </Text>
                 <View
-                  className="w-full bg-blue-600 rounded-xl py-3 flex items-center justify-center active:bg-blue-700"
+                  style={{ width: '100%', borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
+                  onTouchStart={() => press('empty-cta')} onTouchEnd={release} onTouchCancel={release}
                   onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
                 >
-                  <FileSearch size={18} color="#ffffff" />
-                  <Text className="text-white text-sm font-medium ml-2">前往生成职业信用报告</Text>
+                  <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>前往生成职业信用报告</Text>
                 </View>
               </View>
             ) : suggestions.length > 0 ? (
-              <View>
-                {/* 当前状态概览 */}
-                {creditProfile && (
-                  <View className="mb-4 p-3 bg-gray-50 rounded-xl">
-                    <View className="flex items-center justify-between mb-2">
-                      <Text className="text-sm text-gray-600">当前信用分</Text>
-                      <Text className="text-lg font-bold text-blue-600">{creditProfile.totalScore}/{creditProfile.maxScore}</Text>
-                    </View>
-                    <Progress value={(creditProfile.totalScore / creditProfile.maxScore) * 100} />
-                    <View className="flex items-center justify-between mt-2">
-                      <Text className="text-xs text-gray-500">已认证 {creditProfile.verifiedItems}/{creditProfile.totalItems} 项</Text>
-                      <Text className="text-xs text-gray-500">
-                        {creditProfile.totalScore >= 80 ? '信用良好' : creditProfile.totalScore >= 60 ? '信用中等' : '待提升'}
-                      </Text>
-                    </View>
+              <View style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {/* 概览 */}
+                <View style={{ background: '#f8fafc', borderRadius: '14px', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View>
+                    <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.5' }}>已认证项目</Text>
+                    <Text style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', display: 'block', lineHeight: '1.3' }}>{creditProfile.verifiedItems}<Text style={{ fontSize: '13px', color: '#94a3b8', fontWeight: '400' }}>/{creditProfile.totalItems}</Text></Text>
                   </View>
-                )}
-
-                {/* 建议列表 */}
-                <View className="space-y-3">
-                  {suggestions.map((item) => (
-                    <View 
-                      key={item.id}
-                      className="flex items-start gap-3 p-3 bg-white border border-gray-100 rounded-xl active:bg-gray-50"
-                      onClick={() => handleNavigate(item.action)}
-                    >
-                      <View className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                        <item.icon size={20} color="#3b82f6" />
-                      </View>
-                      <View className="flex-1 min-w-0">
-                        <View className="flex items-center gap-2 mb-1">
-                          <Text className="text-base font-medium text-gray-900">{item.title}</Text>
-                          <View className={`px-1.5 py-0.5 rounded text-xs ${getPriorityColor(item.priority)}`}>
-                            <Text className="text-xs">{getPriorityText(item.priority)}</Text>
-                          </View>
-                        </View>
-                        <View className="flex items-center gap-1 mb-1">
-                          <View className="bg-blue-50 px-1.5 py-0.5 rounded">
-                            <Text className="text-xs text-blue-500">{item.dimension}</Text>
-                          </View>
-                        </View>
-                        <Text className="text-sm text-gray-500">{item.description}</Text>
-                        <View className="flex items-center justify-end mt-2">
-                          <View className="flex items-center gap-1">
-                            <Text className="text-xs text-blue-600">{item.actionText}</Text>
-                            <ChevronRight size={14} color="#3b82f6" />
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                  ))}
+                  <View style={{ width: '1px', height: '32px', background: '#e2e8f0' }} />
+                  <View>
+                    <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.5' }}>待完成</Text>
+                    <Text style={{ fontSize: '18px', fontWeight: '700', color: '#dc2626', display: 'block', lineHeight: '1.3' }}>{suggestions.filter(s => s.priority === 'high').length}</Text>
+                  </View>
+                  <View style={{ width: '1px', height: '32px', background: '#e2e8f0' }} />
+                  <View>
+                    <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.5' }}>信用状态</Text>
+                    <Text style={{ fontSize: '13px', fontWeight: '600', color: creditProfile.totalScore >= 80 ? '#059669' : creditProfile.totalScore >= 60 ? '#d97706' : '#dc2626', display: 'block', lineHeight: '1.5' }}>
+                      {creditProfile.totalScore >= 80 ? '良好' : creditProfile.totalScore >= 60 ? '中等' : '待提升'}
+                    </Text>
+                  </View>
                 </View>
 
-                {/* 快速提升提示 */}
-                <View className="mt-4 p-3 bg-yellow-50 rounded-lg">
-                  <View className="flex items-start gap-2">
-                    <Zap size={16} color="#f59e0b" className="mt-0.5" />
-                    <View>
-                      <Text className="text-sm font-medium text-yellow-800">快速提升建议</Text>
-                      <Text className="text-xs text-yellow-700 mt-1">
-                        优先完成标记为「重要」的项目，可快速提升信用分
-                      </Text>
+                {/* 建议列表 */}
+                {suggestions.map(item => {
+                  const ps = PRIORITY_STYLE[item.priority] || PRIORITY_STYLE.low
+                  return (
+                    <View
+                      key={item.id}
+                      style={{ background: '#f8fafc', borderRadius: '16px', padding: '14px', display: 'flex', alignItems: 'flex-start', gap: '12px', transform: pressedId === item.id ? 'scale(0.98)' : 'scale(1)', transition: 'all 0.2s ease' }}
+                      onTouchStart={() => press(item.id)} onTouchEnd={release} onTouchCancel={release}
+                      onClick={() => handleNavigate(item.action)}
+                    >
+                      <View style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <item.icon size={20} color="#2563eb" />
+                      </View>
+                      <View style={{ flex: 1, minWidth: 0 }}>
+                        <View style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                          <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.4', flex: 1 }}>{item.title}</Text>
+                          <View style={{ background: ps.bg, borderRadius: '20px', padding: '2px 8px', flexShrink: 0 }}>
+                            <Text style={{ fontSize: '11px', fontWeight: '600', color: ps.color, lineHeight: '1.5' }}>{ps.label}</Text>
+                          </View>
+                        </View>
+                        <View style={{ background: 'rgba(37,99,235,0.08)', borderRadius: '6px', padding: '1px 6px', display: 'inline-flex', marginBottom: '6px' }}>
+                          <Text style={{ fontSize: '11px', color: '#2563eb', lineHeight: '1.5' }}>{item.dimension}</Text>
+                        </View>
+                        <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.6' }}>{item.description}</Text>
+                        <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '8px', gap: '3px' }}>
+                          <Text style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500', lineHeight: '1.5' }}>{item.actionText}</Text>
+                          <ChevronRight size={13} color="#2563eb" />
+                        </View>
+                      </View>
                     </View>
-                  </View>
+                  )
+                })}
+
+                {/* 提示条 */}
+                <View style={{ background: '#fffbeb', borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  <Zap size={15} color="#d97706" />
+                  <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.6', flex: 1 }}>优先完成标记为「重要」的项目，可快速提升信用分。</Text>
                 </View>
               </View>
             ) : (
-              <View className="py-8 text-center">
-                <CircleCheck size={48} color="#10b981" className="mx-auto mb-3" />
-                <Text className="text-base font-medium text-gray-900 mb-1">信用档案完善</Text>
-                <Text className="text-sm text-gray-500">您的职业信用档案已基本完善，继续保持！</Text>
+              <View style={{ padding: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <CircleCheck size={44} color="#059669" />
+                <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>信用档案完善</Text>
+                <Text style={{ fontSize: '13px', color: '#94a3b8', lineHeight: '1.6' }}>您的职业信用档案已基本完善，继续保持！</Text>
               </View>
             )}
-          </CardContent>
-        </Card>
-      </View>
+          </View>
+        </View>
 
-      {/* 如何提升信用分 */}
-      <View className="px-4 mt-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <View className="flex items-center gap-2">
-              <Award size={20} color="#3b82f6" />
-              <CardTitle>如何提升信用分</CardTitle>
-            </View>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <View className="space-y-3">
-              {creditTips.map((item, index) => (
-                <View 
-                  key={index}
-                  className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl active:bg-gray-100"
-                  onClick={() => handleNavigate('/pages/work-history/index')}
-                >
-                  <View className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <item.icon size={20} color="#3b82f6" />
-                  </View>
-                  <View className="flex-1 min-w-0">
-                    <View className="flex items-center justify-between">
-                      <Text className="text-base font-medium text-gray-900">{item.title}</Text>
-                      <View className="bg-blue-50 px-2 py-0.5 rounded">
-                        <Text className="text-xs font-medium text-blue-600">{item.tag}</Text>
-                      </View>
-                    </View>
-                    <Text className="text-sm text-gray-500 mt-0.5">{item.desc}</Text>
+        {/* ── 如何提升信用分（2列网格）── */}
+        <View style={{ background: '#fff', borderRadius: '20px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
+          <View style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+            <Award size={18} color="#2563eb" />
+            <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>如何提升信用分</Text>
+          </View>
+          <View style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            {creditTips.map((item, i) => (
+              <View
+                key={i}
+                style={{ background: '#f8fafc', borderRadius: '14px', padding: '12px', transform: pressedId === `tip-${i}` ? 'scale(0.97)' : 'scale(1)', transition: 'all 0.2s ease' }}
+                onTouchStart={() => press(`tip-${i}`)} onTouchEnd={release} onTouchCancel={release}
+                onClick={() => handleNavigate('/pages/work-history/index')}
+              >
+                <View style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${TIP_COLORS[i]}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+                  <item.icon size={18} color={TIP_COLORS[i]} />
+                </View>
+                <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <Text style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', lineHeight: '1.4' }}>{item.title}</Text>
+                  <View style={{ background: TIP_COLORS[i] + '18', borderRadius: '6px', padding: '1px 6px' }}>
+                    <Text style={{ fontSize: '10px', fontWeight: '600', color: TIP_COLORS[i], lineHeight: '1.5' }}>{item.tag}</Text>
                   </View>
                 </View>
-              ))}
-            </View>
-          </CardContent>
-        </Card>
-      </View>
+                <Text style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.6' }}>{item.desc}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
 
-      {/* 自证工具操作指引 */}
-      <View className="px-4 mt-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <View className="flex items-center justify-between">
-              <View className="flex items-center gap-2">
-                <Briefcase size={20} color="#3b82f6" />
-                <CardTitle>自证工具</CardTitle>
-              </View>
-              <View className="bg-blue-100 px-2 py-0.5 rounded">
-                <Text className="text-xs font-medium text-blue-600">推荐</Text>
-              </View>
+        {/* ── 自证工具 ── */}
+        <View style={{ background: '#fff', borderRadius: '20px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
+          <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <View style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Briefcase size={18} color="#2563eb" />
+              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>自证工具</Text>
             </View>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <Text className="block text-sm text-gray-600 mb-4">
-              通过自证工具，完整展示您的工作履历，提升报告可信度和信用评分。
-            </Text>
-            
-            {/* 步骤指引 */}
-            <View className="space-y-3">
-              {selfProofSteps.map((item, index) => (
-                <View key={index} className="flex gap-3">
-                  <View className="flex flex-col items-center">
-                    <View className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center">
-                      <Text className="text-white text-sm font-medium">{item.step}</Text>
-                    </View>
-                    {index < selfProofSteps.length - 1 && (
-                      <View className="w-0.5 h-8 bg-blue-200" />
-                    )}
-                  </View>
-                  <View className="flex-1 pb-3">
-                    <Text className="block text-base font-medium text-gray-900">{item.title}</Text>
-                    <Text className="block text-sm text-gray-500 mt-0.5">{item.desc}</Text>
-                  </View>
+            <View style={{ background: 'rgba(37,99,235,0.1)', borderRadius: '20px', padding: '3px 10px' }}>
+              <Text style={{ fontSize: '11px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>推荐</Text>
+            </View>
+          </View>
+          <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '16px', lineHeight: '1.6' }}>完整展示工作履历，提升报告可信度和信用评分。</Text>
+
+          {selfProofSteps.map((item, i) => (
+            <View key={i} style={{ display: 'flex', gap: '12px', marginBottom: i < selfProofSteps.length - 1 ? '0' : '16px' }}>
+              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '28px', flexShrink: 0 }}>
+                <View style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Text style={{ color: '#fff', fontSize: '12px', fontWeight: '700', lineHeight: '1' }}>{item.step}</Text>
                 </View>
-              ))}
+                {i < selfProofSteps.length - 1 && <View style={{ width: '2px', flex: 1, minHeight: '16px', background: '#dbeafe', margin: '3px 0' }} />}
+              </View>
+              <View style={{ flex: 1, paddingBottom: i < selfProofSteps.length - 1 ? '12px' : '0' }}>
+                <Text style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', display: 'block', lineHeight: '1.4', marginBottom: '2px' }}>{item.title}</Text>
+                <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', lineHeight: '1.6' }}>{item.desc}</Text>
+              </View>
             </View>
+          ))}
 
-            <Button 
-              className="w-full mt-4 bg-blue-600" 
-              onClick={() => handleNavigate('/pages/work-history/index')}
+          <View
+            style={{ borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
+            onTouchStart={() => press('self-proof')} onTouchEnd={release} onTouchCancel={release}
+            onClick={() => handleNavigate('/pages/work-history/index')}
+          >
+            <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>前往自证</Text>
+            <ArrowRight size={16} color="rgba(255,255,255,0.85)" />
+          </View>
+        </View>
+
+        {/* ── 维护信息 ── */}
+        <View style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
+          <View style={{ padding: '18px 18px 14px', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #f1f5f9' }}>
+            <Star size={18} color="#2563eb" />
+            <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>维护信息</Text>
+          </View>
+          {maintenanceItems.map((item, i) => (
+            <View
+              key={i}
+              style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: i < maintenanceItems.length - 1 ? '1px solid #f8fafc' : 'none', transform: pressedId === `maint-${i}` ? 'scale(0.99)' : 'scale(1)', transition: 'all 0.2s ease', background: pressedId === `maint-${i}` ? '#f8fafc' : 'transparent' }}
+              onTouchStart={() => press(`maint-${i}`)} onTouchEnd={release} onTouchCancel={release}
+              onClick={() => handleNavigate(item.action)}
             >
-              <Text className="text-white">前往自证</Text>
-              <ArrowRight size={18} color="#ffffff" className="ml-2" />
-            </Button>
-          </CardContent>
-        </Card>
-      </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: '14px', fontWeight: '500', color: '#0f172a', display: 'block', lineHeight: '1.4' }}>{item.title}</Text>
+                <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginTop: '2px', lineHeight: '1.5' }}>{item.desc}</Text>
+              </View>
+              <View style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ChevronRight size={14} color="#94a3b8" />
+              </View>
+            </View>
+          ))}
+        </View>
 
-      {/* 维护信息 */}
-      <View className="px-4 mt-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <View className="flex items-center gap-2">
-              <Star size={20} color="#3b82f6" />
-              <CardTitle>维护信息</CardTitle>
-            </View>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <Text className="block text-sm text-gray-600 mb-3">
-              定期维护您的个人信息，保持信用档案的时效性和准确性。
-            </Text>
-            
-            <View className="space-y-2">
-              {maintenanceItems.map((item, index) => (
-                <View
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg active:bg-gray-100"
-                  onClick={() => handleNavigate(item.action)}
-                >
-                  <View className="flex-1">
-                    <Text className="block text-sm font-medium text-gray-900">{item.title}</Text>
-                    <Text className="block text-xs text-gray-500 mt-0.5">{item.desc}</Text>
-                  </View>
-                  <ChevronRight size={18} color="#9ca3af" />
-                </View>
-              ))}
-            </View>
-          </CardContent>
-        </Card>
-      </View>
-
-      {/* 提升报告可信度 */}
-      <View className="px-4 mt-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <View className="flex items-center gap-2">
-              <CircleCheck size={20} color="#3b82f6" />
-              <CardTitle>提升报告可信度</CardTitle>
-            </View>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <View className="space-y-3">
-              <View className="flex items-start gap-2">
-                <CircleCheck size={16} color="#10b981" className="mt-0.5" />
-                <Text className="text-sm text-gray-700 flex-1">
-                  完整填写个人基本信息，确保信息真实准确
-                </Text>
-              </View>
-              <View className="flex items-start gap-2">
-                <CircleCheck size={16} color="#10b981" className="mt-0.5" />
-                <Text className="text-sm text-gray-700 flex-1">
-                  提供学历、职业资格证书等证明材料
-                </Text>
-              </View>
-              <View className="flex items-start gap-2">
-                <CircleCheck size={16} color="#10b981" className="mt-0.5" />
-                <Text className="text-sm text-gray-700 flex-1">
-                  自证完整工作履历，上传相关证明文件
-                </Text>
-              </View>
-              <View className="flex items-start gap-2">
-                <CircleCheck size={16} color="#10b981" className="mt-0.5" />
-                <Text className="text-sm text-gray-700 flex-1">
-                  定期更新信用报告，保持信息时效性
-                </Text>
-              </View>
-              <View className="flex items-start gap-2">
-                <CircleCheck size={16} color="#10b981" className="mt-0.5" />
-                <Text className="text-sm text-gray-700 flex-1">
-                  授权查询更多维度数据，丰富报告内容
-                </Text>
-              </View>
-            </View>
-
-            <View className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <Text className="text-sm text-blue-700">
-                💡 提示：报告可信度越高，在求职、背调等场景中的认可度越高。
-              </Text>
-            </View>
-          </CardContent>
-        </Card>
-      </View>
-
-      {/* 底部操作 */}
-      <View className="px-4 mt-4">
-        <Button 
-          className="w-full bg-blue-600" 
-          onClick={() => handleNavigate('/pages/work-history/index')}
-        >
-          <Briefcase size={18} color="#ffffff" />
-          <Text className="text-white ml-2">前往自证</Text>
-        </Button>
       </View>
     </View>
   )
 }
+
 
 export default EnhancementPage
