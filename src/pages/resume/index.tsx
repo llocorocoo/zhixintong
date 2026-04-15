@@ -154,25 +154,6 @@ const ResumePage: FC = () => {
               </Text>
             </View>
 
-            {/* 三步引导 */}
-            <View style={{ margin: '0 20px 24px', background: '#f8fafc', borderRadius: '16px', padding: '16px 20px' }}>
-              <Text style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '14px', lineHeight: '1.5' }}>
-                如何获取可信简历
-              </Text>
-              {[
-                { step: '1', text: '生成职业信用报告' },
-                { step: '2', text: '完成信息核查（1-3工作日）' },
-                { step: '3', text: '返回报告页点击「更新可信简历」' },
-              ].map((item, i, arr) => (
-                <View key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: i < arr.length - 1 ? '12px' : '0' }}>
-                  <View style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
-                    <Text style={{ color: '#fff', fontSize: '11px', fontWeight: '700', lineHeight: '1' }}>{item.step}</Text>
-                  </View>
-                  <Text style={{ fontSize: '13px', color: '#475569', lineHeight: '1.6', flex: 1 }}>{item.text}</Text>
-                </View>
-              ))}
-            </View>
-
             {/* CTA */}
             <View style={{ padding: '0 20px 28px' }}>
               <View
