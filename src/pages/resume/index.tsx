@@ -3,7 +3,7 @@ import { FC, useState, useCallback } from 'react'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { FileSearch, ArrowRight } from 'lucide-react-taro'
+import { FileSearch, ArrowRight, UserCheck } from 'lucide-react-taro'
 
 interface ResumeData {
   avatar?: string
@@ -112,34 +112,87 @@ const ResumePage: FC = () => {
     fetchResume()
   })
 
+  const [btnPressed, setBtnPressed] = useState(false)
+
   return (
-    <View className="min-h-screen bg-gray-50">
-      {/* 导航栏 */}
-      <View className="bg-blue-500 px-4 py-3 flex items-center justify-center">
-        <Text className="text-white text-lg font-medium">可信简历</Text>
+    <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
+
+      {/* ── 蓝色渐变头部 ── */}
+      <View style={{
+        background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)',
+        padding: '20px 20px 24px',
+        position: 'relative', overflow: 'hidden',
+      }}>
+        <View style={{ position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <Text style={{ fontSize: '22px', fontWeight: '800', color: '#fff', display: 'block', lineHeight: '1.3', letterSpacing: '0.5px' }}>可信简历</Text>
+        <Text style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', display: 'block', marginTop: '4px', lineHeight: '1.5' }}>经过核实的权威职业档案</Text>
       </View>
 
-      {/* 空状态 */}
+      {/* ── 空状态 ── */}
       {!resumeData && (
-        <View className="p-4 pt-6">
-          <View className="bg-white rounded-xl p-5 border-2 border-blue-100">
-            <View className="flex items-start gap-4">
-              <View className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <FileSearch size={28} color="#3b82f6" />
+        <View style={{ padding: '16px' }}>
+          <View style={{
+            background: '#fff', borderRadius: '24px', overflow: 'hidden',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.08)',
+          }}>
+            {/* 插画区 */}
+            <View style={{ padding: '40px 24px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <View style={{
+                width: '96px', height: '96px', borderRadius: '50%',
+                background: 'linear-gradient(135deg, #1e40af, #3b82f6)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                marginBottom: '20px',
+                boxShadow: '0 8px 28px rgba(37,99,235,0.35)',
+              }}>
+                <UserCheck size={44} color="#fff" />
               </View>
-              <View className="flex-1">
-                <Text className="block text-base font-medium text-gray-900 mb-2">暂无可信简历</Text>
-                <Text className="block text-sm text-gray-500 mb-4 leading-relaxed">
-                  您尚未生成职业信用报告。生成报告并选择「更新可信简历」后，您的可信简历将在此展示。
-                </Text>
-                <View
-                  className="bg-blue-600 rounded-xl px-4 py-3 flex items-center justify-center active:bg-blue-700"
-                  onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
-                >
-                  <FileSearch size={16} color="#ffffff" />
-                  <Text className="text-white text-sm font-medium ml-2">前往生成职业信用报告</Text>
-                  <ArrowRight size={14} color="#ffffff" className="ml-1" />
+              <Text style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', display: 'block', lineHeight: '1.3', marginBottom: '10px' }}>
+                暂无可信简历
+              </Text>
+              <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', lineHeight: '1.7', textAlign: 'center' }}>
+                生成职业信用报告并完成核查后，点击「更新可信简历」即可在此查看您的权威职业档案。
+              </Text>
+            </View>
+
+            {/* 三步引导 */}
+            <View style={{ margin: '0 20px 24px', background: '#f8fafc', borderRadius: '16px', padding: '16px 20px' }}>
+              <Text style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '14px', lineHeight: '1.5' }}>
+                如何获取可信简历
+              </Text>
+              {[
+                { step: '1', text: '生成职业信用报告' },
+                { step: '2', text: '完成信息核查（1-3工作日）' },
+                { step: '3', text: '返回报告页点击「更新可信简历」' },
+              ].map((item, i, arr) => (
+                <View key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: i < arr.length - 1 ? '12px' : '0' }}>
+                  <View style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
+                    <Text style={{ color: '#fff', fontSize: '11px', fontWeight: '700', lineHeight: '1' }}>{item.step}</Text>
+                  </View>
+                  <Text style={{ fontSize: '13px', color: '#475569', lineHeight: '1.6', flex: 1 }}>{item.text}</Text>
                 </View>
+              ))}
+            </View>
+
+            {/* CTA */}
+            <View style={{ padding: '0 20px 28px' }}>
+              <View
+                style={{
+                  borderRadius: '16px', padding: '15px 0',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
+                  boxShadow: '0 6px 20px rgba(37,99,235,0.4)',
+                  transform: btnPressed ? 'scale(0.97)' : 'scale(1)',
+                  transition: 'all 0.2s ease',
+                }}
+                onTouchStart={() => setBtnPressed(true)}
+                onTouchEnd={() => setBtnPressed(false)}
+                onTouchCancel={() => setBtnPressed(false)}
+                onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
+              >
+                <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>
+                  前往生成职业信用报告
+                </Text>
+                <ArrowRight size={17} color="rgba(255,255,255,0.85)" />
               </View>
             </View>
           </View>
