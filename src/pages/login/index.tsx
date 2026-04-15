@@ -184,20 +184,6 @@ const LoginPage: FC = () => {
           专业职业信用管理平台
         </Text>
 
-        {/* 信任标签 */}
-        <View style={{ display: 'flex', gap: '8px', marginTop: '24px' }}>
-          {['权威认证', '数据加密', '合规合法'].map(tag => (
-            <View key={tag} style={{
-              padding: '4px 10px',
-              borderRadius: '20px',
-              background: 'rgba(255,255,255,0.12)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              backdropFilter: 'blur(8px)',
-            }}>
-              <Text style={{ fontSize: '11px', color: 'rgba(255,255,255,0.8)' }}>{tag}</Text>
-            </View>
-          ))}
-        </View>
       </View>
 
       {/* ── 表单卡片 ── */}
