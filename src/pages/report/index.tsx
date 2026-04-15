@@ -90,12 +90,12 @@ const ReportPage: FC = () => {
   const release = () => setPressedBtn(null)
 
   return (
-    <View style={{ background: '#f6f8fc', minHeight: '100vh', paddingBottom: '88px' }}>
+    <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
 
       {/* ── 蓝色渐变头部 ── */}
       <View style={{
         background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)',
-        padding: '48px 20px 72px',
+        padding: '48px 20px 24px',
         position: 'relative', overflow: 'hidden',
       }}>
         {/* 装饰光晕 */}
@@ -105,7 +105,7 @@ const ReportPage: FC = () => {
       </View>
 
       {/* ── 主内容（上移覆盖头部底部） ── */}
-      <View style={{ padding: '0 16px', marginTop: '-44px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <View style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
         {/* ══ 空状态 ══ */}
         {!reportData && (
@@ -323,28 +323,18 @@ const ReportPage: FC = () => {
             )}
           </View>
         )}
-      </View>
-
-      {/* ── 样例报告悬浮入口 ── */}
-      <View style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0,
-        padding: '10px 16px 24px',
-        background: 'rgba(246,248,252,0.9)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderTop: '1px solid rgba(0,0,0,0.06)',
-      }}>
+        {/* ── 样例报告入口 ── */}
         <View
-          style={{ ...btn('sample'), background: '#fff', borderRadius: '16px', padding: '13px 20px', display: 'flex', alignItems: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}
+          style={{ ...btn('sample'), background: '#fff', borderRadius: '20px', padding: '16px 20px', display: 'flex', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)' }}
           onTouchStart={() => press('sample')} onTouchEnd={release} onTouchCancel={release}
           onClick={() => Taro.navigateTo({ url: '/pages/sample-report/index' })}
         >
-          <View style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '12px', flexShrink: 0 }}>
-            <Eye size={18} color="#7c3aed" />
+          <View style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '14px', flexShrink: 0 }}>
+            <Eye size={20} color="#7c3aed" />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', display: 'block', lineHeight: '1.4' }}>查看样例报告</Text>
-            <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', lineHeight: '1.5' }}>了解报告包含哪些内容</Text>
+            <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginTop: '2px', lineHeight: '1.5' }}>了解报告包含哪些内容</Text>
           </View>
           <ChevronRight size={16} color="#94a3b8" />
         </View>
