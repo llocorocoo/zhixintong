@@ -1,8 +1,6 @@
 import { View, Text } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Lock, Phone, ChevronRight, CircleAlert } from 'lucide-react-taro'
 import { useUserStore } from '@/stores/user'
@@ -16,251 +14,169 @@ const AccountSettingsPage: FC = () => {
   const [confirmPwd, setConfirmPwd] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [smsCode, setSmsCode] = useState('')
-  const [codeSent, setCodeSent] = useState(false)
   const [countdown, setCountdown] = useState(0)
   const [saving, setSaving] = useState(false)
 
   const handleSendCode = async () => {
-    if (!newPhone || newPhone.length !== 11) {
-      Taro.showToast({ title: '请输入正确的手机号', icon: 'none' })
-      return
-    }
-    setCodeSent(true)
+    if (!newPhone || newPhone.length !== 11) { Taro.showToast({ title: '请输入正确的手机号', icon: 'none' }); return }
     setCountdown(60)
     Taro.showToast({ title: '验证码已发送', icon: 'success' })
     const timer = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) { clearInterval(timer); return 0 }
-        return prev - 1
-      })
+      setCountdown(prev => { if (prev <= 1) { clearInterval(timer); return 0 } return prev - 1 })
     }, 1000)
   }
 
   const handleChangePhone = async () => {
-    if (!newPhone || newPhone.length !== 11) {
-      Taro.showToast({ title: '请输入正确的手机号', icon: 'none' })
-      return
-    }
-    if (!smsCode) {
-      Taro.showToast({ title: '请输入验证码', icon: 'none' })
-      return
-    }
+    if (!newPhone || newPhone.length !== 11) { Taro.showToast({ title: '请输入正确的手机号', icon: 'none' }); return }
+    if (!smsCode) { Taro.showToast({ title: '请输入验证码', icon: 'none' }); return }
     setSaving(true)
-    await new Promise(resolve => setTimeout(resolve, 800))
+    await new Promise(r => setTimeout(r, 800))
     setUserInfo({ ...userInfo!, phone: newPhone })
     setSaving(false)
-    setNewPhone(''); setSmsCode(''); setCodeSent(false)
-    setShowChangePhone(false)
+    setNewPhone(''); setSmsCode(''); setShowChangePhone(false)
     Taro.showToast({ title: '手机号更换成功', icon: 'success' })
   }
 
   const handleChangePwd = async () => {
-    if (!oldPwd || !newPwd || !confirmPwd) {
-      Taro.showToast({ title: '请填写完整信息', icon: 'none' })
-      return
-    }
-    if (newPwd !== confirmPwd) {
-      Taro.showToast({ title: '两次密码不一致', icon: 'none' })
-      return
-    }
-    if (newPwd.length < 6) {
-      Taro.showToast({ title: '密码不能少于6位', icon: 'none' })
-      return
-    }
+    if (!oldPwd || !newPwd || !confirmPwd) { Taro.showToast({ title: '请填写完整信息', icon: 'none' }); return }
+    if (newPwd !== confirmPwd) { Taro.showToast({ title: '两次密码不一致', icon: 'none' }); return }
+    if (newPwd.length < 6) { Taro.showToast({ title: '密码不能少于6位', icon: 'none' }); return }
     setSaving(true)
-    await new Promise(resolve => setTimeout(resolve, 800))
+    await new Promise(r => setTimeout(r, 800))
     setSaving(false)
-    setOldPwd(''); setNewPwd(''); setConfirmPwd('')
-    setShowChangePwd(false)
+    setOldPwd(''); setNewPwd(''); setConfirmPwd(''); setShowChangePwd(false)
     Taro.showToast({ title: '密码修改成功', icon: 'success' })
   }
 
   const handleDeactivate = () => {
-    Taro.showModal({
-      title: '注销账户',
-      content: '注销后账户数据将被永久删除且无法恢复，确认注销吗？',
-      confirmColor: '#ef4444',
-      success: res => {
-        if (res.confirm) {
-          Taro.showToast({ title: '已提交注销申请', icon: 'success' })
-        }
-      }
+    Taro.showModal({ title: '注销账户', content: '注销后账户数据将被永久删除且无法恢复，确认注销吗？', confirmColor: '#ef4444',
+      success: res => { if (res.confirm) Taro.showToast({ title: '已提交注销申请', icon: 'success' }) }
     })
   }
 
+  const inputStyle = { background: '#f8fafc', borderRadius: '12px', padding: '11px 14px', display: 'flex', alignItems: 'center', gap: '10px', border: '1.5px solid transparent' }
+
   return (
-    <View className="min-h-screen bg-gray-50 pb-8">
+    <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
 
-      {/* 账号信息 */}
-      <Card className="mx-4 mt-4 mb-4">
-        <CardContent className="p-0">
-          <View
-            className="flex items-center justify-between px-4 py-4 border-b border-gray-100 active:bg-gray-50"
-            onClick={() => { setShowChangePhone(!showChangePhone); setShowChangePwd(false) }}
-          >
-            <View className="flex items-center gap-3">
-              <Phone size={18} color="#6b7280" />
-              <View>
-                <Text className="block text-sm font-medium text-gray-900">手机号</Text>
-                <Text className="block text-xs text-gray-500 mt-0.5">{userInfo?.phone || '未绑定'}</Text>
-              </View>
-            </View>
-            <View className="flex items-center gap-1">
-              <Text className="text-xs text-blue-500">更换</Text>
-              <ChevronRight size={14} color="#3b82f6" />
-            </View>
-          </View>
-
-          <View
-            className="flex items-center justify-between px-4 py-4 active:bg-gray-50"
-            onClick={() => setShowChangePwd(!showChangePwd)}
-          >
-            <View className="flex items-center gap-3">
-              <Lock size={18} color="#6b7280" />
-              <View>
-                <Text className="block text-sm font-medium text-gray-900">登录密码</Text>
-                <Text className="block text-xs text-gray-500 mt-0.5">定期更换密码保障账户安全</Text>
-              </View>
-            </View>
-            <View className="flex items-center gap-1">
-              <Text className="text-xs text-blue-500">修改</Text>
-              <ChevronRight size={14} color="#3b82f6" />
-            </View>
-          </View>
-        </CardContent>
-      </Card>
-
-      {/* 更换手机号表单 */}
-      {showChangePhone && (
-        <Card className="mx-4 mb-4">
-          <CardContent className="p-4 space-y-3">
-            <Text className="block text-sm font-medium text-gray-900 mb-2">更换手机号</Text>
-
-            <View className="bg-gray-50 rounded-xl px-4 py-3 flex items-center gap-2">
-              <Phone size={16} color="#9ca3af" />
-              <Input
-                className="flex-1 bg-transparent text-sm"
-                placeholder="请输入新手机号"
-                type="number"
-                maxlength={11}
-                value={newPhone}
-                onInput={e => setNewPhone(e.detail.value)}
-              />
-            </View>
-
-            <View className="flex gap-2">
-              <View className="flex-1 bg-gray-50 rounded-xl px-4 py-3 flex items-center gap-2">
-                <Input
-                  className="flex-1 bg-transparent text-sm"
-                  placeholder="请输入验证码"
-                  type="number"
-                  maxlength={6}
-                  value={smsCode}
-                  onInput={e => setSmsCode(e.detail.value)}
-                />
-              </View>
-              <View
-                className={`px-4 py-3 rounded-xl flex items-center justify-center ${countdown > 0 ? 'bg-gray-100' : 'bg-blue-50 active:bg-blue-100'}`}
-                onClick={countdown === 0 ? handleSendCode : undefined}
-              >
-                <Text className={`text-sm font-medium ${countdown > 0 ? 'text-gray-400' : 'text-blue-500'}`}>
-                  {countdown > 0 ? `${countdown}s` : '获取验证码'}
-                </Text>
-              </View>
-            </View>
-
-            <View className="flex gap-3 pt-1">
-              <Button
-                className="flex-1"
-                variant="outline"
-                onClick={() => { setShowChangePhone(false); setNewPhone(''); setSmsCode(''); setCodeSent(false) }}
-              >
-                <Text className="text-gray-600">取消</Text>
-              </Button>
-              <Button className="flex-1 bg-blue-600" onClick={handleChangePhone} disabled={saving}>
-                <Text className="text-white">{saving ? '提交中...' : '确认更换'}</Text>
-              </Button>
-            </View>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* 修改密码表单 */}
-      {showChangePwd && (
-        <Card className="mx-4 mb-4">
-          <CardContent className="p-4 space-y-3">
-            <Text className="block text-sm font-medium text-gray-900 mb-2">修改登录密码</Text>
-
-            <View className="bg-gray-50 rounded-xl px-4 py-3 flex items-center gap-2">
-              <Lock size={16} color="#9ca3af" />
-              <Input
-                className="flex-1 bg-transparent text-sm"
-                placeholder="当前密码"
-                password
-                value={oldPwd}
-                onInput={e => setOldPwd(e.detail.value)}
-              />
-            </View>
-            <View className="bg-gray-50 rounded-xl px-4 py-3 flex items-center gap-2">
-              <Lock size={16} color="#9ca3af" />
-              <Input
-                className="flex-1 bg-transparent text-sm"
-                placeholder="新密码（不少于6位）"
-                password
-                value={newPwd}
-                onInput={e => setNewPwd(e.detail.value)}
-              />
-            </View>
-            <View className="bg-gray-50 rounded-xl px-4 py-3 flex items-center gap-2">
-              <Lock size={16} color="#9ca3af" />
-              <Input
-                className="flex-1 bg-transparent text-sm"
-                placeholder="确认新密码"
-                password
-                value={confirmPwd}
-                onInput={e => setConfirmPwd(e.detail.value)}
-              />
-            </View>
-
-            <View className="flex gap-3 pt-1">
-              <Button
-                className="flex-1"
-                variant="outline"
-                onClick={() => { setShowChangePwd(false); setOldPwd(''); setNewPwd(''); setConfirmPwd('') }}
-              >
-                <Text className="text-gray-600">取消</Text>
-              </Button>
-              <Button className="flex-1 bg-blue-600" onClick={handleChangePwd} disabled={saving}>
-                <Text className="text-white">{saving ? '提交中...' : '确认修改'}</Text>
-              </Button>
-            </View>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* 安全提示 */}
-      <View className="mx-4 mb-4 p-3 bg-amber-50 rounded-xl flex items-start gap-2">
-        <CircleAlert size={16} color="#f59e0b" className="mt-0.5 flex-shrink-0" />
-        <Text className="text-xs text-amber-700 leading-relaxed">
-          为保障账户安全，建议使用包含字母和数字的组合密码，并定期更换。
-        </Text>
+      {/* 头部 */}
+      <View style={{ background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)', padding: '20px 20px 24px', position: 'relative', overflow: 'hidden' }}>
+        <View style={{ position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <Text style={{ fontSize: '22px', fontWeight: '800', color: '#fff', display: 'block', lineHeight: '1.3', letterSpacing: '0.5px' }}>账户设置</Text>
+        <Text style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', display: 'block', marginTop: '4px', lineHeight: '1.5' }}>管理您的账户安全信息</Text>
       </View>
 
-      {/* 注销账户 */}
-      <Card className="mx-4">
-        <CardContent className="p-4">
-          <Text className="block text-sm font-medium text-gray-900 mb-1">注销账户</Text>
-          <Text className="block text-xs text-gray-500 mb-3 leading-relaxed">
-            注销账户后，您的信用报告、评分及所有个人数据将被永久删除，且无法恢复。
-          </Text>
-          <View
-            className="py-2.5 px-4 border border-red-200 rounded-xl flex items-center justify-center active:bg-red-50"
-            onClick={handleDeactivate}
-          >
-            <Text className="text-sm text-red-500">申请注销账户</Text>
+      <View style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '32px' }}>
+
+        {/* 账号信息 */}
+        <View style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
+          <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 18px', borderBottom: '1px solid #f8fafc' }}
+            onClick={() => { setShowChangePhone(!showChangePhone); setShowChangePwd(false) }}>
+            <View style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <View style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Phone size={18} color="#2563eb" />
+              </View>
+              <View>
+                <Text style={{ fontSize: '14px', fontWeight: '500', color: '#0f172a', display: 'block', lineHeight: '1.4' }}>手机号</Text>
+                <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', lineHeight: '1.5' }}>{userInfo?.phone || '未绑定'}</Text>
+              </View>
+            </View>
+            <View style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <Text style={{ fontSize: '12px', color: '#2563eb', lineHeight: '1.5' }}>更换</Text>
+              <ChevronRight size={13} color="#2563eb" />
+            </View>
           </View>
-        </CardContent>
-      </Card>
+
+          <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 18px' }}
+            onClick={() => { setShowChangePwd(!showChangePwd); setShowChangePhone(false) }}>
+            <View style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <View style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Lock size={18} color="#64748b" />
+              </View>
+              <View>
+                <Text style={{ fontSize: '14px', fontWeight: '500', color: '#0f172a', display: 'block', lineHeight: '1.4' }}>登录密码</Text>
+                <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', lineHeight: '1.5' }}>定期更换密码保障账户安全</Text>
+              </View>
+            </View>
+            <View style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <Text style={{ fontSize: '12px', color: '#2563eb', lineHeight: '1.5' }}>修改</Text>
+              <ChevronRight size={13} color="#2563eb" />
+            </View>
+          </View>
+        </View>
+
+        {/* 更换手机号表单 */}
+        {showChangePhone && (
+          <View style={{ background: '#fff', borderRadius: '20px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <Text style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', lineHeight: '1.5' }}>更换手机号</Text>
+            <View style={inputStyle}>
+              <Phone size={16} color="#94a3b8" />
+              <Input style={{ flex: 1, fontSize: '14px', color: '#0f172a', background: 'transparent' }} placeholder="请输入新手机号" placeholderStyle="color:#cbd5e1;" type="number" maxlength={11} value={newPhone} onInput={e => setNewPhone(e.detail.value)} />
+            </View>
+            <View style={{ display: 'flex', gap: '8px' }}>
+              <View style={{ ...inputStyle, flex: 1 }}>
+                <Input style={{ flex: 1, fontSize: '14px', color: '#0f172a', background: 'transparent' }} placeholder="验证码" placeholderStyle="color:#cbd5e1;" type="number" maxlength={6} value={smsCode} onInput={e => setSmsCode(e.detail.value)} />
+              </View>
+              <View style={{ padding: '11px 14px', borderRadius: '12px', background: countdown > 0 ? '#f1f5f9' : '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={countdown === 0 ? handleSendCode : undefined}>
+                <Text style={{ fontSize: '13px', fontWeight: '500', color: countdown > 0 ? '#94a3b8' : '#2563eb', lineHeight: '1.5' }}>{countdown > 0 ? `${countdown}s` : '获取验证码'}</Text>
+              </View>
+            </View>
+            <View style={{ display: 'flex', gap: '10px' }}>
+              <View style={{ flex: 1, borderRadius: '14px', padding: '12px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px solid #e2e8f0', background: '#fff' }}
+                onClick={() => { setShowChangePhone(false); setNewPhone(''); setSmsCode('') }}>
+                <Text style={{ fontSize: '14px', color: '#64748b', lineHeight: '1.5' }}>取消</Text>
+              </View>
+              <View style={{ flex: 1, borderRadius: '14px', padding: '12px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}
+                onClick={saving ? undefined : handleChangePhone}>
+                <Text style={{ fontSize: '14px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>{saving ? '提交中...' : '确认更换'}</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* 修改密码表单 */}
+        {showChangePwd && (
+          <View style={{ background: '#fff', borderRadius: '20px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <Text style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', lineHeight: '1.5' }}>修改登录密码</Text>
+            {[
+              { key: 'old', val: oldPwd, set: setOldPwd, ph: '当前密码' },
+              { key: 'new', val: newPwd, set: setNewPwd, ph: '新密码（不少于6位）' },
+              { key: 'confirm', val: confirmPwd, set: setConfirmPwd, ph: '确认新密码' },
+            ].map(f => (
+              <View key={f.key} style={inputStyle}>
+                <Lock size={16} color="#94a3b8" />
+                <Input style={{ flex: 1, fontSize: '14px', color: '#0f172a', background: 'transparent' }} placeholder={f.ph} placeholderStyle="color:#cbd5e1;" password value={f.val} onInput={e => f.set(e.detail.value)} />
+              </View>
+            ))}
+            <View style={{ display: 'flex', gap: '10px' }}>
+              <View style={{ flex: 1, borderRadius: '14px', padding: '12px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px solid #e2e8f0', background: '#fff' }}
+                onClick={() => { setShowChangePwd(false); setOldPwd(''); setNewPwd(''); setConfirmPwd('') }}>
+                <Text style={{ fontSize: '14px', color: '#64748b', lineHeight: '1.5' }}>取消</Text>
+              </View>
+              <View style={{ flex: 1, borderRadius: '14px', padding: '12px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}
+                onClick={saving ? undefined : handleChangePwd}>
+                <Text style={{ fontSize: '14px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>{saving ? '提交中...' : '确认修改'}</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* 安全提示 */}
+        <View style={{ background: '#fffbeb', borderRadius: '14px', padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: '8px', borderLeft: '3px solid #f59e0b' }}>
+          <CircleAlert size={15} color="#d97706" />
+          <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.6', flex: 1 }}>为保障账户安全，建议使用包含字母和数字的组合密码，并定期更换。</Text>
+        </View>
+
+        {/* 注销账户 */}
+        <View style={{ background: '#fff', borderRadius: '20px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
+          <Text style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', display: 'block', marginBottom: '6px', lineHeight: '1.5' }}>注销账户</Text>
+          <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '14px', lineHeight: '1.6' }}>注销账户后，您的信用报告、评分及所有个人数据将被永久删除，且无法恢复。</Text>
+          <View style={{ borderRadius: '14px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.04)' }} onClick={handleDeactivate}>
+            <Text style={{ fontSize: '14px', fontWeight: '500', color: '#ef4444', lineHeight: '1.5' }}>申请注销账户</Text>
+          </View>
+        </View>
+      </View>
     </View>
   )
 }

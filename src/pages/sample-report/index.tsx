@@ -235,7 +235,13 @@ const StatusBadge: FC<{ status: string }> = ({ status }) => {
 
 const SampleReportPage: FC = () => {
   return (
-    <View className="min-h-screen bg-gray-100">
+    <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
+      {/* 头部 */}
+      <View style={{ background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)', padding: '20px 20px 24px', position: 'relative', overflow: 'hidden' }}>
+        <View style={{ position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <Text style={{ fontSize: '22px', fontWeight: '800', color: '#fff', display: 'block', lineHeight: '1.3', letterSpacing: '0.5px' }}>样例报告</Text>
+        <Text style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', display: 'block', marginTop: '4px', lineHeight: '1.5' }}>了解职业信用报告包含哪些内容</Text>
+      </View>
       <ScrollView scrollY className="flex-1 px-4 pt-4 pb-10">
 
         {/* 个人基础信息 */}

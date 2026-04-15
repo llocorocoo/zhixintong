@@ -75,10 +75,10 @@ const Badge: FC<{ verified: boolean }> = ({ verified }) => (
 )
 
 const SectionCard: FC<{ title: string; sub?: string; children: React.ReactNode }> = ({ title, sub, children }) => (
-  <View className="mx-4 mb-3 bg-white rounded-xl p-4">
-    <View className="flex items-center gap-2 mb-3">
-      <Text className="text-base font-medium text-gray-900">{title}</Text>
-      {sub && <Text className="text-sm text-gray-400">{sub}</Text>}
+  <View style={{ margin: '0 16px 12px', background: '#fff', borderRadius: '20px', padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
+    <View style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+      <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>{title}</Text>
+      {sub && <Text style={{ fontSize: '13px', color: '#94a3b8', lineHeight: '1.5' }}>{sub}</Text>}
     </View>
     {children}
   </View>
@@ -185,7 +185,7 @@ const ResumePage: FC = () => {
         <ScrollView scrollY className="flex-1" style={{ paddingBottom: '80px' }}>
 
           {/* 个人基础信息 */}
-          <View className="mx-4 mt-3 mb-3 bg-white rounded-xl p-4">
+          <View style={{ margin: '16px 16px 12px', background: '#fff', borderRadius: '20px', padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
             <View className="flex items-start gap-4">
               {/* 头像框 */}
               <View className="w-16 h-16 rounded-lg border border-dashed border-gray-300 flex items-center justify-center flex-shrink-0 bg-white">
