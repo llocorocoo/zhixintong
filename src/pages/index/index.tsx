@@ -5,7 +5,7 @@ import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import {
   Briefcase, FileText, Wrench, ChevronRight,
-  FileSearch, UserCheck, TrendingUp, Bell
+  FileSearch, UserCheck, TrendingUp
 } from 'lucide-react-taro'
 
 interface CreditScoreData {
@@ -119,15 +119,6 @@ const IndexPage: FC = () => {
               管理您的职业信用档案
             </Text>
           </View>
-          <View style={{
-            width: '38px', height: '38px', borderRadius: '50%',
-            background: '#fff',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.2s ease',
-          }}>
-            <Bell size={18} color="#64748b" />
-          </View>
         </View>
       </View>
 
@@ -178,8 +169,7 @@ const IndexPage: FC = () => {
                 }}
                 onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
               >
-                {!creditScore && <FileText size={15} color="#fff" />}
-                <Text style={{ color: '#fff', fontSize: '13px', fontWeight: '600', lineHeight: '1.5' }}>
+                  <Text style={{ color: '#fff', fontSize: '13px', fontWeight: '600', lineHeight: '1.5' }}>
                   {creditScore ? '查看报告' : '立即生成'}
                 </Text>
                 <ChevronRight size={14} color="rgba(255,255,255,0.8)" />
