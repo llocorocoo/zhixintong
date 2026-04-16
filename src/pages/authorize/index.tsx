@@ -94,7 +94,7 @@ const AuthorizePage: FC = () => {
         <View style={{ position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
         {/* 图标 + 说明 */}
-        <View style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+        <View style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <View style={{
             width: '44px', height: '44px', borderRadius: '14px',
             background: 'rgba(255,255,255,0.15)',
@@ -114,62 +114,10 @@ const AuthorizePage: FC = () => {
           </View>
         </View>
 
-        {/* 倒计时提示条 */}
-        <View style={{
-          display: 'flex', alignItems: 'center', gap: '10px',
-          background: 'rgba(255,255,255,0.12)',
-          borderRadius: '14px', padding: '10px 16px',
-          border: '1px solid rgba(255,255,255,0.15)',
-        }}>
-          {!canAgree ? (
-            <>
-              <View style={{
-                width: '32px', height: '32px', borderRadius: '50%',
-                background: 'rgba(255,255,255,0.2)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-              }}>
-                <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1' }}>{countdown}</Text>
-              </View>
-              <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: '13px', lineHeight: '1.5' }}>
-                请阅读完毕后方可授权，剩余 <Text style={{ color: '#fde68a', fontWeight: '700' }}>{countdown}</Text> 秒
-              </Text>
-            </>
-          ) : (
-            <>
-              <CircleCheck size={22} color="#86efac" />
-              <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: '13px', lineHeight: '1.5' }}>
-                已阅读完毕，请勾选确认后授权
-              </Text>
-            </>
-          )}
-        </View>
       </View>
 
       {/* ── 主内容区 ── */}
       <View style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-
-        {/* 授权范围标签 */}
-        <View style={{
-          background: '#fff', borderRadius: '20px', padding: '16px 18px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)',
-        }}>
-          <Text style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', display: 'block', marginBottom: '12px', lineHeight: '1.5' }}>
-            授权核查范围
-          </Text>
-          <View style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {SCOPE_ITEMS.map((item, i) => (
-              <View key={i} style={{
-                display: 'flex', alignItems: 'center', gap: '4px',
-                background: '#eff6ff', borderRadius: '20px',
-                padding: '4px 10px',
-              }}>
-                <CircleCheck size={12} color="#2563eb" />
-                <Text style={{ fontSize: '11px', color: '#2563eb', lineHeight: '1.5' }}>{item}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
 
         {/* 授权书全文 */}
         <View style={{
