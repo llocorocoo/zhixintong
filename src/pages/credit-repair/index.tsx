@@ -1,12 +1,9 @@
 import { View, Text } from '@tarojs/components'
 import { FC, useState, useEffect, useCallback } from 'react'
 import Taro from '@tarojs/taro'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import {
-  Wrench,
   FileSearch,
   TriangleAlert,
   Shield,
@@ -232,292 +229,254 @@ const CreditRepairPage: FC = () => {
     }
   ]
 
+  const CARD = { background: '#fff', borderRadius: '20px', overflow: 'hidden' as const, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }
+
   return (
-    <View className="min-h-screen bg-gray-50 pb-6">
-      {/* 顶部 */}
-      <View className="bg-gradient-to-br from-blue-500 to-blue-600 px-4 pt-12 pb-8">
-        <View className="flex items-center gap-3 mb-2">
-          <Wrench size={24} color="#ffffff" />
-          <Text className="text-white text-xl font-bold">信用修复</Text>
-        </View>
-        <Text className="text-blue-100 text-sm leading-relaxed">
-          查询可修复的信用记录，提供法律依据和修复渠道指引
-        </Text>
+    <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
+
+      {/* 头部 */}
+      <View style={{ background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)', padding: '20px 20px 24px', position: 'relative', overflow: 'hidden' }}>
+        <View style={{ position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <Text style={{ fontSize: '22px', fontWeight: '800', color: '#fff', display: 'block', lineHeight: '1.3', letterSpacing: '0.5px' }}>信用修复</Text>
+        <Text style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', display: 'block', marginTop: '4px', lineHeight: '1.5' }}>查询可修复的信用记录，提供法律依据和修复渠道指引</Text>
       </View>
 
-      {/* 个性化修复建议 */}
-      <View className="px-4 -mt-4">
-        <Card className="shadow-md">
-          <CardHeader className="pb-3">
-            <View className="flex items-center justify-between">
-              <View className="flex items-center gap-2">
-                <Search size={20} color="#3b82f6" />
-                <CardTitle>个性化修复建议</CardTitle>
-              </View>
-              {hasReport && repairableCount > 0 && (
-                <Badge className="bg-red-100">
-                  <Text className="text-xs text-red-600">发现 {repairableCount} 项可修复</Text>
-                </Badge>
-              )}
-              {hasReport && repairableCount === 0 && (
-                <Badge className="bg-green-100">
-                  <Text className="text-xs text-green-600">未发现可修复记录</Text>
-                </Badge>
-              )}
+      <View style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '32px' }}>
+
+        {/* ── 个性化修复建议 ── */}
+        <View style={CARD}>
+          <View style={{ padding: '16px 18px 12px', borderBottom: '1px solid #f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Search size={18} color="#2563eb" />
+              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>个性化修复建议</Text>
             </View>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
+            {hasReport && repairableCount > 0 && (
+              <View style={{ background: 'rgba(220,38,38,0.1)', borderRadius: '20px', padding: '3px 10px' }}>
+                <Text style={{ fontSize: '11px', fontWeight: '600', color: '#dc2626', lineHeight: '1.5' }}>发现 {repairableCount} 项可修复</Text>
+              </View>
+            )}
+            {hasReport && repairableCount === 0 && (
+              <View style={{ background: 'rgba(5,150,105,0.1)', borderRadius: '20px', padding: '3px 10px' }}>
+                <Text style={{ fontSize: '11px', fontWeight: '600', color: '#059669', lineHeight: '1.5' }}>未发现可修复记录</Text>
+              </View>
+            )}
+          </View>
+
+          <View style={{ padding: '16px 18px' }}>
             {loading ? (
-              <View className="py-8 text-center">
-                <Text className="text-gray-400">核查中...</Text>
+              <View style={{ padding: '24px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: '13px', color: '#94a3b8', lineHeight: '1.5' }}>核查中...</Text>
               </View>
             ) : !hasReport ? (
-              /* 未生成报告 */
-              <View className="py-6">
-                <View className="flex items-start gap-4 mb-4">
-                  <View className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <FileSearch size={24} color="#9ca3af" />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="block text-base font-medium text-gray-900 mb-1">需先生成信用报告</Text>
-                    <Text className="block text-sm text-gray-500 leading-relaxed">
-                      生成职业信用报告并完成授权核查后，平台将检索您的行政处罚、失信名单等记录，识别符合国家修复规定的可修复项目。
-                    </Text>
-                  </View>
+              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 0 8px' }}>
+                <View style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e40af, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', boxShadow: '0 6px 20px rgba(37,99,235,0.3)' }}>
+                  <FileSearch size={32} color="#fff" />
                 </View>
+                <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', display: 'block', marginBottom: '8px', lineHeight: '1.4' }}>需先生成信用报告</Text>
+                <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', lineHeight: '1.7', textAlign: 'center', marginBottom: '20px' }}>
+                  生成职业信用报告并完成授权核查后，平台将检索您的行政处罚、失信名单等记录，识别符合国家修复规定的可修复项目。
+                </Text>
                 <View
-                  className="w-full bg-blue-600 rounded-xl py-3 flex items-center justify-center active:bg-blue-700"
+                  style={{ width: '100%', borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
                   onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
                 >
-                  <FileText size={18} color="#ffffff" />
-                  <Text className="text-white text-sm font-medium ml-2">前往生成信用报告</Text>
+                  <FileText size={16} color="#fff" />
+                  <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>前往生成信用报告</Text>
                 </View>
               </View>
             ) : (
-              /* 有报告，展示核查结果 */
-              <View>
-                {/* 说明 */}
-                <View className="mb-4 p-3 bg-blue-50 rounded-xl">
-                  <Text className="text-sm text-blue-700 leading-relaxed">
+              <View style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <View style={{ background: '#eff6ff', borderRadius: '12px', padding: '10px 14px', borderLeft: '3px solid #2563eb' }}>
+                  <Text style={{ fontSize: '12px', color: '#1e40af', lineHeight: '1.7' }}>
                     以下为基于您的信用报告核查的可修复项目，仅包含符合国家及行业信用修复规定的记录。
                   </Text>
                 </View>
 
-                {/* 核查结果列表 */}
-                <View className="space-y-3">
-                  {checkItems.map((item) => (
-                    <View key={item.id} className="border border-gray-100 rounded-xl overflow-hidden">
-                      {/* 核查项头部 */}
-                      <View className="p-4">
-                        <View className="flex items-start justify-between gap-2">
-                          <View className="flex items-start gap-3 flex-1">
-                            {item.status === 'clean' ? (
-                              <CircleCheck size={20} color="#10b981" className="mt-0.5 flex-shrink-0" />
-                            ) : item.status === 'repairable' ? (
-                              <CircleAlert size={20} color="#ef4444" className="mt-0.5 flex-shrink-0" />
-                            ) : (
-                              <Search size={20} color="#9ca3af" className="mt-0.5 flex-shrink-0" />
-                            )}
-                            <View className="flex-1">
-                              <Text className="block text-sm font-medium text-gray-900 mb-0.5">{item.title}</Text>
-                              <Text className="block text-xs text-gray-500 leading-relaxed">{item.desc}</Text>
-                            </View>
-                          </View>
-                          <View className="flex-shrink-0">
-                            {item.status === 'clean' && (
-                              <Badge className="bg-green-100">
-                                <Text className="text-xs text-green-700">未发现问题</Text>
-                              </Badge>
-                            )}
-                            {item.status === 'repairable' && (
-                              <Badge className="bg-red-100">
-                                <Text className="text-xs text-red-600">发现可修复项</Text>
-                              </Badge>
-                            )}
+                {checkItems.map((item) => (
+                  <View key={item.id} style={{ border: `1px solid ${item.status === 'repairable' ? 'rgba(220,38,38,0.15)' : '#f1f5f9'}`, borderRadius: '16px', overflow: 'hidden' }}>
+                    <View style={{ padding: '14px 16px' }}>
+                      <View style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
+                        <View style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flex: 1 }}>
+                          {item.status === 'clean'
+                            ? <CircleCheck size={18} color="#059669" />
+                            : item.status === 'repairable'
+                              ? <CircleAlert size={18} color="#dc2626" />
+                              : <Search size={18} color="#94a3b8" />}
+                          <View style={{ flex: 1 }}>
+                            <Text style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', display: 'block', lineHeight: '1.4', marginBottom: '3px' }}>{item.title}</Text>
+                            <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', lineHeight: '1.6' }}>{item.desc}</Text>
                           </View>
                         </View>
-
-                        {/* 可修复时展示详情 */}
-                        {item.status === 'repairable' && item.detail && (
-                          <View className="mt-3 p-3 bg-red-50 rounded-lg">
-                            <Text className="text-sm text-red-700 leading-relaxed">{item.detail}</Text>
-                          </View>
-                        )}
-
-                        {/* 可修复项目：法律法规 */}
-                        {item.status === 'repairable' && item.laws && item.laws.length > 0 && (
-                          <View className="mt-3">
-                            <View className="flex items-center gap-1.5 mb-2">
-                              <Scale size={13} color="#6b7280" />
-                              <Text className="text-xs text-gray-500 font-medium">适用法律法规</Text>
+                        <View style={{ flexShrink: 0 }}>
+                          {item.status === 'clean' && (
+                            <View style={{ background: 'rgba(5,150,105,0.1)', borderRadius: '20px', padding: '3px 10px' }}>
+                              <Text style={{ fontSize: '11px', fontWeight: '600', color: '#059669', lineHeight: '1.5' }}>未发现问题</Text>
                             </View>
-                            {item.laws.map((law, idx) => (
-                              <View key={idx} className="p-2.5 bg-blue-50 rounded-lg mb-1">
-                                <Text className="block text-xs font-medium text-blue-700">{law.name}</Text>
-                                <Text className="block text-xs text-gray-500 mt-0.5">{law.desc}</Text>
-                              </View>
-                            ))}
-                          </View>
-                        )}
-
-                        {/* 可修复项目：模板文件 */}
-                        {item.status === 'repairable' && item.templates && item.templates.length > 0 && (
-                          <View className="mt-3">
-                            <View className="flex items-center gap-1.5 mb-2">
-                              <ClipboardList size={13} color="#6b7280" />
-                              <Text className="text-xs text-gray-500 font-medium">所需模板文件</Text>
+                          )}
+                          {item.status === 'repairable' && (
+                            <View style={{ background: 'rgba(220,38,38,0.1)', borderRadius: '20px', padding: '3px 10px' }}>
+                              <Text style={{ fontSize: '11px', fontWeight: '600', color: '#dc2626', lineHeight: '1.5' }}>发现可修复项</Text>
                             </View>
-                            {item.templates.map((tpl, idx) => (
-                              <View key={idx} className="flex items-start gap-2 p-2.5 bg-gray-50 rounded-lg mb-1">
-                                <FileText size={14} color="#3b82f6" className="mt-0.5 flex-shrink-0" />
-                                <View>
-                                  <Text className="block text-xs text-gray-800">《{tpl.name}》</Text>
-                                  <Text className="block text-xs text-gray-500 mt-0.5">{tpl.note}</Text>
-                                </View>
-                              </View>
-                            ))}
-                          </View>
-                        )}
-
-                        {/* 可修复项目：修复渠道 */}
-                        {item.status === 'repairable' && item.channel && (
-                          <View className="mt-3 flex items-start gap-2 p-3 bg-blue-50 rounded-lg">
-                            <ArrowRight size={14} color="#3b82f6" className="mt-0.5 flex-shrink-0" />
-                            <Text className="text-xs text-blue-700 leading-relaxed">{item.channel}</Text>
-                          </View>
-                        )}
+                          )}
+                        </View>
                       </View>
+
+                      {item.status === 'repairable' && item.detail && (
+                        <View style={{ marginTop: '10px', background: 'rgba(220,38,38,0.06)', borderRadius: '10px', padding: '10px 12px' }}>
+                          <Text style={{ fontSize: '12px', color: '#dc2626', lineHeight: '1.7' }}>{item.detail}</Text>
+                        </View>
+                      )}
+
+                      {item.status === 'repairable' && item.laws && item.laws.length > 0 && (
+                        <View style={{ marginTop: '10px' }}>
+                          <View style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
+                            <Scale size={13} color="#64748b" />
+                            <Text style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', lineHeight: '1.5' }}>适用法律法规</Text>
+                          </View>
+                          {item.laws.map((law, idx) => (
+                            <View key={idx} style={{ background: '#eff6ff', borderRadius: '10px', padding: '8px 12px', marginBottom: '4px' }}>
+                              <Text style={{ fontSize: '11px', fontWeight: '600', color: '#1e40af', display: 'block', lineHeight: '1.5' }}>{law.name}</Text>
+                              <Text style={{ fontSize: '11px', color: '#64748b', display: 'block', marginTop: '2px', lineHeight: '1.5' }}>{law.desc}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      )}
+
+                      {item.status === 'repairable' && item.templates && item.templates.length > 0 && (
+                        <View style={{ marginTop: '10px' }}>
+                          <View style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
+                            <ClipboardList size={13} color="#64748b" />
+                            <Text style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', lineHeight: '1.5' }}>所需模板文件</Text>
+                          </View>
+                          {item.templates.map((tpl, idx) => (
+                            <View key={idx} style={{ background: '#f8fafc', borderRadius: '10px', padding: '8px 12px', marginBottom: '4px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                              <FileText size={13} color="#2563eb" />
+                              <View>
+                                <Text style={{ fontSize: '11px', color: '#0f172a', display: 'block', lineHeight: '1.5' }}>《{tpl.name}》</Text>
+                                <Text style={{ fontSize: '11px', color: '#94a3b8', display: 'block', marginTop: '2px', lineHeight: '1.5' }}>{tpl.note}</Text>
+                              </View>
+                            </View>
+                          ))}
+                        </View>
+                      )}
+
+                      {item.status === 'repairable' && item.channel && (
+                        <View style={{ marginTop: '10px', background: '#eff6ff', borderRadius: '10px', padding: '10px 12px', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                          <ArrowRight size={13} color="#2563eb" />
+                          <Text style={{ fontSize: '12px', color: '#1e40af', lineHeight: '1.7', flex: 1 }}>{item.channel}</Text>
+                        </View>
+                      )}
                     </View>
-                  ))}
-                </View>
+                  </View>
+                ))}
 
                 {repairableCount === 0 && (
-                  <View className="mt-4 p-3 bg-green-50 rounded-lg">
-                    <View className="flex items-start gap-2">
-                      <CircleCheck size={16} color="#10b981" className="mt-0.5" />
-                      <Text className="text-sm text-green-700 leading-relaxed">
-                        核查未发现需要修复的信用记录。若您认为存在遗漏，可参考下方"信用修复说明"了解三类情况的修复路径，自行申请修复。
-                      </Text>
-                    </View>
+                  <View style={{ background: 'rgba(5,150,105,0.07)', borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <CircleCheck size={15} color="#059669" />
+                    <Text style={{ fontSize: '12px', color: '#059669', lineHeight: '1.7', flex: 1 }}>
+                      核查未发现需要修复的信用记录。若您认为存在遗漏，可参考下方"信用修复说明"了解三类情况的修复路径，自行申请修复。
+                    </Text>
                   </View>
                 )}
               </View>
             )}
-          </CardContent>
-        </Card>
-      </View>
+          </View>
+        </View>
 
-      {/* 信用修复说明 */}
-      <View className="px-4 mt-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <View className="flex items-center gap-2">
-              <BookOpen size={20} color="#3b82f6" />
-              <CardTitle>信用修复情况说明</CardTitle>
+        {/* ── 信用修复情况说明 ── */}
+        <View style={CARD}>
+          <View style={{ padding: '16px 18px 12px', borderBottom: '1px solid #f8fafc' }}>
+            <View style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <BookOpen size={18} color="#2563eb" />
+              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>信用修复情况说明</Text>
             </View>
-            <Text className="text-sm text-gray-500 mt-1">
-              三类可修复情况的法律依据、申请流程与渠道指引
-            </Text>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <View className="space-y-3">
-              {repairGuide.map((cat) => (
-                <View key={cat.id} className={`rounded-xl border ${cat.border} overflow-hidden`}>
-                  {/* 折叠头部 */}
-                  <View
-                    className={`${cat.bg} p-4 flex items-center justify-between active:opacity-80`}
-                    onClick={() => toggleSection(cat.id)}
-                  >
-                    <View className="flex items-center gap-3">
-                      <cat.icon size={20} color={cat.color} />
-                      <View>
-                        <Text className="text-sm font-medium text-gray-900">{cat.title}</Text>
-                        <View className={`inline-flex mt-0.5 px-1.5 py-0.5 rounded ${cat.tagBg}`}>
-                          <Text className={`text-xs ${cat.tagText}`}>{cat.tag}</Text>
-                        </View>
+            <Text style={{ fontSize: '12px', color: '#94a3b8', lineHeight: '1.5' }}>三类可修复情况的法律依据、申请流程与渠道指引</Text>
+          </View>
+
+          <View style={{ padding: '14px 18px 18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {repairGuide.map((cat) => (
+              <View key={cat.id} style={{ borderRadius: '14px', overflow: 'hidden', border: '1px solid #f1f5f9' }}>
+                <View
+                  style={{ background: cat.id === 'fixable' ? '#f0fdf4' : cat.id === 'sealed' ? '#eff6ff' : '#fffbeb', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                  onClick={() => toggleSection(cat.id)}
+                >
+                  <View style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <cat.icon size={20} color={cat.color} />
+                    <View>
+                      <Text style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', display: 'block', lineHeight: '1.4' }}>{cat.title}</Text>
+                      <View style={{ display: 'inline-flex', marginTop: '3px', padding: '2px 8px', borderRadius: '20px', background: cat.id === 'fixable' ? 'rgba(5,150,105,0.15)' : cat.id === 'sealed' ? 'rgba(37,99,235,0.12)' : 'rgba(217,119,6,0.12)' }}>
+                        <Text style={{ fontSize: '11px', color: cat.color, lineHeight: '1.5' }}>{cat.tag}</Text>
                       </View>
                     </View>
-                    {expandedSection === cat.id
-                      ? <ChevronUp size={18} color="#9ca3af" />
-                      : <ChevronDown size={18} color="#9ca3af" />
-                    }
                   </View>
-
-                  {/* 展开内容 */}
-                  {expandedSection === cat.id && (
-                    <View className="p-4 bg-white space-y-4">
-                      <View>
-                        <Text className="text-xs font-medium text-gray-500 mb-1">适用范围</Text>
-                        <Text className="text-sm text-gray-700 leading-relaxed">{cat.scope}</Text>
-                      </View>
-
-                      <View>
-                        <Text className="text-xs font-medium text-gray-500 mb-2">修复步骤</Text>
-                        <View className="space-y-2">
-                          {cat.steps.map((step, idx) => (
-                            <View key={idx} className="flex gap-3">
-                              <View className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <Text className="text-white text-xs font-medium">{idx + 1}</Text>
-                              </View>
-                              <Text className="text-sm text-gray-600 flex-1 leading-relaxed">{step}</Text>
-                            </View>
-                          ))}
-                        </View>
-                      </View>
-
-                      {cat.laws && cat.laws.length > 0 && (
-                        <View>
-                          <View className="flex items-center gap-1.5 mb-2">
-                            <Scale size={14} color="#6b7280" />
-                            <Text className="text-xs font-medium text-gray-500">参考法律法规</Text>
-                          </View>
-                          {cat.laws.map((law, idx) => (
-                            <View key={idx} className="p-2.5 bg-blue-50 rounded-lg mb-1">
-                              <Text className="block text-xs font-medium text-blue-700">{law.name}</Text>
-                              <Text className="block text-xs text-gray-500 mt-0.5">{law.desc}</Text>
-                            </View>
-                          ))}
-                        </View>
-                      )}
-
-                      {cat.templates && cat.templates.length > 0 && (
-                        <View>
-                          <View className="flex items-center gap-1.5 mb-2">
-                            <ClipboardList size={14} color="#6b7280" />
-                            <Text className="text-xs font-medium text-gray-500">模板文件</Text>
-                          </View>
-                          {cat.templates.map((tpl, idx) => (
-                            <View key={idx} className="flex items-start gap-2 p-2.5 bg-gray-50 rounded-lg mb-1">
-                              <FileText size={14} color="#3b82f6" className="mt-0.5 flex-shrink-0" />
-                              <View>
-                                <Text className="block text-xs text-gray-800">《{tpl.name}》</Text>
-                                <Text className="block text-xs text-gray-500 mt-0.5">{tpl.note}</Text>
-                              </View>
-                            </View>
-                          ))}
-                        </View>
-                      )}
-
-                      {cat.contact && (
-                        <View className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
-                          <MessageCircle size={16} color="#10b981" />
-                          <Text className="text-sm text-gray-700">{cat.contact.label}：</Text>
-                          <Text className="text-sm font-bold text-green-700">{cat.contact.value}</Text>
-                        </View>
-                      )}
-                    </View>
-                  )}
+                  {expandedSection === cat.id ? <ChevronUp size={16} color="#94a3b8" /> : <ChevronDown size={16} color="#94a3b8" />}
                 </View>
-              ))}
-            </View>
 
-            <View className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <Text className="text-xs text-gray-500 leading-relaxed">
-                信用修复指依法申请终止公示、封存或移出失信名单，与补充材料提升评分的增信操作不同。修复结果以相关主管部门出具的决定书为准。
-              </Text>
-            </View>
-          </CardContent>
-        </Card>
+                {expandedSection === cat.id && (
+                  <View style={{ padding: '16px', background: '#fff', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <View>
+                      <Text style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '6px', lineHeight: '1.5' }}>适用范围</Text>
+                      <Text style={{ fontSize: '13px', color: '#475569', lineHeight: '1.7' }}>{cat.scope}</Text>
+                    </View>
+
+                    <View>
+                      <Text style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', display: 'block', marginBottom: '8px', lineHeight: '1.5' }}>修复步骤</Text>
+                      {cat.steps.map((step, idx) => (
+                        <View key={idx} style={{ display: 'flex', gap: '10px', marginBottom: idx < cat.steps.length - 1 ? '8px' : '0' }}>
+                          <View style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                            <Text style={{ color: '#fff', fontSize: '11px', fontWeight: '700', lineHeight: '1' }}>{idx + 1}</Text>
+                          </View>
+                          <Text style={{ fontSize: '13px', color: '#475569', flex: 1, lineHeight: '1.7' }}>{step}</Text>
+                        </View>
+                      ))}
+                    </View>
+
+                    {cat.laws && cat.laws.length > 0 && (
+                      <View>
+                        <View style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
+                          <Scale size={13} color="#64748b" />
+                          <Text style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', lineHeight: '1.5' }}>参考法律法规</Text>
+                        </View>
+                        {cat.laws.map((law, idx) => (
+                          <View key={idx} style={{ background: '#eff6ff', borderRadius: '10px', padding: '10px 12px', marginBottom: '4px' }}>
+                            <Text style={{ fontSize: '12px', fontWeight: '600', color: '#1e40af', display: 'block', lineHeight: '1.5' }}>{law.name}</Text>
+                            <Text style={{ fontSize: '11px', color: '#64748b', display: 'block', marginTop: '3px', lineHeight: '1.6' }}>{law.desc}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+
+                    {cat.templates && cat.templates.length > 0 && (
+                      <View>
+                        <View style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
+                          <ClipboardList size={13} color="#64748b" />
+                          <Text style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', lineHeight: '1.5' }}>模板文件</Text>
+                        </View>
+                        {cat.templates.map((tpl, idx) => (
+                          <View key={idx} style={{ background: '#f8fafc', borderRadius: '10px', padding: '8px 12px', marginBottom: '4px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                            <FileText size={13} color="#2563eb" />
+                            <View>
+                              <Text style={{ fontSize: '12px', color: '#0f172a', display: 'block', lineHeight: '1.5' }}>《{tpl.name}》</Text>
+                              <Text style={{ fontSize: '11px', color: '#94a3b8', display: 'block', marginTop: '2px', lineHeight: '1.5' }}>{tpl.note}</Text>
+                            </View>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+
+                    {cat.contact && (
+                      <View style={{ background: '#f0fdf4', borderRadius: '10px', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <MessageCircle size={15} color="#059669" />
+                        <Text style={{ fontSize: '13px', color: '#475569', lineHeight: '1.5' }}>{cat.contact.label}：</Text>
+                        <Text style={{ fontSize: '13px', fontWeight: '700', color: '#059669', lineHeight: '1.5' }}>{cat.contact.value}</Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+              </View>
+            ))}
+          </View>
+        </View>
       </View>
     </View>
   )
