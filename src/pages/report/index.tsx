@@ -156,9 +156,7 @@ const ReportPage: FC = () => {
                 onClick={handleCreateReport}
               >
                 <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>立即生成信用报告</Text>
-                <View style={{ background: 'rgba(255,255,255,0.18)', borderRadius: '20px', padding: '2px 8px' }}>
-                  <Text style={{ color: '#fde68a', fontSize: '12px', fontWeight: '700', lineHeight: '1.5' }}>¥50</Text>
-                </View>
+                <Text style={{ color: '#fde68a', fontSize: '12px', fontWeight: '700', lineHeight: '1.5' }}>¥50</Text>
               </View>
             </View>
           </View>
