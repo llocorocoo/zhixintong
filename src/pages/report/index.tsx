@@ -277,9 +277,7 @@ const ReportPage: FC = () => {
                 >
                   <RotateCcw size={18} color="#d97706" />
                   <Text style={{ flex: 1, fontSize: '14px', fontWeight: '500', color: '#0f172a', marginLeft: '10px', lineHeight: '1.5' }}>更新信用报告</Text>
-                  <View style={{ background: '#fde68a', borderRadius: '20px', padding: '2px 10px', marginRight: '6px' }}>
-                    <Text style={{ fontSize: '12px', fontWeight: '700', color: '#92400e', lineHeight: '1.5' }}>¥9.9</Text>
-                  </View>
+                  <Text style={{ fontSize: '12px', fontWeight: '700', color: '#d97706', marginRight: '6px', lineHeight: '1.5' }}>¥9.9</Text>
                   <ChevronRight size={16} color="#d97706" />
                 </View>
 
@@ -291,9 +289,7 @@ const ReportPage: FC = () => {
                 >
                   <RefreshCw size={18} color="#059669" />
                   <Text style={{ flex: 1, fontSize: '14px', fontWeight: '500', color: '#0f172a', marginLeft: '10px', lineHeight: '1.5' }}>{syncing ? '同步中...' : '更新可信简历'}</Text>
-                  <View style={{ background: 'rgba(5,150,105,0.15)', borderRadius: '20px', padding: '2px 10px', marginRight: '6px' }}>
-                    <Text style={{ fontSize: '12px', fontWeight: '600', color: '#059669', lineHeight: '1.5' }}>免费</Text>
-                  </View>
+                  <Text style={{ fontSize: '12px', fontWeight: '600', color: '#059669', marginRight: '6px', lineHeight: '1.5' }}>免费</Text>
                   <ChevronRight size={16} color="#059669" />
                 </View>
               </View>
