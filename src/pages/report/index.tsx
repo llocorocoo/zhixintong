@@ -232,65 +232,54 @@ const ReportPage: FC = () => {
             {/* ─ 已完成 ─ */}
             {reportData.status === 'completed' && (
               <View style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {/* 成功横幅 */}
-                <View style={{ background: 'rgba(5,150,105,0.08)', borderRadius: '14px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '10px', borderLeft: '3px solid #059669' }}>
-                  <CircleCheck size={20} color="#059669" />
-                  <View>
-                    <Text style={{ fontSize: '14px', fontWeight: '600', color: '#064e3b', display: 'block', lineHeight: '1.4' }}>报告已生成</Text>
-                    <Text style={{ fontSize: '12px', color: '#6ee7b7', display: 'block', lineHeight: '1.5', color: '#059669', opacity: 0.8 }}>可预览、下载或分享您的信用报告</Text>
+                {/* 预览 + 下载 + 分享 同行 */}
+                <View style={{ display: 'flex', gap: '8px' }}>
+                  <View
+                    style={{ ...btn('preview'), flex: 2, borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)', boxShadow: '0 4px 14px rgba(37,99,235,0.32)' }}
+                    onTouchStart={() => press('preview')} onTouchEnd={release} onTouchCancel={release}
+                    onClick={handlePreview}
+                  >
+                    <Eye size={16} color="#fff" />
+                    <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>预览报告</Text>
                   </View>
-                </View>
-
-                {/* 主 CTA：预览 */}
-                <View
-                  style={{ ...btn('preview'), borderRadius: '16px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)', boxShadow: '0 6px 20px rgba(37,99,235,0.35)' }}
-                  onTouchStart={() => press('preview')} onTouchEnd={release} onTouchCancel={release}
-                  onClick={handlePreview}
-                >
-                  <Eye size={17} color="#fff" />
-                  <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>预览报告</Text>
-                </View>
-
-                {/* 下载 + 分享 */}
-                <View style={{ display: 'flex', gap: '10px' }}>
                   {[
                     { id: 'download', icon: Download, label: '下载', onClick: handleDownload },
                     { id: 'share',    icon: Share,    label: '分享', onClick: handleShare },
                   ].map(item => (
                     <View
                       key={item.id}
-                      style={{ ...btn(item.id), flex: 1, borderRadius: '14px', padding: '12px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#f8fafc', border: '1.5px solid #e2e8f0' }}
+                      style={{ ...btn(item.id), flex: 1, borderRadius: '14px', padding: '13px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', background: '#f8fafc', border: '1.5px solid #e2e8f0' }}
                       onTouchStart={() => press(item.id)} onTouchEnd={release} onTouchCancel={release}
                       onClick={item.onClick}
                     >
-                      <item.icon size={16} color="#2563eb" />
-                      <Text style={{ fontSize: '14px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>{item.label}</Text>
+                      <item.icon size={16} color="#64748b" />
+                      <Text style={{ fontSize: '11px', color: '#64748b', lineHeight: '1.4' }}>{item.label}</Text>
                     </View>
                   ))}
                 </View>
 
-                {/* 更新报告 */}
-                <View
-                  style={{ ...btn('update'), background: '#fffbeb', borderRadius: '14px', padding: '14px 16px', display: 'flex', alignItems: 'center' }}
-                  onTouchStart={() => press('update')} onTouchEnd={release} onTouchCancel={release}
-                  onClick={handleUpdateReport}
-                >
-                  <RotateCcw size={18} color="#d97706" />
-                  <Text style={{ flex: 1, fontSize: '14px', fontWeight: '500', color: '#0f172a', marginLeft: '10px', lineHeight: '1.5' }}>更新信用报告</Text>
-                  <Text style={{ fontSize: '12px', fontWeight: '700', color: '#d97706', marginRight: '6px', lineHeight: '1.5' }}>¥9.9</Text>
-                  <ChevronRight size={16} color="#d97706" />
-                </View>
-
-                {/* 同步简历 */}
-                <View
-                  style={{ ...btn('sync'), background: 'rgba(5,150,105,0.07)', borderRadius: '14px', padding: '14px 16px', display: 'flex', alignItems: 'center' }}
-                  onTouchStart={() => press('sync')} onTouchEnd={release} onTouchCancel={release}
-                  onClick={handleSyncToResume}
-                >
-                  <RefreshCw size={18} color="#059669" />
-                  <Text style={{ flex: 1, fontSize: '14px', fontWeight: '500', color: '#0f172a', marginLeft: '10px', lineHeight: '1.5' }}>{syncing ? '同步中...' : '更新可信简历'}</Text>
-                  <Text style={{ fontSize: '12px', fontWeight: '600', color: '#059669', marginRight: '6px', lineHeight: '1.5' }}>免费</Text>
-                  <ChevronRight size={16} color="#059669" />
+                {/* 更新报告 + 同步简历 列表行 */}
+                <View style={{ background: '#f8fafc', borderRadius: '14px', overflow: 'hidden' }}>
+                  <View
+                    style={{ ...btn('update'), padding: '14px 16px', display: 'flex', alignItems: 'center', borderBottom: '1px solid #f1f5f9' }}
+                    onTouchStart={() => press('update')} onTouchEnd={release} onTouchCancel={release}
+                    onClick={handleUpdateReport}
+                  >
+                    <RotateCcw size={16} color="#64748b" />
+                    <Text style={{ flex: 1, fontSize: '14px', color: '#0f172a', marginLeft: '10px', lineHeight: '1.5' }}>更新信用报告</Text>
+                    <Text style={{ fontSize: '12px', color: '#94a3b8', marginRight: '6px', lineHeight: '1.5' }}>¥9.9</Text>
+                    <ChevronRight size={15} color="#94a3b8" />
+                  </View>
+                  <View
+                    style={{ ...btn('sync'), padding: '14px 16px', display: 'flex', alignItems: 'center' }}
+                    onTouchStart={() => press('sync')} onTouchEnd={release} onTouchCancel={release}
+                    onClick={handleSyncToResume}
+                  >
+                    <RefreshCw size={16} color="#64748b" />
+                    <Text style={{ flex: 1, fontSize: '14px', color: '#0f172a', marginLeft: '10px', lineHeight: '1.5' }}>{syncing ? '同步中...' : '更新可信简历'}</Text>
+                    <Text style={{ fontSize: '12px', color: '#94a3b8', marginRight: '6px', lineHeight: '1.5' }}>免费</Text>
+                    <ChevronRight size={15} color="#94a3b8" />
+                  </View>
                 </View>
               </View>
             )}
