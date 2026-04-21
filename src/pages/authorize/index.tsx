@@ -2,6 +2,8 @@ import { View, Text, ScrollView } from '@tarojs/components'
 import { FC, useState, useEffect, useRef } from 'react'
 import Taro from '@tarojs/taro'
 import { ShieldCheck, CircleCheck } from 'lucide-react-taro'
+import { Network } from '@/network'
+import { useReportFormStore } from '@/stores/report-form'
 
 const AGREEMENT = `《信息核查授权书》
 
@@ -50,7 +52,9 @@ const AuthorizePage: FC = () => {
   const [canAgree, setCanAgree] = useState(false)
   const [isChecked, setIsChecked] = useState(false)
   const [btnPressed, setBtnPressed] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const { pendingData, clearPendingData } = useReportFormStore()
 
   useEffect(() => {
     timerRef.current = setInterval(() => {
@@ -66,9 +70,27 @@ const AuthorizePage: FC = () => {
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [])
 
-  const handleAgree = () => {
-    if (!canAgree || !isChecked) return
-    Taro.navigateTo({ url: '/pages/report-form/index' })
+  const handleAgree = async () => {
+    if (!canAgree || !isChecked || submitting) return
+    setSubmitting(true)
+    try {
+      const data = pendingData || {}
+      const res = await Network.request({ url: '/api/report/submit', method: 'POST', data })
+      if (res.data.code === 200) {
+        clearPendingData()
+        Taro.showLoading({ title: '职业信用报告生成中...' })
+        await new Promise(r => setTimeout(r, 3000))
+        Taro.hideLoading()
+        Taro.showToast({ title: '报告已生成', icon: 'success' })
+        setTimeout(() => Taro.switchTab({ url: '/pages/report/index' }), 1000)
+      } else {
+        Taro.showToast({ title: res.data.message || '提交失败', icon: 'none' })
+      }
+    } catch {
+      Taro.showToast({ title: '提交失败，请重试', icon: 'none' })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleCancel = () => {
@@ -194,7 +216,7 @@ const AuthorizePage: FC = () => {
               fontSize: '14px', fontWeight: '700', lineHeight: '1.5',
               color: active ? '#fff' : '#94a3b8',
             }}>
-              {canAgree ? '同意授权' : `请阅读 (${countdown}s)`}
+              {submitting ? '提交中...' : canAgree ? '同意授权' : `请阅读 (${countdown}s)`}
             </Text>
           </View>
         </View>
