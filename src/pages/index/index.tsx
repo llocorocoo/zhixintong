@@ -42,7 +42,9 @@ const IndexPage: FC = () => {
 
   const radarSvg = useMemo(() => {
     if (!creditScore?.factors) return null
-    const factors = creditScore.factors
+    const raw = creditScore.factors
+    const filtered = Object.fromEntries(Object.entries(raw).filter(([k]) => k in FACTOR_LABELS))
+    const factors = filtered
     const keys = Object.keys(factors), values = Object.values(factors), count = keys.length
     const cx = 140, cy = 120, radius = 80, step = (Math.PI * 2) / count, start = -Math.PI / 2
     const pt = (a: number, r: number) => `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`
@@ -227,7 +229,7 @@ const IndexPage: FC = () => {
               <Swiper current={detailTab} onChange={e => setDetailTab(e.detail.current)} style={{ height: '248px' }}>
                 <SwiperItem>
                   <View style={{ padding: '8px 20px 12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {creditScore?.factors && Object.entries(creditScore.factors).map(([key, val]) => (
+                    {creditScore?.factors && Object.entries(creditScore.factors).filter(([key]) => key in FACTOR_LABELS).map(([key, val]) => (
                       <View key={key} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 0' }}>
                         <View style={{ width: '8px', height: '8px', borderRadius: '50%', background: FACTOR_COLORS[key] || '#3b82f6', flexShrink: 0 }} />
                         <Text style={{ fontSize: '13px', color: '#475569', width: '42px', lineHeight: '1.5' }}>{FACTOR_LABELS[key]}</Text>
