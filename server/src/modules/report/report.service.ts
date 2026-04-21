@@ -107,7 +107,6 @@ export class ReportService {
         compliance: 70,
         safety: 100,
         professionalism: 60,
-        reliability: 65,
       }
       await this.creditService.updateCreditScore(report.user_id, score, level, factors)
     }

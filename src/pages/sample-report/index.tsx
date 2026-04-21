@@ -8,7 +8,6 @@ import {
   Award,
   Shield,
   Medal,
-  ShieldCheck,
   Scale
 } from 'lucide-react-taro'
 
@@ -97,6 +96,11 @@ const DIMENSIONS = [
         source: '前雇主评价',
         status: 'verified',
       },
+      {
+        name: '欠税记录',
+        source: '税务公开信息',
+        status: 'verified',
+      },
     ]
   },
   {
@@ -123,8 +127,13 @@ const DIMENSIONS = [
         }
       },
       {
-        name: '关联企业风险',
-        source: '工商数据',
+        name: '关联企业',
+        source: '工商数据、社保记录',
+        status: 'verified',
+      },
+      {
+        name: '个人征信',
+        source: '征信中心（授权查询）',
         status: 'verified',
       },
       {
@@ -166,43 +175,6 @@ const DIMENSIONS = [
         source: '学信网',
         status: 'verified',
         result: '本科（已认证）',
-      },
-      {
-        name: '任职公司规模',
-        source: '工商/公开信息',
-        status: 'checked',
-        result: '中型企业',
-      },
-    ]
-  },
-  {
-    id: 'reliability',
-    name: '可靠性',
-    icon: ShieldCheck,
-    color: '#06b6d4',
-    bgColor: 'bg-cyan-50',
-    borderColor: 'border-cyan-100',
-    features: [
-      {
-        name: '兼职情况',
-        source: '社保记录',
-        status: 'verified',
-      },
-      {
-        name: '个人征信',
-        source: '征信中心（授权查询）',
-        status: 'verified',
-      },
-      {
-        name: '大额负债',
-        source: '征信中心（授权查询）',
-        status: 'verified',
-        result: '无异常大额负债',
-      },
-      {
-        name: '欠税记录',
-        source: '税务公开信息',
-        status: 'verified',
       },
     ]
   },

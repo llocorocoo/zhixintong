@@ -11,7 +11,7 @@ import {
 
 interface EnhancementSuggestion {
   id: string
-  category: 'authenticity' | 'stability' | 'compliance' | 'safety' | 'expertise' | 'reliability'
+  category: 'authenticity' | 'stability' | 'compliance' | 'safety' | 'expertise'
   dimension: string
   title: string
   description: string
@@ -189,35 +189,6 @@ const EnhancementPage: FC = () => {
       icon: Shield
     })
 
-    // 可靠性维度：信用报告
-    if (!profile.reportGenerated) {
-      suggestionList.push({
-        id: 'report',
-        category: 'reliability',
-        dimension: '可靠性',
-        title: '尚未生成信用报告',
-        description: '生成职业信用报告，完整呈现个人信用画像，提升整体可靠性',
-        priority: 'high',
-        status: 'missing',
-        action: '/pages/report/index',
-        actionText: '去生成',
-        icon: FileText
-      })
-    } else if (!profile.lastReportDate || isReportOutdated(profile.lastReportDate)) {
-      suggestionList.push({
-        id: 'report-update',
-        category: 'reliability',
-        dimension: '可靠性',
-        title: '信用报告需要更新',
-        description: '报告已超过3个月，定期更新可保持信用信息时效性',
-        priority: 'medium',
-        status: 'incomplete',
-        action: '/pages/report/index',
-        actionText: '去更新',
-        icon: FileText
-      })
-    }
-
     // 合规性维度：提示
     suggestionList.push({
       id: 'compliance',
@@ -305,12 +276,6 @@ const EnhancementPage: FC = () => {
       desc: '添加职业资格证书、学历证明，展示专业能力',
       tag: '加分'
     },
-    {
-      icon: FileText,
-      title: '可靠性',
-      desc: '定期生成并更新信用报告，保持信用信息时效性',
-      tag: '加分'
-    }
   ]
 
   const selfProofSteps = [
@@ -369,7 +334,7 @@ const EnhancementPage: FC = () => {
     low:    { bg: 'rgba(100,116,139,0.1)', color: '#64748b', label: '可选' },
   }
 
-  const TIP_COLORS = ['#2563eb','#7c3aed','#d97706','#dc2626','#059669','#0891b2']
+  const TIP_COLORS = ['#2563eb','#7c3aed','#d97706','#dc2626','#059669']
 
   return (
     <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>

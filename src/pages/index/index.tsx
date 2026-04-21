@@ -16,12 +16,12 @@ interface CreditScoreData {
 
 const FACTOR_LABELS: Record<string, string> = {
   authenticity: '真实性', stability: '稳定性', compliance: '合规性',
-  safety: '安全性', professionalism: '专业性', reliability: '可靠性',
+  safety: '安全性', professionalism: '专业性',
 }
 
 const FACTOR_COLORS: Record<string, string> = {
   authenticity: '#3b82f6', stability: '#8b5cf6', compliance: '#f59e0b',
-  safety: '#ef4444', professionalism: '#10b981', reliability: '#06b6d4',
+  safety: '#ef4444', professionalism: '#10b981',
 }
 
 const getLevelInfo = (score: number) => {
@@ -91,10 +91,9 @@ const IndexPage: FC = () => {
   const SCORE_DIMENSIONS = [
     { num: '1', name: '真实性', color: '#3b82f6', desc: '工作经历、身份等数据是否真实，是否存在造假行为', source: '公安网、学信网、前雇主核实' },
     { num: '2', name: '稳定性', color: '#8b5cf6', desc: '入职后能否稳定产出，是否跳槽频繁、空窗期长', source: '简历、社保记录、背调报告' },
-    { num: '3', name: '合规性', color: '#f59e0b', desc: '过往职业生涯是否遵守规则，是否有竞业风险或工作违纪', source: '前雇主评价、公开数据' },
-    { num: '4', name: '安全性', color: '#ef4444', desc: '是否存在用工安全风险，如司法诉讼、劳动争议、黑名单等', source: '司法数据、执行信息公开网' },
+    { num: '3', name: '合规性', color: '#f59e0b', desc: '过往职业生涯是否遵守规则，是否有竞业风险、违纪或欠税记录', source: '前雇主评价、税务公开信息' },
+    { num: '4', name: '安全性', color: '#ef4444', desc: '是否存在用工安全风险，如司法诉讼、劳动争议、关联企业风险、个人征信等', source: '司法数据、征信中心、工商数据' },
     { num: '5', name: '专业性', color: '#10b981', desc: '知识技能与岗位匹配度，包括职业资格、学历层次等', source: '简历、证书查询、公开信息' },
-    { num: '6', name: '可靠性', color: '#06b6d4', desc: '履约意愿及个人财务信用状况，包括征信、负债、欠税等', source: '前雇主评价、社保记录、征信报告' },
   ]
 
   return (
