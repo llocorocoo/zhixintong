@@ -240,7 +240,7 @@ const ReportPage: FC = () => {
                     onClick={handlePreview}
                   >
                     <Eye size={16} color="#fff" />
-                    <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>预览报告</Text>
+                    <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>查看报告</Text>
                   </View>
                   {[
                     { id: 'download', icon: Download, label: '下载', onClick: handleDownload },

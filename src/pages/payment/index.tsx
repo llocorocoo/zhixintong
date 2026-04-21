@@ -2,7 +2,7 @@ import { View, Text } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { useUserStore } from '@/stores/user'
-import { Shield, Smartphone, Landmark, CircleCheck } from 'lucide-react-taro'
+import { Shield, Smartphone, CircleCheck } from 'lucide-react-taro'
 
 const PaymentPage: FC = () => {
   const [payMethod, setPayMethod] = useState('wechat')
@@ -17,7 +17,6 @@ const PaymentPage: FC = () => {
   const payMethods = [
     { id: 'wechat', name: '微信支付', sub: '推荐', icon: Smartphone, color: '#07c160', bg: '#f0fdf4' },
     { id: 'alipay', name: '支付宝', sub: null, icon: Smartphone, color: '#1677ff', bg: '#eff6ff' },
-    { id: 'bank', name: '银行卡支付', sub: null, icon: Landmark, color: '#f59e0b', bg: '#fffbeb' },
   ]
 
   const handlePay = async () => {
