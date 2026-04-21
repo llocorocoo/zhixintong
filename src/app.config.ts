@@ -13,6 +13,7 @@ export default defineAppConfig({
     'pages/credit-repair/index',
     'pages/profile-edit/index',
     'pages/privacy/index',
+    'pages/privacy-notice/index',
     'pages/account-settings/index',
     'pages/help-center/index',
     'pages/payment/index',

@@ -2,8 +2,8 @@ import { View, Text, ScrollView, Picker } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { Input } from '@/components/ui/input'
-import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
+import { useReportFormStore } from '@/stores/report-form'
 import {
   User, GraduationCap, Award, Upload,
   ChevronRight, CircleCheck, Plus, Trash2
@@ -58,7 +58,6 @@ const InputBox: FC<{ focused: boolean; children: React.ReactNode }> = ({ focused
 
 const ReportFormPage: FC = () => {
   const [currentStep, setCurrentStep] = useState(0)
-  const [loading, setLoading] = useState(false)
   const [focusField, setFocusField] = useState<string | null>(null)
   const [btnPressed, setBtnPressed] = useState<string | null>(null)
   const [formData, setFormData] = useState<FormData>({
@@ -67,6 +66,7 @@ const ReportFormPage: FC = () => {
     qualificationList: [emptyQual()],
   })
   const { userInfo } = useUserStore()
+  const { setPendingData } = useReportFormStore()
 
   const setField = (field: keyof FormData, value: string) =>
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -118,26 +118,15 @@ const ReportFormPage: FC = () => {
     setCurrentStep(s => s + 1)
   }
 
-  const handleSubmit = async () => {
-    setLoading(true)
-    try {
-      const res = await Network.request({
-        url: '/api/report/submit', method: 'POST',
-        data: {
-          userId: userInfo?.id, realName: formData.realName, idCard: formData.idCard,
-          educationList: formData.educationList.filter(e => e.school || e.major),
-          qualificationList: formData.qualificationList.filter(q => q.qualification || q.certNumber),
-        }
-      })
-      if (res.data.code === 200) {
-        Taro.showLoading({ title: '职业信用报告生成中...' })
-        await new Promise(r => setTimeout(r, 3000))
-        Taro.hideLoading()
-        Taro.showToast({ title: '报告已生成', icon: 'success' })
-        setTimeout(() => Taro.switchTab({ url: '/pages/report/index' }), 1000)
-      } else { Taro.showToast({ title: res.data.message || '提交失败', icon: 'none' }) }
-    } catch { Taro.showToast({ title: '提交失败，请重试', icon: 'none' }) }
-    finally { setLoading(false) }
+  const handleSubmit = () => {
+    setPendingData({
+      userId: userInfo?.id || '',
+      realName: formData.realName,
+      idCard: formData.idCard,
+      educationList: formData.educationList.filter(e => e.school || e.major),
+      qualificationList: formData.qualificationList.filter(q => q.qualification || q.certNumber),
+    })
+    Taro.navigateTo({ url: '/pages/authorize/index' })
   }
 
   // ── 身份表单 ──
@@ -428,16 +417,16 @@ const ReportFormPage: FC = () => {
               style={{
                 flex: 2, borderRadius: '16px', padding: '14px 0',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: loading ? '#93c5fd' : 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
-                boxShadow: loading ? 'none' : '0 6px 20px rgba(37,99,235,0.38)',
+                background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
+                boxShadow: '0 6px 20px rgba(37,99,235,0.38)',
                 transform: btnPressed === 'next' ? 'scale(0.97)' : 'scale(1)',
                 transition: 'all 0.2s ease',
               }}
               onTouchStart={() => setBtnPressed('next')} onTouchEnd={() => setBtnPressed(null)} onTouchCancel={() => setBtnPressed(null)}
-              onClick={loading ? undefined : (isLast ? handleSubmit : handleNext)}
+              onClick={isLast ? handleSubmit : handleNext}
             >
               <Text style={{ fontSize: '15px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>
-                {loading ? '生成中...' : isLast ? '提交信息' : '下一步'}
+                {isLast ? '下一步，去签署授权' : '下一步'}
               </Text>
             </View>
           </View>
