@@ -3,6 +3,7 @@ import { FC, useState, useEffect, useRef } from 'react'
 import Taro from '@tarojs/taro'
 import { ShieldCheck, CircleCheck } from 'lucide-react-taro'
 import { Network } from '@/network'
+import { useUserStore } from '@/stores/user'
 import { useReportFormStore } from '@/stores/report-form'
 
 const AGREEMENT = `《信息核查授权书》
@@ -55,6 +56,9 @@ const AuthorizePage: FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const { pendingData, clearPendingData } = useReportFormStore()
+  const { userInfo } = useUserStore()
+  const params = Taro.getCurrentInstance().router?.params || {}
+  const isUpdate = params.type === 'update'
 
   useEffect(() => {
     timerRef.current = setInterval(() => {
@@ -74,14 +78,15 @@ const AuthorizePage: FC = () => {
     if (!canAgree || !isChecked || submitting) return
     setSubmitting(true)
     try {
-      const data = pendingData || {}
-      const res = await Network.request({ url: '/api/report/submit', method: 'POST', data })
+      const res = isUpdate
+        ? await Network.request({ url: '/api/report/create', method: 'POST', data: { userId: userInfo?.id } })
+        : await Network.request({ url: '/api/report/submit', method: 'POST', data: pendingData || {} })
       if (res.data.code === 200) {
-        clearPendingData()
+        if (!isUpdate) clearPendingData()
         Taro.showLoading({ title: '职业信用报告生成中...' })
         await new Promise(r => setTimeout(r, 3000))
         Taro.hideLoading()
-        Taro.showToast({ title: '报告已生成', icon: 'success' })
+        Taro.showToast({ title: isUpdate ? '报告已更新' : '报告已生成', icon: 'success' })
         setTimeout(() => Taro.switchTab({ url: '/pages/report/index' }), 1000)
       } else {
         Taro.showToast({ title: res.data.message || '提交失败', icon: 'none' })

@@ -27,7 +27,9 @@ const PaymentPage: FC = () => {
       Taro.hideLoading()
       Taro.showToast({ title: '支付成功', icon: 'success' })
       setTimeout(() => {
-        isUpdate ? Taro.navigateBack() : Taro.redirectTo({ url: '/pages/privacy-notice/index' })
+        isUpdate
+          ? Taro.redirectTo({ url: '/pages/authorize/index?type=update' })
+          : Taro.redirectTo({ url: '/pages/privacy-notice/index' })
       }, 1000)
     } catch {
       Taro.showToast({ title: '支付失败，请重试', icon: 'none' })
