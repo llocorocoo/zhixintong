@@ -132,8 +132,8 @@ const DIMENSIONS = [
         status: 'verified',
       },
       {
-        name: '人行征信',
-        source: '人民银行征信中心（授权查询）',
+        name: '个人征信',
+        source: '征信中心（授权查询）',
         status: 'verified',
       },
       {
