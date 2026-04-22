@@ -97,7 +97,7 @@ const DIMENSIONS = [
         status: 'verified',
       },
       {
-        name: '欠税记录',
+        name: '税务不良记录',
         source: '税务公开信息',
         status: 'verified',
       },
@@ -132,8 +132,8 @@ const DIMENSIONS = [
         status: 'verified',
       },
       {
-        name: '个人征信',
-        source: '征信中心（授权查询）',
+        name: '人行征信',
+        source: '人民银行征信中心（授权查询）',
         status: 'verified',
       },
       {
