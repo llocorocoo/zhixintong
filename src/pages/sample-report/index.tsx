@@ -112,10 +112,10 @@ const DIMENSIONS = [
     borderColor: 'border-red-100',
     features: [
       {
-        name: '司法诉讼',
-        source: '司法数据、执行信息公开网',
+        name: '司法诉讼及劳动争议',
+        source: '司法数据、执行信息公开网、劳动仲裁数据',
         status: 'warn',
-        result: '发现1条民事诉讼记录',
+        result: '发现1条民事诉讼记录，未发现劳动争议记录',
         detail: {
           label: '（2023）京0105民初12856号',
           rows: [
@@ -134,11 +134,6 @@ const DIMENSIONS = [
       {
         name: '个人征信',
         source: '征信中心（授权查询）',
-        status: 'verified',
-      },
-      {
-        name: '劳动争议',
-        source: '司法数据',
         status: 'verified',
       },
       {
