@@ -2,11 +2,13 @@ import { View, Text } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { useUserStore } from '@/stores/user'
-import { Shield, Smartphone, CircleCheck } from 'lucide-react-taro'
+import { Shield, Smartphone, CircleCheck, X } from 'lucide-react-taro'
 
 const PaymentPage: FC = () => {
   const [payMethod, setPayMethod] = useState('wechat')
+  const [showConfirm, setShowConfirm] = useState(false)
   const [paying, setPaying] = useState(false)
+  const [btnPressed, setBtnPressed] = useState(false)
   const { userInfo } = useUserStore()
 
   const params = Taro.getCurrentInstance().router?.params || {}
@@ -16,15 +18,18 @@ const PaymentPage: FC = () => {
 
   const payMethods = [
     { id: 'wechat', name: '微信支付', sub: '推荐', icon: Smartphone, color: '#07c160', bg: '#f0fdf4' },
-    { id: 'alipay', name: '支付宝', sub: null, icon: Smartphone, color: '#1677ff', bg: '#eff6ff' },
+    { id: 'alipay', name: '支付宝',   sub: null,   icon: Smartphone, color: '#1677ff', bg: '#eff6ff' },
   ]
 
-  const handlePay = async () => {
+  const currentMethod = payMethods.find(m => m.id === payMethod)!
+
+  const handleConfirmPay = async () => {
     setPaying(true)
     try {
       Taro.showLoading({ title: '支付处理中...' })
       await new Promise(resolve => setTimeout(resolve, 1500))
       Taro.hideLoading()
+      setShowConfirm(false)
       Taro.showToast({ title: '支付成功', icon: 'success' })
       setTimeout(() => {
         isUpdate
@@ -113,22 +118,89 @@ const PaymentPage: FC = () => {
 
         {/* 支付按钮 */}
         <View
-          className="w-full rounded-2xl py-4 flex items-center justify-center active:opacity-80"
           style={{
-            background: paying ? '#93c5fd' : 'linear-gradient(135deg, #1e40af, #3b82f6)',
-            boxShadow: '0 4px 16px rgba(59,130,246,0.4)'
+            borderRadius: '16px', padding: '15px 0',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'linear-gradient(135deg, #1e40af, #3b82f6)',
+            boxShadow: '0 4px 16px rgba(59,130,246,0.4)',
+            transform: btnPressed ? 'scale(0.97)' : 'scale(1)',
+            transition: 'all 0.2s ease',
           }}
-          onClick={paying ? undefined : handlePay}
+          onTouchStart={() => setBtnPressed(true)}
+          onTouchEnd={() => setBtnPressed(false)}
+          onTouchCancel={() => setBtnPressed(false)}
+          onClick={() => setShowConfirm(true)}
         >
-          <Text className="text-white text-base font-semibold">
-            {paying ? '支付处理中...' : `确认支付 ¥${price}`}
-          </Text>
+          <Text className="text-white text-base font-semibold">支付</Text>
         </View>
 
         <Text className="block text-center text-xs text-gray-400">
           支付即表示您同意《服务协议》和《隐私政策》
         </Text>
       </View>
+
+      {/* ── 确认支付弹窗 ── */}
+      {showConfirm && (
+        <View
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'flex-end', zIndex: 200 }}
+          onClick={() => !paying && setShowConfirm(false)}
+        >
+          <View
+            style={{ width: '100%', background: '#fff', borderRadius: '24px 24px 0 0', padding: '24px 24px 40px', boxShadow: '0 -4px 32px rgba(0,0,0,0.12)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* 弹窗头部 */}
+            <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+              <Text style={{ fontSize: '17px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>确认支付</Text>
+              <View
+                style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={() => !paying && setShowConfirm(false)}
+              >
+                <X size={16} color="#64748b" />
+              </View>
+            </View>
+
+            {/* 金额 */}
+            <View style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '4px', marginBottom: '24px' }}>
+              <Text style={{ fontSize: '16px', fontWeight: '600', color: '#ef4444', lineHeight: '1' }}>¥</Text>
+              <Text style={{ fontSize: '48px', fontWeight: '800', color: '#ef4444', lineHeight: '1' }}>{price}</Text>
+            </View>
+
+            {/* 支付明细 */}
+            <View style={{ background: '#f8fafc', borderRadius: '14px', padding: '4px 0', marginBottom: '20px' }}>
+              <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #f1f5f9' }}>
+                <Text style={{ fontSize: '14px', color: '#64748b', lineHeight: '1.5' }}>支付方式</Text>
+                <View style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <View style={{ width: '20px', height: '20px', borderRadius: '6px', background: currentMethod.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <currentMethod.icon size={13} color={currentMethod.color} />
+                  </View>
+                  <Text style={{ fontSize: '14px', fontWeight: '500', color: '#0f172a', lineHeight: '1.5' }}>{currentMethod.name}</Text>
+                </View>
+              </View>
+              <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px' }}>
+                <Text style={{ fontSize: '14px', color: '#64748b', lineHeight: '1.5' }}>支付金额</Text>
+                <Text style={{ fontSize: '14px', fontWeight: '600', color: '#ef4444', lineHeight: '1.5' }}>¥{price}</Text>
+              </View>
+            </View>
+
+            {/* 确认支付按钮 */}
+            <View
+              style={{
+                borderRadius: '16px', padding: '15px 0',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: paying ? '#93c5fd' : 'linear-gradient(135deg, #1e40af, #2563eb)',
+                boxShadow: paying ? 'none' : '0 4px 16px rgba(37,99,235,0.4)',
+                transition: 'all 0.2s ease',
+              }}
+              onClick={paying ? undefined : handleConfirmPay}
+            >
+              <Text style={{ color: '#fff', fontSize: '16px', fontWeight: '700', lineHeight: '1.5' }}>
+                {paying ? '支付处理中...' : `确认支付 ¥${price}`}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   )
 }
