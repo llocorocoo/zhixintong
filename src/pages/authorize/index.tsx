@@ -83,11 +83,7 @@ const AuthorizePage: FC = () => {
         : await Network.request({ url: '/api/report/submit', method: 'POST', data: pendingData || {} })
       if (res.data.code === 200) {
         if (!isUpdate) clearPendingData()
-        Taro.showLoading({ title: '职业信用报告生成中...' })
-        await new Promise(r => setTimeout(r, 3000))
-        Taro.hideLoading()
-        Taro.showToast({ title: isUpdate ? '报告已更新' : '报告已生成', icon: 'success' })
-        setTimeout(() => Taro.switchTab({ url: '/pages/report/index' }), 1000)
+        Taro.redirectTo({ url: '/pages/query-progress/index' })
       } else {
         Taro.showToast({ title: res.data.message || '提交失败', icon: 'none' })
       }
