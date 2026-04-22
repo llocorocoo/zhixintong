@@ -119,6 +119,9 @@ const ReportFormPage: FC = () => {
   }
 
   const handleSubmit = () => {
+    if (!formData.realName || !formData.idCard) {
+      Taro.showToast({ title: '请填写完整身份信息', icon: 'none' }); return
+    }
     setPendingData({
       userId: userInfo?.id || '',
       realName: formData.realName,
@@ -126,7 +129,7 @@ const ReportFormPage: FC = () => {
       educationList: formData.educationList.filter(e => e.school || e.major),
       qualificationList: formData.qualificationList.filter(q => q.qualification || q.certNumber),
     })
-    Taro.navigateTo({ url: '/pages/authorize/index' })
+    Taro.redirectTo({ url: '/pages/submit-success/index' })
   }
 
   // ── 身份表单 ──
@@ -426,7 +429,7 @@ const ReportFormPage: FC = () => {
               onClick={isLast ? handleSubmit : handleNext}
             >
               <Text style={{ fontSize: '15px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>
-                {isLast ? '下一步，去签署授权' : '下一步'}
+                {isLast ? '提交信息' : '下一步'}
               </Text>
             </View>
           </View>
