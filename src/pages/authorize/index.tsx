@@ -1,7 +1,7 @@
 import { View, Text, ScrollView } from '@tarojs/components'
 import { FC, useState, useEffect, useRef } from 'react'
 import Taro from '@tarojs/taro'
-import { ShieldCheck, CircleCheck } from 'lucide-react-taro'
+import { ShieldCheck, CircleCheck, CircleAlert } from 'lucide-react-taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import { useReportFormStore } from '@/stores/report-form'
@@ -145,6 +145,25 @@ const AuthorizePage: FC = () => {
 
       {/* ── 主内容区 ── */}
       <View style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+        {/* 信息已提交提示（新流程专用） */}
+        {!isUpdate && pendingData && (
+          <View style={{
+            display: 'flex', alignItems: 'flex-start', gap: '10px',
+            background: 'rgba(5,150,105,0.08)', borderRadius: '14px',
+            padding: '12px 14px', borderLeft: '3px solid #059669',
+          }}>
+            <CircleCheck size={18} color="#059669" style={{ flexShrink: 0, marginTop: '1px' }} />
+            <View>
+              <Text style={{ fontSize: '13px', fontWeight: '600', color: '#064e3b', display: 'block', lineHeight: '1.4' }}>
+                信息已提交
+              </Text>
+              <Text style={{ fontSize: '12px', color: '#059669', display: 'block', marginTop: '2px', lineHeight: '1.6' }}>
+                请签署以下授权书，平台将基于您的授权开始核查并生成职业信用报告。
+              </Text>
+            </View>
+          </View>
+        )}
 
         {/* 授权书全文 */}
         <View style={{

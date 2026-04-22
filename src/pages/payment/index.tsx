@@ -29,7 +29,7 @@ const PaymentPage: FC = () => {
       setTimeout(() => {
         isUpdate
           ? Taro.redirectTo({ url: '/pages/authorize/index?type=update' })
-          : Taro.redirectTo({ url: '/pages/privacy-notice/index' })
+          : Taro.redirectTo({ url: '/pages/report-form/index' })
       }, 1000)
     } catch {
       Taro.showToast({ title: '支付失败，请重试', icon: 'none' })
