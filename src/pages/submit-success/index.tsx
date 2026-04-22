@@ -7,10 +7,10 @@ const SubmitSuccessPage: FC = () => {
   const [btnPressed, setBtnPressed] = useState(false)
 
   const steps = [
-    { num: '1', title: '提交信息', desc: '您的身份、学历、职业资格信息已提交', done: true },
-    { num: '2', title: '签署授权书', desc: '授权平台查询您的相关信用信息', done: false, current: true },
-    { num: '3', title: '平台核查', desc: '平台核查信息真实性（1-3个工作日）', done: false },
-    { num: '4', title: '生成报告', desc: '职业信用报告生成完成', done: false },
+    { num: '1', title: '提交信息', done: true },
+    { num: '2', title: '签署授权书', done: false, current: true },
+    { num: '3', title: '平台核查', done: false },
+    { num: '4', title: '生成报告', done: false },
   ]
 
   return (
@@ -82,15 +82,9 @@ const SubmitSuccessPage: FC = () => {
                   <Text style={{
                     fontSize: '14px', fontWeight: step.current ? '700' : '500',
                     color: step.done ? '#059669' : step.current ? '#0f172a' : '#94a3b8',
-                    display: 'block', lineHeight: '1.4', marginBottom: '3px',
+                    display: 'block', lineHeight: '1.4',
                   }}>
                     {step.title}
-                    {step.current && (
-                      <Text style={{ fontSize: '11px', fontWeight: '600', color: '#2563eb', marginLeft: '8px' }}>← 当前步骤</Text>
-                    )}
-                  </Text>
-                  <Text style={{ fontSize: '12px', color: step.done ? '#6ee7b7' : step.current ? '#64748b' : '#cbd5e1', lineHeight: '1.5', display: 'block' }}>
-                    {step.desc}
                   </Text>
                 </View>
               </View>
