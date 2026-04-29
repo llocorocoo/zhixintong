@@ -33,6 +33,7 @@ const getLevelInfo = (score: number) => {
 
 const IndexPage: FC = () => {
   const [creditScore, setCreditScore] = useState<CreditScoreData | null>(null)
+  const [reportProcessing, setReportProcessing] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
   const [showModel, setShowModel] = useState(false)
   const [detailTab, setDetailTab] = useState(0)
@@ -66,8 +67,14 @@ const IndexPage: FC = () => {
   const fetchCreditScore = async () => {
     if (!userInfo?.id) return
     try {
-      const res = await Network.request({ url: '/api/credit/score', method: 'POST', data: { userId: userInfo.id } })
-      if (res.data.code === 200 && res.data.data) setCreditScore(res.data.data)
+      const [scoreRes, reportRes] = await Promise.all([
+        Network.request({ url: '/api/credit/score', method: 'POST', data: { userId: userInfo.id } }),
+        Network.request({ url: '/api/report/latest', method: 'POST', data: { userId: userInfo.id } }),
+      ])
+      if (scoreRes.data.code === 200 && scoreRes.data.data) setCreditScore(scoreRes.data.data)
+      setReportProcessing(
+        reportRes.data.code === 200 && reportRes.data.data?.status === 'processing'
+      )
     } catch {}
   }
 
@@ -164,22 +171,26 @@ const IndexPage: FC = () => {
                 style={{
                   display: 'flex', alignItems: 'center', gap: '4px',
                   padding: '10px 16px', borderRadius: '14px',
-                  background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
-                  boxShadow: '0 4px 14px rgba(37,99,235,0.38)',
+                  background: reportProcessing && !creditScore
+                    ? 'linear-gradient(135deg, #64748b 0%, #94a3b8 100%)'
+                    : 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
+                  boxShadow: reportProcessing && !creditScore
+                    ? '0 4px 14px rgba(100,116,139,0.3)'
+                    : '0 4px 14px rgba(37,99,235,0.38)',
                   transition: 'all 0.2s ease',
                 }}
                 onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
               >
-                  <Text style={{ color: '#fff', fontSize: '13px', fontWeight: '600', lineHeight: '1.5' }}>
-                  {creditScore ? '查看报告' : '立即生成'}
+                <Text style={{ color: '#fff', fontSize: '13px', fontWeight: '600', lineHeight: '1.5' }}>
+                  {creditScore ? '查看报告' : reportProcessing ? '生成中...' : '立即生成'}
                 </Text>
                 <ChevronRight size={14} color="rgba(255,255,255,0.8)" />
               </View>
             </View>
 
             {!creditScore && (
-              <Text style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '6px', display: 'block', lineHeight: '1.6' }}>
-                生成信用报告后将自动同步评分
+              <Text style={{ fontSize: '12px', color: reportProcessing ? '#f59e0b' : '#cbd5e1', marginTop: '6px', display: 'block', lineHeight: '1.6' }}>
+                {reportProcessing ? '报告生成中，预计 1-3 个工作日完成' : '生成信用报告后将自动同步评分'}
               </Text>
             )}
           </View>

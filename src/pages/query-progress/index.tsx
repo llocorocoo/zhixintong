@@ -68,12 +68,20 @@ const QueryProgressPage: FC = () => {
             </Text>
           </View>
 
-          {/* 返回首页 */}
-          <View
-            style={{ marginTop: '24px', padding: '8px 20px' }}
-            onClick={() => Taro.switchTab({ url: '/pages/index/index' })}
-          >
-            <Text style={{ fontSize: '14px', color: '#94a3b8', lineHeight: '1.5' }}>返回首页</Text>
+          {/* 操作按钮 */}
+          <View style={{ marginTop: '24px', display: 'flex', gap: '10px', width: '100%' }}>
+            <View
+              style={{ flex: 1, borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1.5px solid #e2e8f0' }}
+              onClick={() => Taro.switchTab({ url: '/pages/index/index' })}
+            >
+              <Text style={{ fontSize: '14px', color: '#64748b', fontWeight: '500', lineHeight: '1.5' }}>返回首页</Text>
+            </View>
+            <View
+              style={{ flex: 1, borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}
+              onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
+            >
+              <Text style={{ fontSize: '14px', color: '#fff', fontWeight: '600', lineHeight: '1.5' }}>查看进度</Text>
+            </View>
           </View>
         </View>
 
