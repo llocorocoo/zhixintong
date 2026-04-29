@@ -1,11 +1,25 @@
 import { View, Text } from '@tarojs/components'
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 import Taro from '@tarojs/taro'
+import { Network } from '@/network'
+import { useUserStore } from '@/stores/user'
 import { CircleCheck, Clock, ChevronRight } from 'lucide-react-taro'
 
 const QueryProgressPage: FC = () => {
-  const [status] = useState<'processing' | 'completed'>('processing')
+  const { userInfo } = useUserStore()
+  const [status, setStatus] = useState<'processing' | 'completed'>('processing')
   const [btnPressed, setBtnPressed] = useState(false)
+
+  useEffect(() => {
+    if (!userInfo?.id) return
+    Network.request({ url: '/api/report/latest', method: 'POST', data: { userId: userInfo.id } })
+      .then(res => {
+        if (res.data.code === 200 && res.data.data?.status === 'completed') {
+          setStatus('completed')
+        }
+      })
+      .catch(() => {})
+  }, [userInfo?.id])
 
   return (
     <View style={{ background: '#f6f8fc', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
