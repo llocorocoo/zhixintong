@@ -1,37 +1,11 @@
 import { View, Text } from '@tarojs/components'
-import { FC, useState, useEffect, useRef } from 'react'
+import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
-import { Network } from '@/network'
-import { useUserStore } from '@/stores/user'
 import { CircleCheck, Clock, ChevronRight } from 'lucide-react-taro'
 
 const QueryProgressPage: FC = () => {
-  const { userInfo } = useUserStore()
-  const [status, setStatus] = useState<'processing' | 'completed'>('processing')
+  const [status] = useState<'processing' | 'completed'>('processing')
   const [btnPressed, setBtnPressed] = useState(false)
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  const checkStatus = async () => {
-    if (!userInfo?.id) return
-    try {
-      const res = await Network.request({
-        url: '/api/report/latest',
-        method: 'POST',
-        data: { userId: userInfo.id }
-      })
-      if (res.data.code === 200 && res.data.data?.status === 'completed') {
-        setStatus('completed')
-        if (pollingRef.current) clearInterval(pollingRef.current)
-      }
-    } catch {}
-  }
-
-  useEffect(() => {
-    // 立即检查一次，再每2秒轮询
-    checkStatus()
-    pollingRef.current = setInterval(checkStatus, 2000)
-    return () => { if (pollingRef.current) clearInterval(pollingRef.current) }
-  }, [userInfo?.id])
 
   return (
     <View style={{ background: '#f6f8fc', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>

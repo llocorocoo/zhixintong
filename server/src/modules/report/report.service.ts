@@ -9,6 +9,7 @@ export interface Report {
   status: string
   report_url?: string
   identity_info?: any
+  work_history_info?: any
   education_info?: any
   qualification_info?: any
   litigation_info?: any
@@ -68,24 +69,11 @@ export class ReportService {
     }
 
     report.status = 'processing'
-    report.identity_info = { realName: formData.realName, idCard: formData.idCard }
-    report.education_info = formData.education ? {
-      education: formData.education,
-      school: formData.school,
-      major: formData.major,
-      degreeCertNo: formData.degreeCertNo,
-      diplomaCertNo: formData.diplomaCertNo,
-      files: formData.educationFiles,
-    } : undefined
-    report.qualification_info = formData.qualification ? {
-      qualification: formData.qualification,
-      certNumber: formData.certNumber,
-      issueDate: formData.issueDate,
-      files: formData.qualificationFiles,
-    } : undefined
+    report.identity_info = { realName: formData.realName, gender: formData.gender, idCard: formData.idCard }
+    report.work_history_info = formData.workHistoryList?.length ? formData.workHistoryList : undefined
+    report.education_info = formData.educationList?.length ? formData.educationList : undefined
+    report.qualification_info = formData.qualificationList?.length ? formData.qualificationList : undefined
     report.updated_at = new Date().toISOString()
-
-    setTimeout(() => { this.processReport(report!.id) }, 1000)
 
     return { reportId: report.id, status: 'processing' }
   }
