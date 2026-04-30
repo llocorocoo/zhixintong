@@ -29,16 +29,22 @@ const DEMO_CREDIT_SCORE = {
   },
 }
 
-const DEMO_REPORT = {
+const DEMO_REPORT_BASE = {
   id: 'report-demo-001',
   report_no: 'CR20260403001',
-  status: 'completed',
   report_url: 'https://example.com/reports/demo.pdf',
   identity_info: { realName: '张三', idCard: '330102199001011234' },
   education_info: { education: '本科', school: '某某大学', major: '计算机科学与技术' },
   expires_at: '2027-04-03T00:00:00.000Z',
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
+}
+
+// 提交后 2 分钟内为 processing，之后自动变为 completed
+function getReportStatus(state: any): 'processing' | 'completed' | null {
+  if (!state.reportSubmittedAt) return null
+  const elapsed = Date.now() - state.reportSubmittedAt
+  return elapsed < 2 * 60 * 1000 ? 'processing' : 'completed'
 }
 
 const DEMO_RESUME = {
@@ -157,34 +163,34 @@ async function mockRequest(url: string, data: any): Promise<any> {
 
   // ── 退出登录 ──
   if (url.includes('/auth/logout')) {
-    setState({ loggedIn: false, reportGenerated: false, resumeSynced: false })
+    setState({ loggedIn: false, reportSubmittedAt: null, resumeSynced: false })
     return ok({ message: '已退出' })
   }
 
   // ── 信用评分 ──
   if (url.includes('/credit/score')) {
-    if (!state.reportGenerated) {
-      return fail('暂无信用评分', 404)
-    }
+    const rStatus = getReportStatus(state)
+    if (rStatus !== 'completed') return fail('暂无信用评分', 404)
     return ok(DEMO_CREDIT_SCORE)
   }
 
   // ── 创建报告 ──
   if (url.includes('/report/create')) {
-    return ok({ reportId: DEMO_REPORT.id, reportNo: DEMO_REPORT.report_no })
+    return ok({ reportId: DEMO_REPORT_BASE.id, reportNo: DEMO_REPORT_BASE.report_no })
   }
 
   // ── 提交报告（触发生成）──
   if (url.includes('/report/submit')) {
     await delay(1500)
-    setState({ reportGenerated: true })
-    return ok({ reportId: DEMO_REPORT.id, status: 'processing' })
+    setState({ reportSubmittedAt: Date.now() })
+    return ok({ reportId: DEMO_REPORT_BASE.id, status: 'processing' })
   }
 
   // ── 报告列表 ──
   if (url.includes('/report/list')) {
-    if (!state.reportGenerated) return ok([])
-    return ok([DEMO_REPORT])
+    const rStatus = getReportStatus(state)
+    if (!rStatus) return ok([])
+    return ok([{ ...DEMO_REPORT_BASE, status: rStatus }])
   }
 
   // ── 报告详情 ──
@@ -193,14 +199,16 @@ async function mockRequest(url: string, data: any): Promise<any> {
   }
 
   if (url.match(/\/report\/[^/]+$/)) {
-    if (!state.reportGenerated) return fail('报告不存在', 404)
-    return ok(DEMO_REPORT)
+    const rStatus = getReportStatus(state)
+    if (!rStatus) return fail('报告不存在', 404)
+    return ok({ ...DEMO_REPORT_BASE, status: rStatus })
   }
 
   // ── 获取最新报告 ──
   if (url.includes('/report')) {
-    if (!state.reportGenerated) return fail('暂无报告', 404)
-    return ok(DEMO_REPORT)
+    const rStatus = getReportStatus(state)
+    if (!rStatus) return fail('暂无报告', 404)
+    return ok({ ...DEMO_REPORT_BASE, status: rStatus })
   }
 
   // ── 可信简历 ──

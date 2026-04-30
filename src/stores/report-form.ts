@@ -5,13 +5,18 @@ interface EducationItem {
   degreeCertNo: string; diplomaCertNo: string; files: string[]
 }
 interface QualificationItem {
-  id: string; qualification: string; certNumber: string; issueDate: string; files: string[]
+  id: string; certNumber: string; files: string[]
+}
+export interface WorkHistoryItem {
+  id: string; company: string; position: string; startDate: string; endDate: string; isCurrent: boolean
 }
 
 export interface PendingReportData {
   userId: string
   realName: string
+  gender: string
   idCard: string
+  workHistoryList: WorkHistoryItem[]
   educationList: EducationItem[]
   qualificationList: QualificationItem[]
 }

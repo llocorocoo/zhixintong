@@ -1,7 +1,7 @@
 import { View, Text } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
-import { CircleCheck, Clock, ChevronRight } from 'lucide-react-taro'
+import { Clock, ChevronRight } from 'lucide-react-taro'
 
 const QueryProgressPage: FC = () => {
   const [btnPressed, setBtnPressed] = useState(false)
