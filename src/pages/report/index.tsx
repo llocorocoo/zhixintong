@@ -185,7 +185,7 @@ const ReportPage: FC = () => {
                   fontSize: '12px', fontWeight: '600', lineHeight: '1.5',
                   color: reportData.status === 'completed' ? '#059669' : reportData.status === 'processing' ? '#2563eb' : '#dc2626',
                 }}>
-                  {reportData.status === 'completed' ? '已完成' : reportData.status === 'processing' ? '核查中' : '生成失败'}
+                  {reportData.status === 'completed' ? '已完成' : reportData.status === 'processing' ? '生成中' : '生成失败'}
                 </Text>
               </View>
             </View>
@@ -194,8 +194,8 @@ const ReportPage: FC = () => {
             {reportData.status === 'processing' && (
               <View style={{ padding: '20px' }}>
                 <View style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <Text style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>核查进度</Text>
-                  <Text style={{ fontSize: '13px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>核查中...</Text>
+                  <Text style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>生成进度</Text>
+                  <Text style={{ fontSize: '13px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>生成中...</Text>
                 </View>
                 {/* 进度条 */}
                 <View style={{ height: '6px', background: '#e2e8f0', borderRadius: '3px', marginBottom: '20px', overflow: 'hidden' }}>
@@ -224,7 +224,7 @@ const ReportPage: FC = () => {
                   ))}
                 </View>
                 <View style={{ marginTop: '16px', background: '#eff6ff', borderRadius: '12px', padding: '12px 14px' }}>
-                  <Text style={{ fontSize: '12px', color: '#2563eb', lineHeight: '1.7' }}>预计 1-3 个工作日完成核查，届时将通知您查看报告。</Text>
+                  <Text style={{ fontSize: '12px', color: '#2563eb', lineHeight: '1.7' }}>报告生成中，预计 1-3 个工作日完成，届时将通知您查看报告。</Text>
                 </View>
               </View>
             )}

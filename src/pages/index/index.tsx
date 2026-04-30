@@ -171,18 +171,14 @@ const IndexPage: FC = () => {
                 style={{
                   display: 'flex', alignItems: 'center', gap: '4px',
                   padding: '10px 16px', borderRadius: '14px',
-                  background: reportProcessing && !creditScore
-                    ? 'linear-gradient(135deg, #64748b 0%, #94a3b8 100%)'
-                    : 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
-                  boxShadow: reportProcessing && !creditScore
-                    ? '0 4px 14px rgba(100,116,139,0.3)'
-                    : '0 4px 14px rgba(37,99,235,0.38)',
+                  background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
+                  boxShadow: '0 4px 14px rgba(37,99,235,0.38)',
                   transition: 'all 0.2s ease',
                 }}
                 onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
               >
                 <Text style={{ color: '#fff', fontSize: '13px', fontWeight: '600', lineHeight: '1.5' }}>
-                  {creditScore ? '查看报告' : reportProcessing ? '生成中...' : '立即生成'}
+                  {creditScore ? '查看报告' : reportProcessing ? '查看进度' : '立即生成'}
                 </Text>
                 <ChevronRight size={14} color="rgba(255,255,255,0.8)" />
               </View>
