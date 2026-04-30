@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { useUserStore } from '@/stores/user'
 import { useReportFormStore } from '@/stores/report-form'
 import {
-  User, Briefcase, GraduationCap, Award, Upload,
+  User, GraduationCap, Award, Upload,
   ChevronRight, CircleCheck, Plus, Trash2
 } from 'lucide-react-taro'
 
@@ -15,35 +15,21 @@ interface EducationItem {
   degreeCertNo: string; diplomaCertNo: string; files: string[]
 }
 interface QualificationItem {
-  id: string; type: 'teacher' | 'accountant' | 'custom'
-  certNumber: string; qualification: string; issueDate: string
-  examLevel: string; examYear: string; examIdentity: string
-  files: string[]
-}
-interface WorkHistoryItem {
-  id: string; company: string; position: string; startDate: string; endDate: string; isCurrent: boolean
+  id: string; certNumber: string; files: string[]
 }
 interface FormData {
-  realName: string; gender: string; idCard: string
-  workHistoryList: WorkHistoryItem[]
-  educationList: EducationItem[]; qualificationList: QualificationItem[]
+  realName: string; idCard: string
+  educationList: EducationItem[]
+  qualificationList: QualificationItem[]
 }
 
 const EDU_OPTIONS = ['高中', '大专', '本科', '硕士', '博士']
-const GENDER_OPTIONS = ['男', '女']
-const ACCT_LEVEL_OPTIONS = ['初级会计师', '中级会计师', '高级会计师', '注册会计师(CPA)']
-const ACCT_YEAR_OPTIONS = Array.from({ length: 11 }, (_, i) => String(new Date().getFullYear() - i))
-const ACCT_IDENTITY_OPTIONS = ['应届毕业生', '在职人员', '离职人员', '自由职业者']
 const genId = () => Math.random().toString(36).substring(2, 9)
-const emptyWork = (): WorkHistoryItem => ({ id: genId(), company: '', position: '', startDate: '', endDate: '', isCurrent: false })
 const emptyEdu = (): EducationItem => ({ id: genId(), education: '本科', school: '', major: '', degreeCertNo: '', diplomaCertNo: '', files: [] })
-const emptyTeacher = (): QualificationItem => ({ id: genId(), type: 'teacher', certNumber: '', qualification: '', issueDate: '', examLevel: '', examYear: '', examIdentity: '', files: [] })
-const emptyAccountant = (): QualificationItem => ({ id: genId(), type: 'accountant', certNumber: '', qualification: '', issueDate: '', examLevel: '', examYear: '', examIdentity: '', files: [] })
-const emptyCustom = (): QualificationItem => ({ id: genId(), type: 'custom', certNumber: '', qualification: '', issueDate: '', examLevel: '', examYear: '', examIdentity: '', files: [] })
+const emptyQual = (): QualificationItem => ({ id: genId(), certNumber: '', files: [] })
 
 const STEPS = [
   { title: '身份信息', icon: User,          required: true  },
-  { title: '工作经历', icon: Briefcase,     required: false },
   { title: '学历信息', icon: GraduationCap, required: false },
   { title: '职业资格', icon: Award,         required: false },
 ]
@@ -76,8 +62,7 @@ const ReportFormPage: FC = () => {
   const [focusField, setFocusField] = useState<string | null>(null)
   const [btnPressed, setBtnPressed] = useState<string | null>(null)
   const [formData, setFormData] = useState<FormData>({
-    realName: '', gender: '男', idCard: '',
-    workHistoryList: [emptyWork()],
+    realName: '', idCard: '',
     educationList: [emptyEdu()],
     qualificationList: [],
   })
@@ -87,19 +72,12 @@ const ReportFormPage: FC = () => {
   const setField = (field: keyof FormData, value: string) =>
     setFormData(prev => ({ ...prev, [field]: value }))
 
-  const setWork = (id: string, field: keyof WorkHistoryItem, value: string | boolean) =>
-    setFormData(prev => ({ ...prev, workHistoryList: prev.workHistoryList.map(w => w.id === id ? { ...w, [field]: value } : w) }))
-
   const setEdu = (id: string, field: keyof EducationItem, value: string) =>
     setFormData(prev => ({ ...prev, educationList: prev.educationList.map(e => e.id === id ? { ...e, [field]: value } : e) }))
 
   const setQual = (id: string, field: keyof QualificationItem, value: string) =>
     setFormData(prev => ({ ...prev, qualificationList: prev.qualificationList.map(q => q.id === id ? { ...q, [field]: value } : q) }))
 
-  const removeWork = (id: string) => {
-    if (formData.workHistoryList.length <= 1) { Taro.showToast({ title: '至少保留一条工作经历', icon: 'none' }); return }
-    setFormData(prev => ({ ...prev, workHistoryList: prev.workHistoryList.filter(w => w.id !== id) }))
-  }
   const removeEdu = (id: string) => {
     if (formData.educationList.length <= 1) { Taro.showToast({ title: '至少保留一条学历信息', icon: 'none' }); return }
     setFormData(prev => ({ ...prev, educationList: prev.educationList.filter(e => e.id !== id) }))
@@ -146,11 +124,11 @@ const ReportFormPage: FC = () => {
     setPendingData({
       userId: userInfo?.id || '',
       realName: formData.realName,
-      gender: formData.gender,
+      gender: '',
       idCard: formData.idCard,
-      workHistoryList: formData.workHistoryList.filter(w => w.company || w.position),
+      workHistoryList: [],
       educationList: formData.educationList.filter(e => e.school || e.major),
-      qualificationList: formData.qualificationList.filter(q => q.qualification || q.certNumber || q.examLevel || q.files.length > 0),
+      qualificationList: formData.qualificationList.filter(q => q.certNumber || q.files.length > 0),
     })
     Taro.redirectTo({ url: '/pages/submit-success/index' })
   }
@@ -169,14 +147,6 @@ const ReportFormPage: FC = () => {
           />
         </InputBox>
       </Field>
-      <Field label="性别" required>
-        <Picker mode="selector" range={GENDER_OPTIONS} value={GENDER_OPTIONS.indexOf(formData.gender)} onChange={e => setField('gender', GENDER_OPTIONS[e.detail.value])}>
-          <View style={{ background: '#f8fafc', borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1.5px solid transparent' }}>
-            <Text style={{ fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}>{formData.gender}</Text>
-            <ChevronRight size={15} color="#94a3b8" />
-          </View>
-        </Picker>
-      </Field>
       <Field label="身份证号" required>
         <InputBox focused={focusField === 'idcard'}>
           <Input
@@ -188,94 +158,6 @@ const ReportFormPage: FC = () => {
           />
         </InputBox>
       </Field>
-    </View>
-  )
-
-  // ── 工作经历表单 ──
-  const renderWorkHistory = () => (
-    <View style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      {formData.workHistoryList.map((work, idx) => (
-        <View key={work.id} style={{ background: '#f8fafc', borderRadius: '16px', padding: '16px' }}>
-          <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-            <View style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <View style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: '#fff', fontSize: '11px', fontWeight: '700', lineHeight: '1' }}>{idx + 1}</Text>
-              </View>
-              <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.5' }}>工作经历 {formData.workHistoryList.length > 1 ? idx + 1 : ''}</Text>
-            </View>
-            {formData.workHistoryList.length > 1 && (
-              <View onClick={() => removeWork(work.id)} style={{ padding: '4px' }}>
-                <Trash2 size={17} color="#ef4444" />
-              </View>
-            )}
-          </View>
-
-          {[
-            { label: '公司名称', field: 'company',   placeholder: '请输入公司全称' },
-            { label: '担任职位', field: 'position',  placeholder: '请输入职位名称' },
-          ].map(row => (
-            <Field key={row.field} label={row.label}>
-              <InputBox focused={focusField === `${work.id}-${row.field}`}>
-                <Input
-                  style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                  placeholder={row.placeholder} placeholderStyle="color:#cbd5e1;"
-                  value={(work as any)[row.field]}
-                  onFocus={() => setFocusField(`${work.id}-${row.field}`)} onBlur={() => setFocusField(null)}
-                  onInput={e => setWork(work.id, row.field as keyof WorkHistoryItem, e.detail.value)}
-                />
-              </InputBox>
-            </Field>
-          ))}
-
-          <Field label="入职时间">
-            <Picker mode="date" value={work.startDate} onChange={e => setWork(work.id, 'startDate', e.detail.value)}>
-              <View style={{ background: '#fff', borderRadius: '12px', padding: '11px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1.5px solid #e2e8f0' }}>
-                <Text style={{ fontSize: '14px', color: work.startDate ? '#0f172a' : '#cbd5e1', lineHeight: '1.5' }}>{work.startDate || '请选择入职时间'}</Text>
-                <ChevronRight size={15} color="#94a3b8" />
-              </View>
-            </Picker>
-          </Field>
-
-          <Field label="离职时间">
-            {work.isCurrent ? (
-              <View style={{ background: '#f0fdf4', borderRadius: '12px', padding: '11px 14px', border: '1.5px solid #86efac' }}>
-                <Text style={{ fontSize: '14px', color: '#16a34a', lineHeight: '1.5' }}>至今（在职）</Text>
-              </View>
-            ) : (
-              <Picker mode="date" value={work.endDate} onChange={e => setWork(work.id, 'endDate', e.detail.value)}>
-                <View style={{ background: '#fff', borderRadius: '12px', padding: '11px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1.5px solid #e2e8f0' }}>
-                  <Text style={{ fontSize: '14px', color: work.endDate ? '#0f172a' : '#cbd5e1', lineHeight: '1.5' }}>{work.endDate || '请选择离职时间'}</Text>
-                  <ChevronRight size={15} color="#94a3b8" />
-                </View>
-              </Picker>
-            )}
-          </Field>
-
-          {/* 在职切换 */}
-          <View
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '-6px', marginBottom: '4px' }}
-            onClick={() => setWork(work.id, 'isCurrent', !work.isCurrent)}
-          >
-            <View style={{
-              width: '18px', height: '18px', borderRadius: '4px', border: `2px solid ${work.isCurrent ? '#2563eb' : '#cbd5e1'}`,
-              background: work.isCurrent ? '#2563eb' : '#fff',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>
-              {work.isCurrent && <Text style={{ color: '#fff', fontSize: '12px', lineHeight: '1', fontWeight: '700' }}>✓</Text>}
-            </View>
-            <Text style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>目前在职</Text>
-          </View>
-        </View>
-      ))}
-
-      <View
-        style={{ borderRadius: '14px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', border: '1.5px dashed #c4b5fd', background: '#f5f3ff' }}
-        onClick={() => setFormData(prev => ({ ...prev, workHistoryList: [...prev.workHistoryList, emptyWork()] }))}
-      >
-        <Plus size={16} color="#7c3aed" />
-        <Text style={{ fontSize: '14px', color: '#7c3aed', fontWeight: '500', lineHeight: '1.5' }}>添加工作经历</Text>
-      </View>
-      <Text style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.5' }}>可添加多段工作经历，按时间倒序填写</Text>
     </View>
   )
 
@@ -357,178 +239,63 @@ const ReportFormPage: FC = () => {
   )
 
   // ── 职业资格表单 ──
-  const renderQualification = () => {
-    const hasTeacher = formData.qualificationList.some(q => q.type === 'teacher')
-    const hasAccountant = formData.qualificationList.some(q => q.type === 'accountant')
-
-    const renderUpload = (id: string, qual: QualificationItem, label: string) => (
-      <Field label={label}>
-        <View style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-          {qual.files.map((_, fi) => (
-            <View key={fi} style={{ position: 'relative', width: '72px', height: '72px' }}>
-              <View style={{ width: '72px', height: '72px', background: '#e2e8f0', borderRadius: '10px' }} />
-              <View style={{ position: 'absolute', top: '-4px', right: '-4px', width: '18px', height: '18px', background: '#ef4444', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => removeFile('qualification', id, fi)}>
-                <Text style={{ color: '#fff', fontSize: '12px', lineHeight: '1' }}>×</Text>
+  const renderQualification = () => (
+    <View style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {formData.qualificationList.map((qual, idx) => (
+        <View key={qual.id} style={{ background: '#f8fafc', borderRadius: '16px', padding: '16px' }}>
+          <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <View style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <View style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: '11px', fontWeight: '700', lineHeight: '1' }}>{idx + 1}</Text>
               </View>
+              <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.5' }}>职业资格 {formData.qualificationList.length > 1 ? idx + 1 : ''}</Text>
             </View>
-          ))}
-          <View style={{ width: '72px', height: '72px', border: '1.5px dashed #cbd5e1', borderRadius: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }} onClick={() => handleUpload('qualification', id)}>
-            <Upload size={18} color="#94a3b8" />
-            <Text style={{ fontSize: '10px', color: '#cbd5e1', lineHeight: '1.3' }}>点击上传</Text>
-          </View>
-        </View>
-      </Field>
-    )
-
-    return (
-      <View style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-
-        {/* ── 推荐上传 ── */}
-        <View style={{ background: '#f8fafc', borderRadius: '14px', padding: '14px' }}>
-          <Text style={{ fontSize: '12px', fontWeight: '600', color: '#94a3b8', display: 'block', marginBottom: '10px', letterSpacing: '0.5px' }}>推荐上传</Text>
-          <View style={{ display: 'flex', gap: '10px' }}>
-            <View
-              style={{ flex: 1, borderRadius: '12px', padding: '14px 10px', border: `1.5px solid ${hasTeacher ? '#059669' : '#e2e8f0'}`, background: hasTeacher ? '#f0fdf4' : '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', transition: 'all 0.2s ease' }}
-              onClick={() => { if (!hasTeacher) setFormData(prev => ({ ...prev, qualificationList: [...prev.qualificationList, emptyTeacher()] })) }}
-            >
-              <Text style={{ fontSize: '22px', lineHeight: '1' }}>📋</Text>
-              <Text style={{ fontSize: '12px', fontWeight: '600', color: hasTeacher ? '#059669' : '#374151', lineHeight: '1.4', textAlign: 'center' }}>教师资格证</Text>
-              {hasTeacher
-                ? <Text style={{ fontSize: '10px', color: '#059669', lineHeight: '1.3' }}>已添加 ✓</Text>
-                : <Text style={{ fontSize: '10px', color: '#94a3b8', lineHeight: '1.3' }}>点击添加</Text>
-              }
-            </View>
-            <View
-              style={{ flex: 1, borderRadius: '12px', padding: '14px 10px', border: `1.5px solid ${hasAccountant ? '#059669' : '#e2e8f0'}`, background: hasAccountant ? '#f0fdf4' : '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', transition: 'all 0.2s ease' }}
-              onClick={() => { if (!hasAccountant) setFormData(prev => ({ ...prev, qualificationList: [...prev.qualificationList, emptyAccountant()] })) }}
-            >
-              <Text style={{ fontSize: '22px', lineHeight: '1' }}>🧾</Text>
-              <Text style={{ fontSize: '12px', fontWeight: '600', color: hasAccountant ? '#059669' : '#374151', lineHeight: '1.4', textAlign: 'center' }}>会计专业资格</Text>
-              {hasAccountant
-                ? <Text style={{ fontSize: '10px', color: '#059669', lineHeight: '1.3' }}>已添加 ✓</Text>
-                : <Text style={{ fontSize: '10px', color: '#94a3b8', lineHeight: '1.3' }}>点击添加</Text>
-              }
+            <View onClick={() => removeQual(qual.id)} style={{ padding: '4px' }}>
+              <Trash2 size={17} color="#ef4444" />
             </View>
           </View>
-        </View>
 
-        {/* ── 已添加的资格列表 ── */}
-        {formData.qualificationList.map((qual, idx) => (
-          <View key={qual.id} style={{ background: '#f8fafc', borderRadius: '16px', padding: '16px' }}>
-            <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <View style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <View style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: '#fff', fontSize: '11px', fontWeight: '700', lineHeight: '1' }}>{idx + 1}</Text>
+          <Field label="证书编号">
+            <InputBox focused={focusField === `${qual.id}-cert`}>
+              <Input
+                style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
+                placeholder="请输入证书编号" placeholderStyle="color:#cbd5e1;"
+                value={qual.certNumber}
+                onFocus={() => setFocusField(`${qual.id}-cert`)} onBlur={() => setFocusField(null)}
+                onInput={e => setQual(qual.id, 'certNumber', e.detail.value)}
+              />
+            </InputBox>
+          </Field>
+
+          <Field label="证书照片">
+            <View style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {qual.files.map((_, fi) => (
+                <View key={fi} style={{ position: 'relative', width: '72px', height: '72px' }}>
+                  <View style={{ width: '72px', height: '72px', background: '#e2e8f0', borderRadius: '10px' }} />
+                  <View style={{ position: 'absolute', top: '-4px', right: '-4px', width: '18px', height: '18px', background: '#ef4444', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => removeFile('qualification', qual.id, fi)}>
+                    <Text style={{ color: '#fff', fontSize: '12px', lineHeight: '1' }}>×</Text>
+                  </View>
                 </View>
-                <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.5' }}>
-                  {qual.type === 'teacher' ? '教师资格证' : qual.type === 'accountant' ? '会计专业资格' : `职业资格 ${idx + 1}`}
-                </Text>
-              </View>
-              <View onClick={() => removeQual(qual.id)} style={{ padding: '4px' }}>
-                <Trash2 size={17} color="#ef4444" />
+              ))}
+              <View style={{ width: '72px', height: '72px', border: '1.5px dashed #cbd5e1', borderRadius: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }} onClick={() => handleUpload('qualification', qual.id)}>
+                <Upload size={18} color="#94a3b8" />
+                <Text style={{ fontSize: '10px', color: '#cbd5e1', lineHeight: '1.3' }}>点击上传</Text>
               </View>
             </View>
-
-            {/* 教师资格证字段 */}
-            {qual.type === 'teacher' && (
-              <>
-                <Field label="教师资格证书编号">
-                  <InputBox focused={focusField === `${qual.id}-certNumber`}>
-                    <Input
-                      style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                      placeholder="请输入证书编号" placeholderStyle="color:#cbd5e1;"
-                      value={qual.certNumber}
-                      onFocus={() => setFocusField(`${qual.id}-certNumber`)} onBlur={() => setFocusField(null)}
-                      onInput={e => setQual(qual.id, 'certNumber', e.detail.value)}
-                    />
-                  </InputBox>
-                </Field>
-                {renderUpload(qual.id, qual, '上传照片')}
-              </>
-            )}
-
-            {/* 会计专业资格字段 */}
-            {qual.type === 'accountant' && (
-              <>
-                <Field label="报考级别">
-                  <Picker mode="selector" range={ACCT_LEVEL_OPTIONS} value={Math.max(0, ACCT_LEVEL_OPTIONS.indexOf(qual.examLevel))} onChange={e => setQual(qual.id, 'examLevel', ACCT_LEVEL_OPTIONS[e.detail.value])}>
-                    <View style={{ background: '#fff', borderRadius: '12px', padding: '11px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1.5px solid #e2e8f0' }}>
-                      <Text style={{ fontSize: '14px', color: qual.examLevel ? '#0f172a' : '#cbd5e1', lineHeight: '1.5' }}>{qual.examLevel || '请选择报考级别'}</Text>
-                      <ChevronRight size={15} color="#94a3b8" />
-                    </View>
-                  </Picker>
-                </Field>
-                <Field label="报考年份">
-                  <Picker mode="selector" range={ACCT_YEAR_OPTIONS} value={Math.max(0, ACCT_YEAR_OPTIONS.indexOf(qual.examYear))} onChange={e => setQual(qual.id, 'examYear', ACCT_YEAR_OPTIONS[e.detail.value])}>
-                    <View style={{ background: '#fff', borderRadius: '12px', padding: '11px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1.5px solid #e2e8f0' }}>
-                      <Text style={{ fontSize: '14px', color: qual.examYear ? '#0f172a' : '#cbd5e1', lineHeight: '1.5' }}>{qual.examYear || '请选择报考年份'}</Text>
-                      <ChevronRight size={15} color="#94a3b8" />
-                    </View>
-                  </Picker>
-                </Field>
-                <Field label="报考身份">
-                  <Picker mode="selector" range={ACCT_IDENTITY_OPTIONS} value={Math.max(0, ACCT_IDENTITY_OPTIONS.indexOf(qual.examIdentity))} onChange={e => setQual(qual.id, 'examIdentity', ACCT_IDENTITY_OPTIONS[e.detail.value])}>
-                    <View style={{ background: '#fff', borderRadius: '12px', padding: '11px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1.5px solid #e2e8f0' }}>
-                      <Text style={{ fontSize: '14px', color: qual.examIdentity ? '#0f172a' : '#cbd5e1', lineHeight: '1.5' }}>{qual.examIdentity || '请选择报考身份'}</Text>
-                      <ChevronRight size={15} color="#94a3b8" />
-                    </View>
-                  </Picker>
-                </Field>
-                {renderUpload(qual.id, qual, '会计资格照片')}
-              </>
-            )}
-
-            {/* 自定义职业资格字段 */}
-            {qual.type === 'custom' && (
-              <>
-                <Field label="证书名称">
-                  <InputBox focused={focusField === `${qual.id}-name`}>
-                    <Input
-                      style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                      placeholder="请输入职业资格证书名称" placeholderStyle="color:#cbd5e1;"
-                      value={qual.qualification}
-                      onFocus={() => setFocusField(`${qual.id}-name`)} onBlur={() => setFocusField(null)}
-                      onInput={e => setQual(qual.id, 'qualification', e.detail.value)}
-                    />
-                  </InputBox>
-                </Field>
-                <Field label="证书编号">
-                  <InputBox focused={focusField === `${qual.id}-certNumber`}>
-                    <Input
-                      style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                      placeholder="请输入证书编号" placeholderStyle="color:#cbd5e1;"
-                      value={qual.certNumber}
-                      onFocus={() => setFocusField(`${qual.id}-certNumber`)} onBlur={() => setFocusField(null)}
-                      onInput={e => setQual(qual.id, 'certNumber', e.detail.value)}
-                    />
-                  </InputBox>
-                </Field>
-                <Field label="发证日期">
-                  <Picker mode="date" value={qual.issueDate} onChange={e => setQual(qual.id, 'issueDate', e.detail.value)}>
-                    <View style={{ background: '#fff', borderRadius: '12px', padding: '11px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1.5px solid #e2e8f0' }}>
-                      <Text style={{ fontSize: '14px', color: qual.issueDate ? '#0f172a' : '#cbd5e1', lineHeight: '1.5' }}>{qual.issueDate || '请选择发证日期'}</Text>
-                      <ChevronRight size={15} color="#94a3b8" />
-                    </View>
-                  </Picker>
-                </Field>
-                {renderUpload(qual.id, qual, '证书照片')}
-              </>
-            )}
-          </View>
-        ))}
-
-        {/* ── + 添加职业资格 ── */}
-        <View
-          style={{ borderRadius: '14px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', border: '1.5px dashed #6ee7b7', background: '#f0fdf4' }}
-          onClick={() => setFormData(prev => ({ ...prev, qualificationList: [...prev.qualificationList, emptyCustom()] }))}
-        >
-          <Plus size={16} color="#059669" />
-          <Text style={{ fontSize: '14px', color: '#059669', fontWeight: '500', lineHeight: '1.5' }}>添加职业资格</Text>
+          </Field>
         </View>
-        <Text style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.5' }}>可添加多个职业资格证书，如律师资格证、建造师证等</Text>
+      ))}
+
+      <View
+        style={{ borderRadius: '14px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', border: '1.5px dashed #6ee7b7', background: '#f0fdf4' }}
+        onClick={() => setFormData(prev => ({ ...prev, qualificationList: [...prev.qualificationList, emptyQual()] }))}
+      >
+        <Plus size={16} color="#059669" />
+        <Text style={{ fontSize: '14px', color: '#059669', fontWeight: '500', lineHeight: '1.5' }}>添加职业资格</Text>
       </View>
-    )
-  }
+      <Text style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.5' }}>可添加多个职业资格证书，如注册会计师、律师资格证等</Text>
+    </View>
+  )
 
   const isLast = currentStep === STEPS.length - 1
 
@@ -554,8 +321,7 @@ const ReportFormPage: FC = () => {
                     background: i < currentStep ? '#10b981' : i === currentStep ? '#fff' : 'rgba(255,255,255,0.2)',
                     border: i === currentStep ? '2.5px solid #fff' : 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'all 0.3s ease',
-                    flexShrink: 0,
+                    transition: 'all 0.3s ease', flexShrink: 0,
                   }}>
                     {i < currentStep
                       ? <CircleCheck size={16} color="#fff" />
@@ -595,9 +361,8 @@ const ReportFormPage: FC = () => {
             </View>
 
             {currentStep === 0 && renderIdentity()}
-            {currentStep === 1 && renderWorkHistory()}
-            {currentStep === 2 && renderEducation()}
-            {currentStep === 3 && renderQualification()}
+            {currentStep === 1 && renderEducation()}
+            {currentStep === 2 && renderQualification()}
           </View>
 
           <View style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', padding: '2px 4px' }}>
