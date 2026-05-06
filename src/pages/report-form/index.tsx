@@ -127,7 +127,7 @@ const ReportFormPage: FC = () => {
       gender: '',
       idCard: formData.idCard,
       workHistoryList: [],
-      educationList: formData.educationList.filter(e => e.school || e.major),
+      educationList: formData.educationList.filter(e => e.degreeCertNo || e.diplomaCertNo),
       qualificationList: formData.qualificationList.filter(q => q.certNumber || q.files.length > 0),
     })
     Taro.redirectTo({ url: '/pages/submit-success/index' })
@@ -190,8 +190,6 @@ const ReportFormPage: FC = () => {
           </Field>
 
           {[
-            { label: '毕业院校', field: 'school', placeholder: '请输入毕业院校' },
-            { label: '所学专业', field: 'major',  placeholder: '请输入所学专业' },
             { label: '学位证书编号', field: 'degreeCertNo', placeholder: '请输入学位证书编号' },
             { label: '毕业证书编号', field: 'diplomaCertNo', placeholder: '请输入毕业证书编号' },
           ].map(row => (
@@ -207,23 +205,6 @@ const ReportFormPage: FC = () => {
               </InputBox>
             </Field>
           ))}
-
-          <Field label="学历证书照片">
-            <View style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              {edu.files.map((_, fi) => (
-                <View key={fi} style={{ position: 'relative', width: '64px', height: '64px' }}>
-                  <View style={{ width: '64px', height: '64px', background: '#e2e8f0', borderRadius: '10px' }} />
-                  <View style={{ position: 'absolute', top: '-4px', right: '-4px', width: '18px', height: '18px', background: '#ef4444', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => removeFile('education', edu.id, fi)}>
-                    <Text style={{ color: '#fff', fontSize: '12px', lineHeight: '1' }}>×</Text>
-                  </View>
-                </View>
-              ))}
-              <View style={{ width: '64px', height: '64px', border: '1.5px dashed #cbd5e1', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => handleUpload('education', edu.id)}>
-                <Upload size={20} color="#94a3b8" />
-              </View>
-            </View>
-            <Text style={{ fontSize: '11px', color: '#94a3b8', display: 'block', marginTop: '6px', lineHeight: '1.5' }}>支持上传学历证书、学位证书照片</Text>
-          </Field>
         </View>
       ))}
 
