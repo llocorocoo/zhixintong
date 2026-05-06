@@ -30,7 +30,7 @@ const emptyQual = (): QualificationItem => ({ id: genId(), certNumber: '', files
 
 const STEPS = [
   { title: '身份信息', icon: User,          required: true  },
-  { title: '学历信息', icon: GraduationCap, required: false },
+  { title: '学历信息', icon: GraduationCap, required: true  },
   { title: '职业资格', icon: Award,         required: false },
 ]
 
@@ -113,6 +113,12 @@ const ReportFormPage: FC = () => {
   const handleNext = () => {
     if (currentStep === 0 && (!formData.realName || !formData.idCard)) {
       Taro.showToast({ title: '请填写完整身份信息', icon: 'none' }); return
+    }
+    if (currentStep === 1) {
+      const edu = formData.educationList[0]
+      if (!edu.degreeCertNo && !edu.diplomaCertNo) {
+        Taro.showToast({ title: '请至少填写一个证书编号', icon: 'none' }); return
+      }
     }
     setCurrentStep(s => s + 1)
   }
