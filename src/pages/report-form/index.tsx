@@ -37,8 +37,8 @@ const STEPS = [
 const Field: FC<{ label: string; required?: boolean; children: React.ReactNode }> = ({ label, required, children }) => (
   <View style={{ marginBottom: '14px' }}>
     <View style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '7px' }}>
+      {required && <Text style={{ fontSize: '13px', color: '#ef4444', lineHeight: '1.5' }}>*</Text>}
       <Text style={{ fontSize: '13px', fontWeight: '500', color: '#374151', lineHeight: '1.5' }}>{label}</Text>
-      {required && <Text style={{ fontSize: '12px', color: '#ef4444', lineHeight: '1' }}>*</Text>}
     </View>
     {children}
   </View>
