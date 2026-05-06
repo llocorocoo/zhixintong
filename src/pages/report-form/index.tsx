@@ -116,8 +116,8 @@ const ReportFormPage: FC = () => {
     }
     if (currentStep === 1) {
       const edu = formData.educationList[0]
-      if (!edu.degreeCertNo && !edu.diplomaCertNo) {
-        Taro.showToast({ title: '请至少填写一个证书编号', icon: 'none' }); return
+      if (!edu.degreeCertNo || !edu.diplomaCertNo) {
+        Taro.showToast({ title: '请填写学位证书编号和毕业证书编号', icon: 'none' }); return
       }
     }
     setCurrentStep(s => s + 1)
