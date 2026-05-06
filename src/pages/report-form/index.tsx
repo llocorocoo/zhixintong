@@ -115,9 +115,9 @@ const ReportFormPage: FC = () => {
       Taro.showToast({ title: '请填写完整身份信息', icon: 'none' }); return
     }
     if (currentStep === 1) {
-      const edu = formData.educationList[0]
-      if (!edu.degreeCertNo || !edu.diplomaCertNo) {
-        Taro.showToast({ title: '请填写学位证书编号和毕业证书编号', icon: 'none' }); return
+      const invalid = formData.educationList.some(e => !e.education || !e.degreeCertNo || !e.diplomaCertNo)
+      if (invalid) {
+        Taro.showToast({ title: '请完整填写学历、学位证书编号和毕业证书编号', icon: 'none' }); return
       }
     }
     setCurrentStep(s => s + 1)
@@ -186,7 +186,7 @@ const ReportFormPage: FC = () => {
             )}
           </View>
 
-          <Field label="学历">
+          <Field label="学历" required>
             <Picker mode="selector" range={EDU_OPTIONS} value={EDU_OPTIONS.indexOf(edu.education)} onChange={e => setEdu(edu.id, 'education', EDU_OPTIONS[e.detail.value])}>
               <View style={{ background: '#fff', borderRadius: '12px', padding: '11px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1.5px solid #e2e8f0' }}>
                 <Text style={{ fontSize: '14px', color: edu.education ? '#0f172a' : '#cbd5e1', lineHeight: '1.5' }}>{edu.education || '请选择学历'}</Text>
@@ -199,7 +199,7 @@ const ReportFormPage: FC = () => {
             { label: '学位证书编号', field: 'degreeCertNo', placeholder: '请输入学位证书编号' },
             { label: '毕业证书编号', field: 'diplomaCertNo', placeholder: '请输入毕业证书编号' },
           ].map(row => (
-            <Field key={row.field} label={row.label}>
+            <Field key={row.field} label={row.label} required>
               <InputBox focused={focusField === `${edu.id}-${row.field}`}>
                 <Input
                   style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
