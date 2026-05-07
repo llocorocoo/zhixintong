@@ -186,7 +186,7 @@ const IndexPage: FC = () => {
 
             {!creditScore && (
               <Text style={{ fontSize: '12px', color: reportProcessing ? '#f59e0b' : '#cbd5e1', marginTop: '6px', display: 'block', lineHeight: '1.6' }}>
-                {reportProcessing ? '报告生成中，预计 1-3 个工作日完成' : '生成信用报告后将自动同步评分'}
+                {reportProcessing ? '信用核查中，完成后可查看完整职业信用报告' : '生成信用报告后将自动同步评分'}
               </Text>
             )}
           </View>
