@@ -35,7 +35,8 @@ const LoginPage: FC = () => {
         const { user, token } = res.data.data
         setToken(token)
         setUserInfo(user)
-        setTimeout(() => Taro.switchTab({ url: '/pages/index/index' }), 600)
+        Taro.showToast({ title: '登录成功', icon: 'success' })
+        setTimeout(() => Taro.switchTab({ url: '/pages/index/index' }), 1000)
       } else {
         Taro.showToast({ title: res.data.message || '登录失败', icon: 'none' })
       }
@@ -242,30 +243,41 @@ const LoginPage: FC = () => {
             style={{ width: '280px', background: '#fff', borderRadius: '16px', overflow: 'hidden' }}
             onClick={e => e.stopPropagation()}
           >
-            <View style={{ padding: '28px 24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-              <View style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ShieldCheck size={28} color="#fff" />
+            {/* 头部说明 */}
+            <View style={{ padding: '24px 20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+              <View style={{ width: '48px', height: '48px', borderRadius: '14px', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ShieldCheck size={24} color="#fff" />
               </View>
-              <Text style={{ fontSize: '16px', fontWeight: '600', color: '#0f172a', textAlign: 'center', lineHeight: '1.5' }}>
-                "职信通"申请获取并{'\n'}验证你的手机号
+              <Text style={{ fontSize: '15px', fontWeight: '600', color: '#0f172a', textAlign: 'center', lineHeight: '1.5' }}>
+                "职信通"申请获取并验证你的手机号
               </Text>
-              <Text style={{ fontSize: '13px', color: '#94a3b8', textAlign: 'center', lineHeight: '1.6' }}>
-                用于登录验证和账户安全{'\n'}不会用于其他用途
+              <Text style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center', lineHeight: '1.6' }}>
+                用于登录验证和账户安全，不会用于其他用途
               </Text>
             </View>
-            <View style={{ borderTop: '1px solid #f1f5f9', display: 'flex' }}>
+
+            {/* 手机号选项 */}
+            <View style={{ borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' }}>
               <View
-                style={{ flex: 1, padding: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid #f1f5f9' }}
-                onClick={() => setShowPhoneModal(false)}
-              >
-                <Text style={{ fontSize: '16px', color: '#94a3b8', lineHeight: '1.5' }}>不允许</Text>
-              </View>
-              <View
-                style={{ flex: 1, padding: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ display: 'flex', alignItems: 'center', padding: '14px 20px', gap: '12px', background: '#fff' }}
                 onClick={() => { setShowPhoneModal(false); doLogin(DEMO_PHONE_FULL, 'demo') }}
               >
-                <Text style={{ fontSize: '16px', color: '#2563eb', fontWeight: '600', lineHeight: '1.5' }}>管理号码</Text>
+                <View style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Phone size={17} color="#2563eb" />
+                </View>
+                <Text style={{ flex: 1, fontSize: '16px', fontWeight: '500', color: '#0f172a', lineHeight: '1.5', letterSpacing: '1px' }}>
+                  138****0000
+                </Text>
+                <ChevronRight size={16} color="#94a3b8" />
               </View>
+            </View>
+
+            {/* 不允许 */}
+            <View
+              style={{ padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={() => setShowPhoneModal(false)}
+            >
+              <Text style={{ fontSize: '15px', color: '#94a3b8', lineHeight: '1.5' }}>不允许</Text>
             </View>
           </View>
         </View>
