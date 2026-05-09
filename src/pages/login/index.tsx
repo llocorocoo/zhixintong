@@ -199,7 +199,7 @@ const LoginPage: FC = () => {
 
         {/* 协议勾选 */}
         <View
-          style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}
+          style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '20px' }}
           onClick={() => setAgreed(!agreed)}
         >
           <View style={{
@@ -217,6 +217,18 @@ const LoginPage: FC = () => {
             和
             <Text style={{ color: '#2563eb' }}>《隐私政策》</Text>
           </Text>
+        </View>
+
+        {/* 暂不登录 */}
+        <View
+          style={{ paddingBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => {
+            setUserInfo({ id: 'guest', name: '游客', phone: '' })
+            setToken('guest')
+            Taro.switchTab({ url: '/pages/index/index' })
+          }}
+        >
+          <Text style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: '1.5' }}>暂不登录</Text>
         </View>
       </View>
 
