@@ -23,6 +23,7 @@ const ReportPage: FC = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [syncing, setSyncing] = useState(false)
   const [pressedBtn, setPressedBtn] = useState<string | null>(null)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const { isLoggedIn, userInfo } = useUserStore()
 
   const fetchLatestReport = useCallback(async () => {
@@ -34,14 +35,19 @@ const ReportPage: FC = () => {
   }, [userInfo?.id])
 
   useEffect(() => {
-    if (!isLoggedIn) { Taro.redirectTo({ url: '/pages/login/index' }); return }
-    fetchLatestReport()
+    if (isLoggedIn) fetchLatestReport()
   }, [isLoggedIn, fetchLatestReport])
 
   useDidShow(() => { if (isLoggedIn) fetchLatestReport() })
 
-  const handleCreateReport = () => Taro.navigateTo({ url: '/pages/payment/index?price=50&type=create' })
-  const handleUpdateReport = () => Taro.navigateTo({ url: '/pages/payment/index?price=9.9&type=update' })
+  const handleCreateReport = () => {
+    if (!isLoggedIn) { setShowLoginPrompt(true); return }
+    Taro.navigateTo({ url: '/pages/payment/index?price=50&type=create' })
+  }
+  const handleUpdateReport = () => {
+    if (!isLoggedIn) { setShowLoginPrompt(true); return }
+    Taro.navigateTo({ url: '/pages/payment/index?price=9.9&type=update' })
+  }
 
   const handleDownload = async () => {
     if (!reportData?.reportUrl) return
@@ -322,6 +328,40 @@ const ReportPage: FC = () => {
           <ChevronRight size={16} color="#94a3b8" />
         </View>
       </View>
+
+      {/* ── 游客登录提示弹窗 ── */}
+      {showLoginPrompt && (
+        <View
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}
+          onClick={() => setShowLoginPrompt(false)}
+        >
+          <View
+            style={{ width: '280px', background: '#fff', borderRadius: '20px', padding: '28px 24px 20px' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <View style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+              <View style={{ width: '52px', height: '52px', borderRadius: '16px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <FileSearch size={26} color="#2563eb" />
+              </View>
+            </View>
+            <Text style={{ fontSize: '17px', fontWeight: '700', color: '#0f172a', display: 'block', textAlign: 'center', marginBottom: '8px', lineHeight: '1.4' }}>
+              登录后使用完整功能
+            </Text>
+            <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', textAlign: 'center', marginBottom: '24px', lineHeight: '1.7' }}>
+              生成职业信用报告、查看信用评分等{'\n'}功能需要登录后才能使用
+            </Text>
+            <View
+              style={{ borderRadius: '14px', padding: '13px 0', background: 'linear-gradient(135deg, #1e40af, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(37,99,235,0.35)', marginBottom: '12px' }}
+              onClick={() => { setShowLoginPrompt(false); Taro.navigateTo({ url: '/pages/login/index' }) }}
+            >
+              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>立即登录</Text>
+            </View>
+            <Text style={{ display: 'block', textAlign: 'center', fontSize: '13px', color: '#cbd5e1', lineHeight: '1.5' }} onClick={() => setShowLoginPrompt(false)}>
+              稍后再说
+            </Text>
+          </View>
+        </View>
+      )}
     </View>
   )
 }

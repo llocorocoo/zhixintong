@@ -39,6 +39,7 @@ const IndexPage: FC = () => {
   const [detailTab, setDetailTab] = useState(0)
   const [pressedAction, setPressedAction] = useState<number | null>(null)
   const [pressedMenu, setPressedMenu] = useState<number | null>(null)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const { userInfo, isLoggedIn } = useUserStore()
 
   const radarSvg = useMemo(() => {
@@ -59,8 +60,7 @@ const IndexPage: FC = () => {
   }, [creditScore])
 
   useEffect(() => {
-    if (!isLoggedIn) { Taro.redirectTo({ url: '/pages/login/index' }); return }
-    fetchCreditScore()
+    if (isLoggedIn) fetchCreditScore()
   }, [isLoggedIn])
   useDidShow(() => { if (isLoggedIn) fetchCreditScore() })
 
@@ -80,7 +80,8 @@ const IndexPage: FC = () => {
 
   const levelInfo = creditScore ? getLevelInfo(creditScore.score) : null
 
-  const navigate = (path: string) => {
+  const navigate = (path: string, requireLogin = false) => {
+    if (requireLogin && !isLoggedIn) { setShowLoginPrompt(true); return }
     const tabs = ['/pages/index/index', '/pages/report/index', '/pages/resume/index', '/pages/profile/index']
     tabs.some(t => path.startsWith(t)) ? Taro.switchTab({ url: path }) : Taro.navigateTo({ url: path })
   }
@@ -92,9 +93,9 @@ const IndexPage: FC = () => {
   ]
 
   const menuItems = [
-    { icon: FileSearch, title: '信用报告', desc: '授权查询并生成信用报告', path: '/pages/report/index',    color: '#2563eb', bg: '#eff6ff', accent: '#2563eb' },
-    { icon: UserCheck,  title: '可信简历', desc: '生成和维护可信简历',    path: '/pages/resume/index',    color: '#7c3aed', bg: '#f5f3ff', accent: '#7c3aed' },
-    { icon: TrendingUp, title: '提升信用', desc: '提升信用分和报告可信度', path: '/pages/enhancement/index', color: '#059669', bg: '#f0fdf4', accent: '#059669' },
+    { icon: FileSearch, title: '信用报告', desc: '授权查询并生成信用报告', path: '/pages/report/index',    color: '#2563eb', bg: '#eff6ff', accent: '#2563eb', requireLogin: true  },
+    { icon: UserCheck,  title: '可信简历', desc: '生成和维护可信简历',    path: '/pages/resume/index',    color: '#7c3aed', bg: '#f5f3ff', accent: '#7c3aed', requireLogin: true  },
+    { icon: TrendingUp, title: '提升信用', desc: '提升信用分和报告可信度', path: '/pages/enhancement/index', color: '#059669', bg: '#f0fdf4', accent: '#059669', requireLogin: false },
   ]
 
   const SCORE_DIMENSIONS = [
@@ -175,7 +176,7 @@ const IndexPage: FC = () => {
                   boxShadow: '0 4px 14px rgba(37,99,235,0.38)',
                   transition: 'all 0.2s ease',
                 }}
-                onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
+                onClick={() => navigate('/pages/report/index', !isLoggedIn)}
               >
                 <Text style={{ color: '#fff', fontSize: '13px', fontWeight: '600', lineHeight: '1.5' }}>
                   {creditScore ? '查看报告' : reportProcessing ? '查看进度' : '立即生成'}
@@ -318,7 +319,7 @@ const IndexPage: FC = () => {
             onTouchStart={() => setPressedMenu(i)}
             onTouchEnd={() => setPressedMenu(null)}
             onTouchCancel={() => setPressedMenu(null)}
-            onClick={() => navigate(item.path)}
+            onClick={() => navigate(item.path, item.requireLogin)}
           >
             {/* 右侧彩色渐变细条 */}
             <View style={{
@@ -356,6 +357,40 @@ const IndexPage: FC = () => {
           </View>
         ))}
       </View>
+
+      {/* ── 游客登录提示弹窗 ── */}
+      {showLoginPrompt && (
+        <View
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}
+          onClick={() => setShowLoginPrompt(false)}
+        >
+          <View
+            style={{ width: '280px', background: '#fff', borderRadius: '20px', padding: '28px 24px 20px' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <View style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+              <View style={{ width: '52px', height: '52px', borderRadius: '16px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <UserCheck size={26} color="#2563eb" />
+              </View>
+            </View>
+            <Text style={{ fontSize: '17px', fontWeight: '700', color: '#0f172a', display: 'block', textAlign: 'center', marginBottom: '8px', lineHeight: '1.4' }}>
+              登录后使用完整功能
+            </Text>
+            <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', textAlign: 'center', marginBottom: '24px', lineHeight: '1.7' }}>
+              生成职业信用报告、查看信用评分等{'\n'}功能需要登录后才能使用
+            </Text>
+            <View
+              style={{ borderRadius: '14px', padding: '13px 0', background: 'linear-gradient(135deg, #1e40af, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(37,99,235,0.35)', marginBottom: '12px' }}
+              onClick={() => { setShowLoginPrompt(false); Taro.navigateTo({ url: '/pages/login/index' }) }}
+            >
+              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>立即登录</Text>
+            </View>
+            <Text style={{ display: 'block', textAlign: 'center', fontSize: '13px', color: '#cbd5e1', lineHeight: '1.5' }} onClick={() => setShowLoginPrompt(false)}>
+              稍后再说
+            </Text>
+          </View>
+        </View>
+      )}
 
       {/* ── 评分说明弹窗 ── */}
       {showModel && (

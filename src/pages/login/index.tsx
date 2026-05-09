@@ -6,12 +6,12 @@ import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import { ShieldCheck, Phone, Lock, ChevronRight } from 'lucide-react-taro'
 
-const DEMO_PHONE = '138****0000'
 const DEMO_PHONE_FULL = '13800000000'
 
 const LoginPage: FC = () => {
   const [agreed, setAgreed] = useState(false)
   const [showOther, setShowOther] = useState(false)
+  const [showPhoneModal, setShowPhoneModal] = useState(false)
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -46,21 +46,15 @@ const LoginPage: FC = () => {
     }
   }
 
-  const handleOneClick = async () => {
+  const handleOneClick = () => {
     if (!checkAgreed()) return
-    await doLogin(DEMO_PHONE_FULL, 'demo')
+    setShowPhoneModal(true)
   }
 
   const handleOtherLogin = async () => {
     if (!checkAgreed()) return
     if (!phone || !password) { Taro.showToast({ title: '请填写手机号和密码', icon: 'none' }); return }
     await doLogin(phone, password)
-  }
-
-  const handleGuest = () => {
-    setUserInfo({ id: 'guest', name: '游客', phone: '' })
-    setToken('guest')
-    Taro.switchTab({ url: '/pages/index/index' })
   }
 
   return (
@@ -98,57 +92,47 @@ const LoginPage: FC = () => {
       <View style={{
         background: 'rgba(255,255,255,0.97)',
         borderRadius: '32px 32px 0 0',
-        padding: '28px 24px 0',
+        padding: '28px 24px 48px',
         boxShadow: '0 -8px 40px rgba(0,0,0,0.15)',
       }}>
 
-        {/* ── 本机号码一键登录 ── */}
-        <View style={{ marginBottom: '20px' }}>
-          <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', textAlign: 'center', marginBottom: '6px', lineHeight: '1.5' }}>
-            当前手机号
+        {/* 一键登录按钮 */}
+        <View
+          style={{
+            borderRadius: '16px', padding: '15px 0', marginBottom: '20px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            background: loading ? '#93c5fd' : 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
+            boxShadow: loading ? 'none' : '0 6px 20px rgba(37,99,235,0.4)',
+            transform: btnPressed === 'one' ? 'scale(0.97)' : 'scale(1)',
+            transition: 'all 0.2s ease',
+          }}
+          onTouchStart={() => setBtnPressed('one')}
+          onTouchEnd={() => setBtnPressed(null)}
+          onTouchCancel={() => setBtnPressed(null)}
+          onClick={loading ? undefined : handleOneClick}
+        >
+          <Phone size={17} color="#fff" />
+          <Text style={{ fontSize: '16px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>
+            {loading ? '登录中...' : '手机号一键登录'}
           </Text>
-          <Text style={{ fontSize: '22px', fontWeight: '700', color: '#0f172a', display: 'block', textAlign: 'center', letterSpacing: '2px', marginBottom: '20px', lineHeight: '1.3' }}>
-            {DEMO_PHONE}
-          </Text>
-
-          <View
-            style={{
-              borderRadius: '16px', padding: '15px 0',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              background: loading ? '#93c5fd' : 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
-              boxShadow: loading ? 'none' : '0 6px 20px rgba(37,99,235,0.4)',
-              transform: btnPressed === 'one' ? 'scale(0.97)' : 'scale(1)',
-              transition: 'all 0.2s ease',
-            }}
-            onTouchStart={() => setBtnPressed('one')}
-            onTouchEnd={() => setBtnPressed(null)}
-            onTouchCancel={() => setBtnPressed(null)}
-            onClick={loading ? undefined : handleOneClick}
-          >
-            <Phone size={17} color="#fff" />
-            <Text style={{ fontSize: '16px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>
-              {loading ? '登录中...' : '本机号码一键登录'}
-            </Text>
-          </View>
         </View>
 
-        {/* ── 分割线 ── */}
+        {/* 分割线 */}
         <View style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
           <View style={{ flex: 1, height: '1px', background: '#f1f5f9' }} />
           <Text style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.5' }}>其他方式登录</Text>
           <View style={{ flex: 1, height: '1px', background: '#f1f5f9' }} />
         </View>
 
-        {/* ── 其他手机号登录 ── */}
+        {/* 其他手机号登录 */}
         {!showOther ? (
           <View
             style={{
-              borderRadius: '14px', padding: '14px 0',
+              borderRadius: '14px', padding: '14px 0', marginBottom: '20px',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
               border: '1.5px solid #e2e8f0', background: '#fff',
               transform: btnPressed === 'other' ? 'scale(0.97)' : 'scale(1)',
               transition: 'all 0.2s ease',
-              marginBottom: '20px',
             }}
             onTouchStart={() => setBtnPressed('other')}
             onTouchEnd={() => setBtnPressed(null)}
@@ -160,7 +144,6 @@ const LoginPage: FC = () => {
           </View>
         ) : (
           <View style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {/* 手机号输入 */}
             <View style={{
               display: 'flex', alignItems: 'center', gap: '12px',
               background: focusField === 'phone' ? '#eff6ff' : '#f8fafc',
@@ -177,7 +160,6 @@ const LoginPage: FC = () => {
                 onInput={e => setPhone(e.detail.value)}
               />
             </View>
-            {/* 密码输入 */}
             <View style={{
               display: 'flex', alignItems: 'center', gap: '12px',
               background: focusField === 'pwd' ? '#eff6ff' : '#f8fafc',
@@ -194,7 +176,6 @@ const LoginPage: FC = () => {
                 onInput={e => setPassword(e.detail.value)}
               />
             </View>
-            {/* 登录按钮 */}
             <View
               style={{
                 borderRadius: '14px', padding: '14px 0',
@@ -216,9 +197,9 @@ const LoginPage: FC = () => {
           </View>
         )}
 
-        {/* ── 协议勾选 ── */}
+        {/* 协议勾选 */}
         <View
-          style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '4px' }}
+          style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}
           onClick={() => setAgreed(!agreed)}
         >
           <View style={{
@@ -237,16 +218,46 @@ const LoginPage: FC = () => {
             <Text style={{ color: '#2563eb' }}>《隐私政策》</Text>
           </Text>
         </View>
-
-        {/* ── 暂不登录 ── */}
-        <View
-          style={{ paddingTop: '16px', paddingBottom: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          onClick={handleGuest}
-        >
-          <Text style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.5' }}>暂不登录，以游客身份浏览</Text>
-        </View>
-
       </View>
+
+      {/* ── 微信风格授权弹窗 ── */}
+      {showPhoneModal && (
+        <View
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300 }}
+          onClick={() => setShowPhoneModal(false)}
+        >
+          <View
+            style={{ width: '280px', background: '#fff', borderRadius: '16px', overflow: 'hidden' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <View style={{ padding: '28px 24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+              <View style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ShieldCheck size={28} color="#fff" />
+              </View>
+              <Text style={{ fontSize: '16px', fontWeight: '600', color: '#0f172a', textAlign: 'center', lineHeight: '1.5' }}>
+                "职信通"申请获取并{'\n'}验证你的手机号
+              </Text>
+              <Text style={{ fontSize: '13px', color: '#94a3b8', textAlign: 'center', lineHeight: '1.6' }}>
+                用于登录验证和账户安全{'\n'}不会用于其他用途
+              </Text>
+            </View>
+            <View style={{ borderTop: '1px solid #f1f5f9', display: 'flex' }}>
+              <View
+                style={{ flex: 1, padding: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid #f1f5f9' }}
+                onClick={() => setShowPhoneModal(false)}
+              >
+                <Text style={{ fontSize: '16px', color: '#94a3b8', lineHeight: '1.5' }}>不允许</Text>
+              </View>
+              <View
+                style={{ flex: 1, padding: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={() => { setShowPhoneModal(false); doLogin(DEMO_PHONE_FULL, 'demo') }}
+              >
+                <Text style={{ fontSize: '16px', color: '#2563eb', fontWeight: '600', lineHeight: '1.5' }}>管理号码</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   )
 }
