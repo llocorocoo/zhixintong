@@ -223,11 +223,7 @@ const LoginPage: FC = () => {
         {/* 暂不登录 */}
         <View
           style={{ paddingBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          onClick={() => {
-            setUserInfo({ id: 'guest', name: '游客', phone: '' })
-            setToken('guest')
-            Taro.switchTab({ url: '/pages/index/index' })
-          }}
+          onClick={() => Taro.switchTab({ url: '/pages/index/index' })}
         >
           <Text style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: '1.5' }}>暂不登录</Text>
         </View>
