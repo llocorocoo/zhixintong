@@ -178,7 +178,7 @@ const WorkHistoryPage: FC = () => {
             <View>
               <Text className="text-sm font-medium text-blue-700">数据安全保障</Text>
               <Text className="text-xs text-blue-600 mt-1">
-                您上传的所有资料均经过加密存储，仅用于生成信用报告，未经授权不会向第三方披露。
+                您上传的所有资料均经过加密存储，仅用于生成职业信用报告，未经授权不会向第三方披露。
               </Text>
             </View>
           </View>

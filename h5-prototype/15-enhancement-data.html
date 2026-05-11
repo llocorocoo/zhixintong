@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>提升信用 - 有建议</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif;background:#f6f8fc;max-width:390px;margin:0 auto}
+.grad-header{background:linear-gradient(135deg,#0f2460 0%,#1e40af 50%,#2563eb 100%);padding:20px 20px 24px;position:relative;overflow:hidden}
+.grad-header::after{content:'';position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
+.grad-title{font-size:22px;font-weight:800;color:#fff;display:block;line-height:1.3;letter-spacing:.5px}
+.grad-sub{font-size:13px;color:rgba(255,255,255,.6);display:block;margin-top:4px;line-height:1.5}
+.content{padding:16px 16px 32px;display:flex;flex-direction:column;gap:12px}
+.card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.07)}
+.card-header{padding:16px 18px 12px;border-bottom:1px solid #f8fafc;display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:15px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px}
+.card-body{padding:16px 18px}
+/* stats */
+.stats-row{background:#f8fafc;border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.stat{text-align:center;flex:1}
+.stat-val{font-size:18px;font-weight:700;color:#0f172a;display:block}
+.stat-label{font-size:12px;color:#64748b;display:block;margin-top:2px}
+.stat-divider{width:1px;height:32px;background:#e2e8f0;flex-shrink:0}
+/* suggestion item */
+.sugg-item{background:#f8fafc;border-radius:16px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+.sugg-item:last-child{margin-bottom:0}
+.sugg-item:active{transform:scale(.99)}
+.sugg-top{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sugg-icon{width:40px;height:40px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sugg-meta{flex:1}
+.sugg-title{font-size:14px;font-weight:600;color:#0f172a}
+.sugg-dim{display:inline-block;background:rgba(37,99,235,.08);border-radius:6px;padding:1px 6px;font-size:11px;color:#2563eb;margin-top:3px}
+.priority-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.priority-high{background:rgba(220,38,38,.1);color:#dc2626}
+.priority-med{background:rgba(217,119,6,.1);color:#d97706}
+.sugg-desc{font-size:12px;color:#64748b;line-height:1.6;margin-bottom:8px}
+.sugg-action{display:flex;align-items:center;justify-content:flex-end;gap:3px;font-size:12px;color:#2563eb;font-weight:500}
+/* tip bar */
+.tip-bar{background:#fffbeb;border-radius:12px;padding:12px 14px;display:flex;align-items:flex-start;gap:8px;margin-top:4px}
+.tip-text{font-size:12px;color:#92400e;line-height:1.6}
+/* grid same as empty */
+.tip-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tip-tile{background:#f8fafc;border-radius:14px;padding:12px}
+.tip-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.tip-name{font-size:13px;font-weight:600;color:#0f172a}
+.tip-tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px;display:inline-block;margin-left:4px}
+.tip-desc{font-size:11px;color:#94a3b8;line-height:1.6;margin-top:4px}
+.tl-item{display:flex;gap:12px}
+.tl-left{display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0}
+.tl-circle{width:28px;height:28px;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+.tl-line{width:2px;flex:1;min-height:12px;background:#dbeafe;margin:3px 0}
+.tl-content{flex:1;padding-bottom:12px}
+.tl-title{font-size:13px;font-weight:600;color:#0f172a;line-height:1.4}
+.tl-desc{font-size:12px;color:#94a3b8;line-height:1.6;margin-top:2px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:13px 0;background:linear-gradient(135deg,#1e40af,#2563eb);box-shadow:0 4px 16px rgba(37,99,235,.35);color:#fff;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;width:100%;margin-top:16px;transition:all .2s}
+.list-row{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid #f8fafc;cursor:pointer}
+.list-row:last-child{border-bottom:none}
+.list-text{flex:1}
+.list-title{font-size:14px;font-weight:500;color:#0f172a}
+.list-sub{font-size:12px;color:#94a3b8;margin-top:2px}
+.arrow-circle{width:28px;height:28px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+svg{display:block}
+</style>
+</head>
+<body>
+<div class="grad-header">
+  <span class="grad-title">提升信用</span>
+  <span class="grad-sub">完善信用档案，提升职业竞争力</span>
+</div>
+<div class="content">
+  <!-- 建议（有数据） -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>个性化增信建议</span>
+      <span style="background:rgba(37,99,235,.1);color:#2563eb;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">2 项重要</span>
+    </div>
+    <div class="card-body">
+      <div class="stats-row">
+        <div class="stat"><span class="stat-val">5<span style="font-size:13px;color:#94a3b8;font-weight:400">/8</span></span><span class="stat-label">已认证项目</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-val" style="color:#dc2626">2</span><span class="stat-label">待完成</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-val" style="font-size:13px;color:#059669">良好</span><span class="stat-label">信用状态</span></div>
+      </div>
+      <div class="sugg-item">
+        <div class="sugg-top">
+          <div class="sugg-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21l-4.3-4.3c-.1-.1-.1-.3 0-.4L11 8l1.4 1.4-5.3 5.3 2.9 2.9 5.3-5.3L16.7 13 8.7 21H7z"/></svg></div>
+          <div class="sugg-meta"><div class="sugg-title">专业性评分偏低</div><div class="sugg-dim">专业性维度</div></div>
+          <span class="priority-badge priority-high">重要</span>
+        </div>
+        <p class="sugg-desc">职业资格认证和专业技能证明不足，补充可验证材料可提升专业性评分。</p>
+        <div class="sugg-action">去认证 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="sugg-item">
+        <div class="sugg-top">
+          <div class="sugg-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+          <div class="sugg-meta"><div class="sugg-title">工作履历待完善</div><div class="sugg-dim">稳定性维度</div></div>
+          <span class="priority-badge priority-med">建议</span>
+        </div>
+        <p class="sugg-desc">补充更完整的工作记录，展示稳定的职业发展路径。</p>
+        <div class="sugg-action">去补充 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="tip-bar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><p class="tip-text">优先完成标记为「重要」的项目，可快速提升信用分。</p></div>
+    </div>
+  </div>
+
+  <!-- 如何提升 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">如何提升信用分</span></div>
+    <div class="card-body">
+      <div class="tip-grid">
+        <div class="tip-tile"><div class="tip-icon" style="background:#eff6ff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg></div><div style="display:flex;align-items:center"><span class="tip-name">真实性</span><span class="tip-tag" style="background:#eff6ff;color:#2563eb">基础</span></div><p class="tip-desc">完成身份认证和学历核验</p></div>
+        <div class="tip-tile"><div class="tip-icon" style="background:#f5f3ff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div style="display:flex;align-items:center"><span class="tip-name">稳定性</span><span class="tip-tag" style="background:#f5f3ff;color:#7c3aed">重要</span></div><p class="tip-desc">完整记录工作履历</p></div>
+        <div class="tip-tile"><div class="tip-icon" style="background:#fffbeb"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div><div style="display:flex;align-items:center"><span class="tip-name">合规性</span><span class="tip-tag" style="background:#fffbeb;color:#d97706">重要</span></div><p class="tip-desc">如实填写竞业协议情况</p></div>
+        <div class="tip-tile"><div class="tip-icon" style="background:#fef2f2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div style="display:flex;align-items:center"><span class="tip-name">安全性</span><span class="tip-tag" style="background:#fef2f2;color:#dc2626">重要</span></div><p class="tip-desc">授权核查诉讼和黑名单</p></div>
+        <div class="tip-tile"><div class="tip-icon" style="background:#f0fdf4"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21l-4.3-4.3c-.1-.1-.1-.3 0-.4L11 8l1.4 1.4-5.3 5.3 2.9 2.9 5.3-5.3L16.7 13 8.7 21H7z"/><path d="M17 3l4 4-7.3 7.3-1.4-1.4L17 8.4 14.4 5.8 17 3z"/></svg></div><div style="display:flex;align-items:center"><span class="tip-name">专业性</span><span class="tip-tag" style="background:#f0fdf4;color:#059669">加分</span></div><p class="tip-desc">添加职业资格证书</p></div>
+        <div class="tip-tile"><div class="tip-icon" style="background:#ecfeff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="display:flex;align-items:center"><span class="tip-name">可靠性</span><span class="tip-tag" style="background:#ecfeff;color:#0891b2">加分</span></div><p class="tip-desc">定期更新信用报告</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自证工具 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">自证工具</span><span style="background:rgba(37,99,235,.1);color:#2563eb;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">推荐</span></div>
+    <div class="card-body">
+      <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;line-height:1.6">完整展示工作履历，提升报告可信度和信用评分。</p>
+      <div>
+        <div class="tl-item"><div class="tl-left"><div class="tl-circle">1</div><div class="tl-line"></div></div><div class="tl-content"><p class="tl-title">填写工作履历</p><p class="tl-desc">录入完整的工作经历</p></div></div>
+        <div class="tl-item"><div class="tl-left"><div class="tl-circle">2</div><div class="tl-line"></div></div><div class="tl-content"><p class="tl-title">上传证明材料</p><p class="tl-desc">提供劳动合同、社保记录等</p></div></div>
+        <div class="tl-item"><div class="tl-left"><div class="tl-circle">3</div><div class="tl-line"></div></div><div class="tl-content"><p class="tl-title">AI 智能核验</p><p class="tl-desc">系统自动核验材料真实性</p></div></div>
+        <div class="tl-item"><div class="tl-left"><div class="tl-circle">4</div></div><div class="tl-content"><p class="tl-title">生成自证报告</p><p class="tl-desc">生成可信的工作履历自证报告</p></div></div>
+      </div>
+      <a href="#" class="btn">前往自证 →</a>
+    </div>
+  </div>
+
+  <!-- 维护信息 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">维护信息</span></div>
+    <div style="padding:0">
+      <div class="list-row"><div class="list-text"><div class="list-title">更新个人信息</div><div class="list-sub">保持联系方式、工作状态等信息最新</div></div><div class="arrow-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="list-row"><div class="list-text"><div class="list-title">添加新工作经历</div><div class="list-sub">及时记录新的工作经历和成就</div></div><div class="arrow-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="list-row"><div class="list-text"><div class="list-title">上传新证书</div><div class="list-sub">持续添加学历、职业资格等证书</div></div><div class="arrow-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="list-row"><div class="list-text"><div class="list-title">定期生成报告</div><div class="list-sub">建议每季度更新一次信用报告</div></div><div class="arrow-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

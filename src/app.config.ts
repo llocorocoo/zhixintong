@@ -41,7 +41,7 @@ export default defineAppConfig({
       },
       {
         pagePath: 'pages/report/index',
-        text: '信用报告',
+        text: '职业信用报告',
         iconPath: './assets/tabbar/file-text.png',
         selectedIconPath: './assets/tabbar/file-text-active.png'
       },

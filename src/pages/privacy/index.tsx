@@ -12,7 +12,7 @@ const PrivacyPage: FC = () => {
     { id: 'education', icon: FileText, title: '学历信息核查授权', desc: '授权平台通过学信网核验学历学位信息',              enabled: true  },
     { id: 'credit',    icon: Database, title: '征信查询授权',    desc: '授权平台查询个人征信报告（用于可靠性评分）',       enabled: false },
     { id: 'judicial',  icon: Eye,      title: '司法数据查询授权', desc: '授权平台查询诉讼记录、失信名单等司法数据',         enabled: true  },
-    { id: 'share',     icon: Share2,   title: '报告共享授权',    desc: '允许通过链接将您的信用报告分享给第三方查看',       enabled: false },
+    { id: 'share',     icon: Share2,   title: '报告共享授权',    desc: '允许通过链接将您的职业信用报告分享给第三方查看',       enabled: false },
   ])
 
   const toggle = (id: string) =>

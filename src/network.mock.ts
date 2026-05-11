@@ -170,7 +170,7 @@ async function mockRequest(url: string, data: any): Promise<any> {
   // ── 信用评分 ──
   if (url.includes('/credit/score')) {
     const rStatus = getReportStatus(state)
-    if (rStatus !== 'completed') return fail('暂无信用评分', 404)
+    if (rStatus !== 'completed') return fail('暂无职业信用评分', 404)
     return ok(DEMO_CREDIT_SCORE)
   }
 

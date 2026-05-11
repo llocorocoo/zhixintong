@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>可信简历 - 空状态</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif;background:#f6f8fc;min-height:100vh;max-width:390px;margin:0 auto}
+.grad-header{background:linear-gradient(135deg,#0f2460 0%,#1e40af 50%,#2563eb 100%);padding:20px 20px 24px;position:relative;overflow:hidden}
+.grad-header::after{content:'';position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
+.grad-title{font-size:22px;font-weight:800;color:#fff;display:block;line-height:1.3;letter-spacing:.5px}
+.grad-sub{font-size:13px;color:rgba(255,255,255,.6);display:block;margin-top:4px;line-height:1.5}
+.content{padding:16px 16px 88px}
+.card{background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.08)}
+.empty-area{display:flex;flex-direction:column;align-items:center;padding:40px 24px 24px;text-align:center}
+.icon-circle{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 28px rgba(37,99,235,.35)}
+.empty-title{font-size:20px;font-weight:700;color:#0f172a;margin-bottom:10px}
+.empty-desc{font-size:13px;color:#94a3b8;line-height:1.7;margin-bottom:0}
+.cta-area{padding:0 20px 28px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:16px;padding:15px 0;background:linear-gradient(135deg,#1e40af,#2563eb);box-shadow:0 6px 20px rgba(37,99,235,.4);color:#fff;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s}
+.btn:active{transform:scale(.97)}
+.tab-bar{display:flex;background:#fff;border-top:1px solid #f1f5f9;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 20px;text-decoration:none}
+.tab-dot{width:20px;height:4px;border-radius:2px;background:#e2e8f0}
+.tab-item.active .tab-dot{background:#2563eb}
+.tab-item span{font-size:10px;font-weight:500;color:#9ca3af}
+.tab-item.active span{color:#2563eb;font-weight:600}
+svg{display:block}
+</style>
+</head>
+<body>
+<div class="grad-header">
+  <span class="grad-title">可信简历</span>
+  <span class="grad-sub">经过核实的权威职业档案</span>
+</div>
+<div class="content">
+  <div class="card">
+    <div class="empty-area">
+      <div class="icon-circle">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          <polyline points="16 11 18 13 22 9"/>
+        </svg>
+      </div>
+      <p class="empty-title">暂无可信简历</p>
+      <p class="empty-desc">生成职业信用报告并完成核查后，点击「更新可信简历」即可在此查看您的权威职业档案。</p>
+    </div>
+    <div class="cta-area">
+      <a href="05-report-empty.html" class="btn">前往生成职业信用报告
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+<nav class="tab-bar">
+  <a class="tab-item" href="03-home-empty.html"><div class="tab-dot"></div><span>首页</span></a>
+  <a class="tab-item" href="05-report-empty.html"><div class="tab-dot"></div><span>信用报告</span></a>
+  <a class="tab-item active" href="#"><div class="tab-dot"></div><span>可信简历</span></a>
+  <a class="tab-item" href="19-profile.html"><div class="tab-dot"></div><span>我的</span></a>
+</nav>
+</body>
+</html>

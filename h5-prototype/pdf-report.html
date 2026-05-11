@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>职业信用报告 PDF 样式预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #e8eaf0;
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    padding: 32px 16px;
+    color: #1a1a2e;
+  }
+
+  /* A4 页面容器 */
+  .page {
+    width: 794px;
+    margin: 0 auto 24px;
+    background: #fff;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+    position: relative;
+    page-break-after: always;
+  }
+
+  /* ── 封面页 ── */
+  .cover {
+    height: 1123px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cover-top {
+    background: linear-gradient(160deg, #0a1a4e 0%, #1e40af 55%, #2563eb 100%);
+    padding: 56px 56px 48px;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover-top::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+  }
+  .cover-top::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+  }
+
+  .cover-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 64px;
+  }
+  .cover-logo-icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cover-logo-icon svg { width: 20px; height: 20px; }
+  .cover-logo-text {
+    font-size: 16px; font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 2px;
+  }
+
+  .cover-title {
+    font-size: 38px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.25;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .cover-subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 3px;
+    margin-bottom: 56px;
+  }
+
+  .cover-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cover-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cover-meta-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    width: 72px;
+    letter-spacing: 0.5px;
+  }
+  .cover-meta-value {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+  }
+
+  .cover-bottom {
+    padding: 36px 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #e8ecf4;
+  }
+
+  .cover-score-block {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+  }
+  .cover-score-label {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+  }
+  .cover-score-num {
+    font-size: 64px;
+    font-weight: 800;
+    color: #1e40af;
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+  .cover-score-max {
+    font-size: 16px;
+    color: #cbd5e1;
+    margin-bottom: 8px;
+  }
+  .cover-score-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-left: 4px;
+  }
+
+  .cover-dividers {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+  .cover-declaration {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.7;
+    max-width: 260px;
+    text-align: right;
+  }
+
+  /* ── 内容页通用 ── */
+  .content-page {
+    min-height: 1123px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-header {
+    background: linear-gradient(135deg, #0a1a4e 0%, #1e40af 60%, #2563eb 100%);
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .page-header-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  .page-header-info {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.5px;
+  }
+
+  .page-body {
+    padding: 32px 48px;
+    flex: 1;
+  }
+
+  .page-footer {
+    padding: 14px 48px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .page-footer-text {
+    font-size: 10px;
+    color: #cbd5e1;
+  }
+  .page-num {
+    font-size: 10px;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  /* ── 风险摘要 ── */
+  .summary-section {
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #1e40af;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title-dot {
+    width: 4px; height: 16px;
+    background: #1e40af;
+    border-radius: 2px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .summary-card {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 14px 16px;
+    border-left: 3px solid;
+    text-align: center;
+  }
+  .summary-card-label {
+    font-size: 11px;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+  .summary-card-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .risk-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .risk-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 8px;
+  }
+  .risk-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .risk-name {
+    font-size: 12px;
+    color: #475569;
+    width: 120px;
+    flex-shrink: 0;
+  }
+  .risk-remark {
+    font-size: 11px;
+    color: #94a3b8;
+    flex: 1;
+  }
+  .risk-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+  .badge-ok   { background: #dcfce7; color: #15803d; }
+  .badge-warn { background: #fef3c7; color: #d97706; }
+  .badge-risk { background: #fee2e2; color: #dc2626; }
+  .badge-na   { background: #f1f5f9; color: #64748b; }
+
+  /* ── 维度详情 ── */
+  .dim-block {
+    margin-bottom: 24px;
+    border: 1px solid #e8ecf4;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .dim-header {
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dim-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .dim-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .dim-body {
+    padding: 0 18px 4px;
+  }
+
+  .feat-row {
+    padding: 12px 0;
+    border-bottom: 1px solid #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .feat-row:last-child { border-bottom: none; }
+
+  .feat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .feat-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .feat-source {
+    font-size: 10px;
+    color: #94a3b8;
+  }
+  .feat-result {
+    font-size: 11px;
+    color: #475569;
+    line-height: 1.6;
+  }
+
+  .feat-kv {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin-top: 4px;
+  }
+  .feat-kv-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .feat-kv-label { font-size: 10px; color: #94a3b8; }
+  .feat-kv-value { font-size: 11px; color: #334155; }
+
+  .feat-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .feat-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+  .feat-item-info { font-size: 11px; color: #334155; }
+  .feat-item-sub  { font-size: 10px; color: #94a3b8; }
+
+  .case-box {
+    background: #fff7ed;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 6px;
+    border-left: 3px solid #f59e0b;
+  }
+  .case-no {
+    font-size: 11px;
+    font-weight: 600;
+    color: #92400e;
+    margin-bottom: 6px;
+  }
+  .case-rows {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+  }
+  .case-row {
+    display: flex;
+    gap: 4px;
+  }
+  .case-label { font-size: 10px; color: #b45309; }
+  .case-value { font-size: 10px; color: #78350f; }
+
+  /* 状态标签 */
+  .status-verified { background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+  .status-checked  { color: #1d4ed8; font-size: 10px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+  .status-warn     { background: #fef3c7; color: #d97706; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+  .status-pending  { background: #f1f5f9; color: #64748b; font-size: 10px; padding: 2px 8px; border-radius: 10px; }
+
+  /* 维度颜色 */
+  .dim-authenticity .dim-header { background: #eff6ff; }
+  .dim-authenticity .dim-icon   { background: #dbeafe; }
+  .dim-stability    .dim-header { background: #f5f3ff; }
+  .dim-stability    .dim-icon   { background: #ede9fe; }
+  .dim-compliance   .dim-header { background: #fffbeb; }
+  .dim-compliance   .dim-icon   { background: #fef3c7; }
+  .dim-safety       .dim-header { background: #fff1f2; }
+  .dim-safety       .dim-icon   { background: #fee2e2; }
+  .dim-professionalism .dim-header { background: #f0fdf4; }
+  .dim-professionalism .dim-icon   { background: #dcfce7; }
+
+  /* 打印样式 */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .page { box-shadow: none; margin: 0; }
+  }
+  @page { size: A4; margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     封面页
+════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-top">
+    <!-- Logo -->
+    <div class="cover-logo">
+      <div class="cover-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <span class="cover-logo-text">职信通</span>
+    </div>
+
+    <!-- 标题 -->
+    <div class="cover-title">个人职业<br>信用报告</div>
+    <div class="cover-subtitle">PROFESSIONAL CREDIT REPORT</div>
+
+    <!-- 候选人信息 -->
+    <div class="cover-meta">
+      <div class="cover-meta-row">
+        <span class="cover-meta-label">候选人</span>
+        <span class="cover-meta-value">小王</span>
+      </div>
+      <div class="cover-meta-row">
+        <span class="cover-meta-label">报告编号</span>
+        <span class="cover-meta-value">CR20260403001</span>
+      </div>
+      <div class="cover-meta-row">
+        <span class="cover-meta-label">生成日期</span>
+        <span class="cover-meta-value">2026年04月03日</span>
+      </div>
+      <div class="cover-meta-row">
+        <span class="cover-meta-label">报告状态</span>
+        <span class="cover-meta-value">已完成</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <!-- 评分 -->
+    <div class="cover-score-block">
+      <div>
+        <div class="cover-score-label">职业信用评分</div>
+        <div style="display:flex;align-items:flex-end;gap:6px">
+          <span class="cover-score-num">650</span>
+          <span class="cover-score-max">/ 940</span>
+        </div>
+        <span class="cover-score-badge">良好</span>
+      </div>
+    </div>
+
+    <!-- 声明 -->
+    <div class="cover-dividers">
+      <div class="cover-declaration">
+        本报告依据候选人授权信息生成，评分结果仅供参考，不作为任何法律依据。数据来源：公安网、学信网、司法数据等权威机构。
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     第2页：风险摘要
+════════════════════════════════════════ -->
+<div class="page content-page">
+  <div class="page-header">
+    <span class="page-header-title">个人职业信用报告</span>
+    <span class="page-header-info">CR20260403001 · 小王 · 2026-04-03</span>
+  </div>
+
+  <div class="page-body">
+
+    <!-- 候选人基本信息 -->
+    <div class="summary-section">
+      <div class="section-title"><div class="section-title-dot"></div>候选人基本信息</div>
+      <div style="display:flex;gap:48px;background:#f8fafc;border-radius:10px;padding:18px 24px">
+        <div>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">姓名</div>
+          <div style="font-size:13px;font-weight:600;color:#0f172a">小王</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">年龄</div>
+          <div style="font-size:13px;font-weight:600;color:#0f172a">26岁</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">手机号码</div>
+          <div style="font-size:13px;font-weight:600;color:#0f172a">133****3333</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">邮箱</div>
+          <div style="font-size:13px;font-weight:600;color:#0f172a">1234@123.com</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">证件号码</div>
+          <div style="font-size:13px;font-weight:600;color:#0f172a">110101xxxxxxxxxxxxxx</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 评分维度概览 -->
+    <div class="summary-section">
+      <div class="section-title"><div class="section-title-dot"></div>维度评分概览</div>
+      <div class="summary-grid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="summary-card" style="border-left-color:#3b82f6">
+          <div class="summary-card-label">真实性</div>
+          <div class="summary-card-value" style="color:#3b82f6">80</div>
+        </div>
+        <div class="summary-card" style="border-left-color:#8b5cf6">
+          <div class="summary-card-label">稳定性</div>
+          <div class="summary-card-value" style="color:#8b5cf6">75</div>
+        </div>
+        <div class="summary-card" style="border-left-color:#f59e0b">
+          <div class="summary-card-label">合规性</div>
+          <div class="summary-card-value" style="color:#f59e0b">70</div>
+        </div>
+        <div class="summary-card" style="border-left-color:#ef4444">
+          <div class="summary-card-label">安全性</div>
+          <div class="summary-card-value" style="color:#ef4444">100</div>
+        </div>
+        <div class="summary-card" style="border-left-color:#10b981">
+          <div class="summary-card-label">专业性</div>
+          <div class="summary-card-value" style="color:#10b981">60</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 风险摘要 -->
+    <div class="summary-section">
+      <div class="section-title"><div class="section-title-dot"></div>风险摘要</div>
+      <div class="risk-list">
+        <div class="risk-row">
+          <div class="risk-dot" style="background:#3b82f6"></div>
+          <div class="risk-name">身份风险</div>
+          <div class="risk-remark">核实候选人身份信息真实性</div>
+          <div class="risk-badge badge-ok">无风险</div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-dot" style="background:#f59e0b"></div>
+          <div class="risk-name">诉讼及处罚风险</div>
+          <div class="risk-remark">核实法院诉讼、失信、执行及行政处罚记录</div>
+          <div class="risk-badge badge-warn">发现记录</div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-dot" style="background:#10b981"></div>
+          <div class="risk-name">金融信用风险</div>
+          <div class="risk-remark">核实金融违约欺诈记录</div>
+          <div class="risk-badge badge-ok">无风险</div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-dot" style="background:#8b5cf6"></div>
+          <div class="risk-name">社会风险</div>
+          <div class="risk-remark">核实候选人社会治安风险记录</div>
+          <div class="risk-badge badge-ok">无风险</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 报告声明 -->
+    <div style="background:#f8fafc;border-radius:10px;padding:16px 20px;margin-top:8px">
+      <div style="font-size:11px;color:#94a3b8;line-height:1.8">
+        应候选人委托，就其工作背景做细致调查，本次调查结果获取途径合法，内容真实有效。本报告不得用于法律诉讼依据，仅供招聘决策参考之用。在任何情况下，对由于使用本报告所造成的损失，本公司不承担任何责任，且未经本公司许可，本报告内容不得向包括候选人在内的任何第三方透露。
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    <span class="page-footer-text">本报告由职信通平台生成 · 数据来源：公安网、学信网、司法数据、征信中心等权威机构</span>
+    <span class="page-num">2</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     第3页：真实性 + 稳定性 + 合规性
+════════════════════════════════════════ -->
+<div class="page content-page">
+  <div class="page-header">
+    <span class="page-header-title">个人职业信用报告</span>
+    <span class="page-header-info">CR20260403001 · 小王 · 2026-04-03</span>
+  </div>
+
+  <div class="page-body">
+
+    <!-- 真实性 -->
+    <div class="dim-block dim-authenticity">
+      <div class="dim-header">
+        <div class="dim-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 11l2 2 4-4"/></svg>
+        </div>
+        <span class="dim-name">真实性</span>
+      </div>
+      <div class="dim-body">
+
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">身份核实</div>
+              <div class="feat-source">公安接口（全国公民身份信息系统）</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+          <div class="feat-kv">
+            <div class="feat-kv-item"><span class="feat-kv-label">姓名：</span><span class="feat-kv-value">小王</span></div>
+            <div class="feat-kv-item"><span class="feat-kv-label">性别：</span><span class="feat-kv-value">男</span></div>
+            <div class="feat-kv-item"><span class="feat-kv-label">年龄：</span><span class="feat-kv-value">26岁</span></div>
+            <div class="feat-kv-item"><span class="feat-kv-label">证件号码：</span><span class="feat-kv-value">110101xxxxxxxxxxxxxx</span></div>
+            <div class="feat-kv-item"><span class="feat-kv-label">初始发证地：</span><span class="feat-kv-value">北京市东城区</span></div>
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">学历核实</div>
+              <div class="feat-source">学信网</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+          <div class="feat-items">
+            <div class="feat-item">
+              <div>
+                <div class="feat-item-info">中国xx大学 · 计算机科学与技术 · 本科</div>
+              </div>
+              <span class="status-verified">已认证</span>
+            </div>
+            <div class="feat-item">
+              <div>
+                <div class="feat-item-info">中国xx大学 · 计算机科学与技术 · 硕士</div>
+              </div>
+              <span class="status-pending">待认证</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">工作经历核实</div>
+              <div class="feat-source">前雇主核实</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+          <div class="feat-result">最近2段工作经历核实一致</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 稳定性 -->
+    <div class="dim-block dim-stability">
+      <div class="dim-header">
+        <div class="dim-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <span class="dim-name">稳定性</span>
+      </div>
+      <div class="dim-body">
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">工作稳定性</div>
+              <div class="feat-source">社保记录、简历</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+          <div class="feat-kv">
+            <div class="feat-kv-item"><span class="feat-kv-label">平均在职时长：</span><span class="feat-kv-value">约2年（正常）</span></div>
+            <div class="feat-kv-item"><span class="feat-kv-label">过去5年跳槽次数：</span><span class="feat-kv-value">2次</span></div>
+            <div class="feat-kv-item"><span class="feat-kv-label">最长一段工作年限：</span><span class="feat-kv-value">3年2个月</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 合规性 -->
+    <div class="dim-block dim-compliance">
+      <div class="dim-header">
+        <div class="dim-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <span class="dim-name">合规性</span>
+      </div>
+      <div class="dim-body">
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">竞业限制</div>
+              <div class="feat-source">前雇主</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">前雇主违纪记录</div>
+              <div class="feat-source">前雇主评价</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">税务不良记录</div>
+              <div class="feat-source">税务公开信息</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    <span class="page-footer-text">本报告由职信通平台生成 · 数据来源：公安网、学信网、司法数据、征信中心等权威机构</span>
+    <span class="page-num">3</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     第4页：安全性 + 专业性
+════════════════════════════════════════ -->
+<div class="page content-page">
+  <div class="page-header">
+    <span class="page-header-title">个人职业信用报告</span>
+    <span class="page-header-info">CR20260403001 · 小王 · 2026-04-03</span>
+  </div>
+
+  <div class="page-body">
+
+    <!-- 安全性 -->
+    <div class="dim-block dim-safety">
+      <div class="dim-header">
+        <div class="dim-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <span class="dim-name">安全性</span>
+      </div>
+      <div class="dim-body">
+
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">司法诉讼及劳动争议</div>
+              <div class="feat-source">司法数据、执行信息公开网、劳动仲裁数据</div>
+            </div>
+            <span class="status-warn">发现记录</span>
+          </div>
+          <div class="feat-result">发现1条民事诉讼记录，未发现劳动争议记录</div>
+          <div class="case-box">
+            <div class="case-no">（2023）京0105民初12856号</div>
+            <div class="case-rows">
+              <div class="case-row"><span class="case-label">案由：</span><span class="case-value">合同纠纷</span></div>
+              <div class="case-row"><span class="case-label">当事人身份：</span><span class="case-value">原告</span></div>
+              <div class="case-row"><span class="case-label">审理法院：</span><span class="case-value">北京市朝阳区人民法院</span></div>
+              <div class="case-row"><span class="case-label">结案方式：</span><span class="case-value">调解结案</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">关联企业</div>
+              <div class="feat-source">工商数据、社保记录</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">个人征信</div>
+              <div class="feat-source">征信中心（授权查询）</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">黑名单核查</div>
+              <div class="feat-source">阳光诚信、反舞弃联盟等</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">犯罪记录</div>
+              <div class="feat-source">公安数据</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 专业性 -->
+    <div class="dim-block dim-professionalism">
+      <div class="dim-header">
+        <div class="dim-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        </div>
+        <span class="dim-name">专业性</span>
+      </div>
+      <div class="dim-body">
+
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">职业资格证书</div>
+              <div class="feat-source">行业协会、人社部门</div>
+            </div>
+            <span class="status-verified">已认证</span>
+          </div>
+          <div class="feat-items">
+            <div class="feat-item">
+              <div>
+                <div class="feat-item-info">教师资格证</div>
+                <div class="feat-item-sub">教育部</div>
+              </div>
+              <span class="status-verified">已认证</span>
+            </div>
+            <div class="feat-item">
+              <div>
+                <div class="feat-item-info">法律职业资格证</div>
+                <div class="feat-item-sub">司法部</div>
+              </div>
+              <span class="status-verified">已认证</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feat-row">
+          <div class="feat-top">
+            <div>
+              <div class="feat-name">学历层次</div>
+              <div class="feat-source">学信网</div>
+            </div>
+            <div class="status-checked">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              已核查
+            </div>
+          </div>
+          <div class="feat-result">本科（已认证）</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 底部声明 -->
+    <div style="background:#f8fafc;border-radius:10px;padding:14px 18px;margin-top:8px;text-align:center">
+      <div style="font-size:10px;color:#94a3b8;line-height:1.8">
+        本报告依据授权信息生成，评分结果仅供参考，不作为任何法律依据。<br>
+        数据来源：公安网、学信网、司法数据、征信中心等权威机构。
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    <span class="page-footer-text">本报告由职信通平台生成 · 数据来源：公安网、学信网、司法数据、征信中心等权威机构</span>
+    <span class="page-num">4</span>
+  </div>
+</div>
+
+</body>
+</html>

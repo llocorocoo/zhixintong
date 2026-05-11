@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>职信通 - 信用报告（空）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    background: #f6f8fc;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .phone {
+    width: 100%;
+    max-width: 390px;
+    min-height: 100vh;
+    background: #f6f8fc;
+    position: relative;
+    padding-bottom: 80px;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%);
+    padding: 52px 20px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 20px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .header-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.72);
+    position: relative;
+    z-index: 1;
+  }
+
+  .content {
+    padding: 0 16px 16px;
+    margin-top: -12px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.07);
+    margin-bottom: 14px;
+  }
+
+  /* Empty State */
+  .empty-card {
+    padding: 40px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .empty-icon-wrap {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .empty-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+  .empty-desc {
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    max-width: 240px;
+  }
+
+  /* Use case cards */
+  .usecase-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    width: 100%;
+  }
+  .usecase-item {
+    flex: 1;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .usecase-emoji { font-size: 22px; }
+  .usecase-label { font-size: 11px; color: #475569; font-weight: 600; text-align: center; line-height: 1.3; }
+
+  /* CTA button */
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 52px;
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:active { opacity: 0.88; }
+  .price-tag {
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 2px 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* Sample report row */
+  .sample-row {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    gap: 14px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .sample-icon {
+    width: 44px; height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .sample-text { flex: 1; }
+  .sample-title { font-size: 15px; font-weight: 600; color: #0f172a; margin-bottom: 2px; }
+  .sample-desc { font-size: 12px; color: #94a3b8; }
+  .sample-arrow {
+    width: 28px; height: 28px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Tab Bar */
+  .tabbar {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%; max-width: 390px;
+    background: #fff;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    padding: 8px 0 20px;
+    z-index: 100;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+  }
+  .tab-item {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
+    cursor: pointer; text-decoration: none;
+  }
+  .tab-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+  .tab-label { font-size: 10px; font-weight: 500; color: #94a3b8; }
+  .tab-item.active .tab-label { color: #2563eb; }
+  .tab-item.active .tab-icon svg { stroke: #2563eb; }
+  .tab-item .tab-icon svg { stroke: #94a3b8; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-title">职业信用报告</div>
+    <div class="header-sub">真实、权威、可信的职业信用凭证</div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Empty state card -->
+    <div class="card empty-card">
+      <div class="empty-icon-wrap">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v3"/>
+          <circle cx="9" cy="14" r="4"/>
+          <path d="M15 17l3 3"/>
+        </svg>
+      </div>
+      <div class="empty-title">暂无信用报告</div>
+      <div class="empty-desc">立即生成您的职业信用报告，让用人单位全面了解您的职业诚信记录</div>
+
+      <!-- Use cases -->
+      <div class="usecase-row">
+        <div class="usecase-item">
+          <span class="usecase-emoji">🎯</span>
+          <span class="usecase-label">求职应聘</span>
+        </div>
+        <div class="usecase-item">
+          <span class="usecase-emoji">🔍</span>
+          <span class="usecase-label">背景调查</span>
+        </div>
+        <div class="usecase-item">
+          <span class="usecase-emoji">📋</span>
+          <span class="usecase-label">职业档案</span>
+        </div>
+      </div>
+
+      <!-- CTA Button -->
+      <a href="09-payment.html" class="btn-primary">
+        立即生成信用报告
+        <span class="price-tag">¥50</span>
+      </a>
+    </div>
+
+    <!-- Sample Report row -->
+    <div class="card">
+      <a href="18-sample-report.html" class="sample-row">
+        <div class="sample-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <div class="sample-text">
+          <div class="sample-title">查看样例报告</div>
+          <div class="sample-desc">了解信用报告内容与格式</div>
+        </div>
+        <div class="sample-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tabbar">
+    <a href="03-home-empty.html" class="tab-item">
+      <div class="tab-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <span class="tab-label">首页</span>
+    </a>
+    <a href="05-report-empty.html" class="tab-item active">
+      <div class="tab-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <span class="tab-label">信用报告</span>
+    </a>
+    <a href="12-resume-empty.html" class="tab-item">
+      <div class="tab-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M9 9h6M9 12h6M9 15h4"/>
+        </svg>
+      </div>
+      <span class="tab-label">可信简历</span>
+    </a>
+    <a href="19-profile.html" class="tab-item">
+      <div class="tab-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <span class="tab-label">我的</span>
+    </a>
+  </div>
+
+</div>
+</body>
+</html>

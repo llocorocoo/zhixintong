@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>信息核查授权</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    background: #f6f8fc;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+  .app {
+    width: 100%;
+    max-width: 390px;
+    min-height: 100vh;
+    background: #f6f8fc;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Nav bar */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #1e40af;
+    padding: 44px 16px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-back {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .nav-back:active { background: rgba(255,255,255,.15); }
+  .nav-title {
+    flex: 1;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    margin-right: 36px;
+  }
+
+  /* Gradient header */
+  .page-header {
+    background: linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%);
+    padding: 24px 20px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .header-icon-wrap {
+    width: 64px; height: 64px;
+    background: rgba(255,255,255,.15);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .page-header p {
+    font-size: 14px;
+    color: rgba(255,255,255,.75);
+  }
+
+  /* Content area */
+  .scroll-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: -16px;
+  }
+
+  /* Card */
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.07);
+    padding: 20px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-title::before {
+    content: '';
+    width: 3px; height: 16px;
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  /* Authorization text */
+  .auth-text-area {
+    height: 240px;
+    overflow-y: auto;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+  }
+  .auth-text-area h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .auth-text-area p {
+    margin-bottom: 10px;
+  }
+  .auth-text-area .section-head {
+    font-weight: 600;
+    color: #1e40af;
+    margin-top: 14px;
+    margin-bottom: 6px;
+  }
+
+  /* Checkbox card */
+  .checkbox-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    padding: 16px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.07);
+    border: 1.5px solid #e2e8f0;
+    transition: border-color .2s, background .2s;
+  }
+  .checkbox-card.checked {
+    border-color: #2563eb;
+    background: #eff6ff;
+  }
+  .custom-checkbox {
+    width: 22px; height: 22px;
+    border-radius: 7px;
+    border: 2px solid #cbd5e1;
+    background: #fff;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s, background .2s;
+    margin-top: 1px;
+  }
+  .checkbox-card.checked .custom-checkbox {
+    border-color: #2563eb;
+    background: #2563eb;
+  }
+  .check-mark {
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .checkbox-card.checked .check-mark { opacity: 1; }
+  .checkbox-label {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #374151;
+  }
+  .checkbox-label a { color: #2563eb; text-decoration: none; }
+
+  /* Bottom fixed bar */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 390px;
+    background: #fff;
+    padding: 16px 16px 32px;
+    box-shadow: 0 -1px 0 rgba(0,0,0,.06), 0 -4px 20px rgba(0,0,0,.05);
+    display: flex;
+    gap: 10px;
+  }
+  .btn-outline {
+    flex: 1;
+    height: 52px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    color: #475569;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+  }
+  .btn-outline:active { background: #f1f5f9; }
+  .btn-primary {
+    flex: 2;
+    height: 52px;
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    border-radius: 16px;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    transition: opacity .15s;
+  }
+  .btn-primary.disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .btn-primary:not(.disabled):active { opacity: .88; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Nav bar -->
+  <div class="nav-bar">
+    <div class="nav-back" onclick="history.back()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </div>
+    <div class="nav-title">信息核查授权</div>
+  </div>
+
+  <!-- Gradient header -->
+  <div class="page-header">
+    <div class="header-icon-wrap">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <h1>信息核查授权</h1>
+    <p>请仔细阅读并确认以下授权内容</p>
+  </div>
+
+  <!-- Content -->
+  <div class="scroll-body">
+
+    <!-- Auth text card -->
+    <div class="card">
+      <div class="card-title">授权书全文</div>
+      <div class="auth-text-area">
+        <h3>《职业信用信息核查授权书》</h3>
+        <p>本人（以下称"授权人"）自愿授权职信通平台（以下称"受托方"）对本人以下信息进行合法核查，用于生成职业信用报告，本授权书具有法律效力。</p>
+
+        <p class="section-head">一、身份信息核查</p>
+        <p>授权受托方通过合法渠道核查本人姓名、公民身份号码、户籍信息及其他身份证明文件信息的真实性与有效性。</p>
+
+        <p class="section-head">二、学历学籍信息核查</p>
+        <p>授权受托方向教育部学信网等权威机构核查本人学历证书、学位证书、在校学籍状态的真实性，包括毕业院校、专业、学制及证书编号等信息。</p>
+
+        <p class="section-head">三、司法记录核查</p>
+        <p>授权受托方通过公安机关、人民法院、司法行政机关等查询本人是否存在刑事犯罪记录、失信被执行人记录及行政违法记录。</p>
+
+        <p class="section-head">四、金融信用信息核查</p>
+        <p>授权受托方在符合相关法律法规前提下，对本人金融信用状况进行核查，包括但不限于贷款逾期、信用卡欠款等记录。</p>
+
+        <p class="section-head">五、行业黑名单核查</p>
+        <p>授权受托方核查本人是否被列入行业禁入名单、违规从业名单或其他行业监管机构发布的负面清单。</p>
+
+        <p class="section-head">六、授权期限</p>
+        <p>本授权书自本人确认之日起生效，有效期为一年，期满后如需续期须重新授权。</p>
+
+        <p class="section-head">七、信息保护承诺</p>
+        <p>受托方承诺严格遵守《个人信息保护法》《数据安全法》等相关法律法规，本人信息仅用于职业信用报告生成，不得用于其他商业目的。</p>
+      </div>
+    </div>
+
+    <!-- Checkbox -->
+    <div class="checkbox-card" id="checkCard" onclick="toggleCheck()">
+      <div class="custom-checkbox" id="customCb">
+        <svg class="check-mark" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+      </div>
+      <div class="checkbox-label">
+        我已仔细阅读并完全理解上述授权内容，自愿同意<a href="#">《职业信用信息核查授权书》</a>，并授权职信通平台对本人相关信息进行合法核查。
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">
+    <div class="btn-outline" onclick="history.back()">取消</div>
+    <a href="11-report-form.html" class="btn-primary disabled" id="agreeBtn">同意授权</a>
+  </div>
+</div>
+
+<script>
+var checked = false;
+function toggleCheck() {
+  checked = !checked;
+  var card = document.getElementById('checkCard');
+  var btn = document.getElementById('agreeBtn');
+  if (checked) {
+    card.classList.add('checked');
+    btn.classList.remove('disabled');
+  } else {
+    card.classList.remove('checked');
+    btn.classList.add('disabled');
+  }
+}
+</script>
+</body>
+</html>

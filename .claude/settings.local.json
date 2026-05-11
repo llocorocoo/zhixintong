@@ -1,7 +1,38 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(npm list:*)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "mcp__claude_ai_Figma__get_metadata",
+      "Bash(python -c ' *)",
+      "Bash(git commit -m 'revert: 人行征信改回个人征信 *)",
+      "Bash(xargs grep *)",
+      "Bash(git commit *)",
+      "Bash(pip install *)",
+      "Bash(python3 -c ' *)",
+      "Bash(file *.docx *.xlsx)",
+      "Bash(cd /tmp)",
+      "Bash(unzip -q \"/e/claude/zhixintong/职业信用评分模型_v3_0_通用基准版.docx\" -d docx_extracted)",
+      "Read(//root/.claude/projects/e--claude-zhixintong/2bf6a5bf-f5af-4bf2-91be-cb291047a2a9/tool-results/**)",
+      "Bash(unzip -q \"/e/claude/zhixintong/职业信用评分模型_v3_0_通用基准版.docx\" -d docx_content)",
+      "Read(//tmp/docx_content/word/**)",
+      "Bash(unzip -q \"/e/claude/zhixintong/评分细则.xlsx\" -d xlsx_content)",
+      "Read(//tmp/xlsx_content/xl/worksheets/**)",
+      "Read(//tmp/xlsx_content/xl/**)",
+      "Bash(sed 's/.*<w:t[^>]*>//;s/<\\\\/w:t>.*//')",
+      "Read(//tmp/**)",
+      "Bash(PYTHONIOENCODING=utf-8 python3:*)",
+      "Bash(python3:*)",
+      "Bash(ls \"E:/claude/zhixintong/\"*芝麻*)",
+      "Bash(ls \"E:/claude/zhixintong/\"*背调*)",
+      "Bash(ls \"E:/claude/zhixintong/\"*20240517*)",
+      "Bash(python:*)"
+    ],
     "additionalDirectories": [
-      "e:\\claude\\zhixintong\\src\\pages"
+      "e:\\claude\\zhixintong\\src\\pages",
+      "\\tmp\\docx_content\\word"
     ]
   }
 }

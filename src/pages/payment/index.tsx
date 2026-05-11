@@ -48,7 +48,7 @@ const PaymentPage: FC = () => {
 
       {/* 顶部金额展示 */}
       <View style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', paddingTop: '48px', paddingBottom: '80px', paddingLeft: '16px', paddingRight: '16px' }}>
-        <Text className="block text-blue-200 text-sm mb-2">{isUpdate ? '更新信用报告' : '生成信用报告'}</Text>
+        <Text className="block text-blue-200 text-sm mb-2">{isUpdate ? '更新职业信用报告' : '生成职业信用报告'}</Text>
         <View className="flex items-end gap-1">
           <Text className="text-white text-lg font-medium">¥</Text>
           <Text className="text-white font-bold" style={{ fontSize: '48px', lineHeight: '1' }}>{price}</Text>

@@ -127,7 +127,7 @@ const ReportPage: FC = () => {
               }}>
                 <FileSearch size={40} color="#fff" />
               </View>
-              <Text style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', display: 'block', lineHeight: '1.4', marginBottom: '8px' }}>暂无信用报告</Text>
+              <Text style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', display: 'block', lineHeight: '1.4', marginBottom: '8px' }}>暂无职业信用报告</Text>
               <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', lineHeight: '1.7', textAlign: 'center' }}>
                 生成报告后获得完整职业信用评估，可用于求职、背调等场景
               </Text>
@@ -161,7 +161,7 @@ const ReportPage: FC = () => {
                 onTouchEnd={release} onTouchCancel={release}
                 onClick={handleCreateReport}
               >
-                <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>立即生成信用报告</Text>
+                <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>立即生成职业信用报告</Text>
                 <Text style={{ color: '#fde68a', fontSize: '12px', fontWeight: '700', lineHeight: '1.5' }}>¥50</Text>
               </View>
             </View>
@@ -272,7 +272,7 @@ const ReportPage: FC = () => {
                     onClick={handleUpdateReport}
                   >
                     <RotateCcw size={16} color="#64748b" />
-                    <Text style={{ flex: 1, fontSize: '14px', color: '#0f172a', marginLeft: '10px', lineHeight: '1.5' }}>更新信用报告</Text>
+                    <Text style={{ flex: 1, fontSize: '14px', color: '#0f172a', marginLeft: '10px', lineHeight: '1.5' }}>更新职业信用报告</Text>
                     <Text style={{ fontSize: '12px', color: '#94a3b8', marginRight: '6px', lineHeight: '1.5' }}>¥9.9</Text>
                     <ChevronRight size={15} color="#94a3b8" />
                   </View>

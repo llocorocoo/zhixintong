@@ -171,7 +171,7 @@ const AccountSettingsPage: FC = () => {
         {/* 注销账户 */}
         <View style={{ background: '#fff', borderRadius: '20px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
           <Text style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', display: 'block', marginBottom: '6px', lineHeight: '1.5' }}>注销账户</Text>
-          <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '14px', lineHeight: '1.6' }}>注销账户后，您的信用报告、评分及所有个人数据将被永久删除，且无法恢复。</Text>
+          <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '14px', lineHeight: '1.6' }}>注销账户后，您的职业信用报告、评分及所有个人数据将被永久删除，且无法恢复。</Text>
           <View style={{ borderRadius: '14px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.04)' }} onClick={handleDeactivate}>
             <Text style={{ fontSize: '14px', fontWeight: '500', color: '#ef4444', lineHeight: '1.5' }}>申请注销账户</Text>
           </View>

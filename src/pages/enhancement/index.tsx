@@ -319,7 +319,7 @@ const EnhancementPage: FC = () => {
     },
     {
       title: '定期生成报告',
-      desc: '建议每季度更新一次信用报告',
+      desc: '建议每季度更新一次职业信用报告',
       action: '/pages/report/index'
     }
   ]
@@ -497,7 +497,7 @@ const EnhancementPage: FC = () => {
               <Text style={{ fontSize: '11px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>推荐</Text>
             </View>
           </View>
-          <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '16px', lineHeight: '1.6' }}>完整展示工作履历，提升报告可信度和信用评分。</Text>
+          <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '16px', lineHeight: '1.6' }}>完整展示工作履历，提升报告可信度和职业信用评分。</Text>
 
           {selfProofSteps.map((item, i) => (
             <View key={i} style={{ display: 'flex', gap: '12px', marginBottom: i < selfProofSteps.length - 1 ? '0' : '16px' }}>

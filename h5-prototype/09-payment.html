@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>生成信用报告 - 支付</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    background: #f6f8fc;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+  .app {
+    width: 100%;
+    max-width: 390px;
+    min-height: 100vh;
+    background: #f6f8fc;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* Nav bar */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    padding: 44px 16px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.06);
+  }
+  .nav-back {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .nav-back:active { background: #f1f5f9; }
+  .nav-title {
+    flex: 1;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-right: 36px;
+  }
+
+  /* Scroll area */
+  .scroll-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* Card */
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.07);
+    padding: 20px;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .shield-icon-wrap {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-header-text h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .card-header-text p {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  /* Order rows */
+  .order-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f8fafc;
+  }
+  .order-row:last-child { border-bottom: none; }
+  .order-label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 400;
+  }
+  .order-value {
+    font-size: 14px;
+    color: #0f172a;
+    font-weight: 500;
+    text-align: right;
+  }
+  .order-value.price {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ef4444;
+  }
+  .price-unit {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  /* Section title */
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 14px;
+  }
+
+  /* Payment options */
+  .pay-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .pay-option:last-child { margin-bottom: 0; }
+  .pay-option.selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+  }
+  .pay-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .pay-icon.wechat { background: #07c160; }
+  .pay-icon.alipay { background: #1677ff; }
+  .pay-icon.bank   { background: #f59e0b; }
+  .pay-label-wrap { flex: 1; }
+  .pay-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .pay-sub {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  .badge-tuijian {
+    font-size: 11px;
+    font-weight: 700;
+    color: #07c160;
+    background: #dcfce7;
+    border-radius: 6px;
+    padding: 2px 7px;
+    margin-left: 6px;
+  }
+  .radio-outer {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: border-color .2s;
+  }
+  .pay-option.selected .radio-outer {
+    border-color: #2563eb;
+  }
+  .radio-inner {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #2563eb;
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity .2s, transform .2s;
+  }
+  .pay-option.selected .radio-inner {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Bottom fixed bar */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 390px;
+    background: #fff;
+    padding: 16px 16px 32px;
+    box-shadow: 0 -1px 0 rgba(0,0,0,.06), 0 -4px 20px rgba(0,0,0,.05);
+  }
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 52px;
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    border-radius: 16px;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity .15s;
+  }
+  .btn-primary:active { opacity: .88; }
+  .fine-print {
+    text-align: center;
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 10px;
+  }
+  .fine-print a { color: #2563eb; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Nav bar -->
+  <div class="nav-bar">
+    <div class="nav-back" onclick="history.back()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </div>
+    <div class="nav-title">生成信用报告</div>
+  </div>
+
+  <!-- Scroll body -->
+  <div class="scroll-body">
+
+    <!-- Order card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="shield-icon-wrap">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="card-header-text">
+          <h2>订单信息</h2>
+          <p>请确认您的订单详情</p>
+        </div>
+      </div>
+
+      <div class="order-row">
+        <span class="order-label">商品</span>
+        <span class="order-value">职业信用报告生成服务</span>
+      </div>
+      <div class="order-row">
+        <span class="order-label">用户</span>
+        <span class="order-value">张三（138****8888）</span>
+      </div>
+      <div class="order-row">
+        <span class="order-label">有效期</span>
+        <span class="order-value">1年</span>
+      </div>
+      <div class="order-row">
+        <span class="order-label">应付金额</span>
+        <span class="order-value price"><span class="price-unit">¥</span>50</span>
+      </div>
+    </div>
+
+    <!-- Payment method card -->
+    <div class="card">
+      <div class="section-title">选择支付方式</div>
+
+      <div class="pay-option selected" onclick="selectPay(this)">
+        <div class="pay-icon wechat">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8.5 12.5a.5.5 0 1 0 1 0 .5.5 0 0 0-1 0z" fill="#fff"/>
+            <path d="M14.5 12.5a.5.5 0 1 0 1 0 .5.5 0 0 0-1 0z" fill="#fff"/>
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+        </div>
+        <div class="pay-label-wrap">
+          <div class="pay-name">微信支付<span class="badge-tuijian">推荐</span></div>
+          <div class="pay-sub">安全快捷，支持零钱及银行卡</div>
+        </div>
+        <div class="radio-outer"><div class="radio-inner"></div></div>
+      </div>
+
+      <div class="pay-option" onclick="selectPay(this)">
+        <div class="pay-icon alipay">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 7v5l3 3"/>
+          </svg>
+        </div>
+        <div class="pay-label-wrap">
+          <div class="pay-name">支付宝</div>
+          <div class="pay-sub">花呗分期，余额宝付款</div>
+        </div>
+        <div class="radio-outer"><div class="radio-inner"></div></div>
+      </div>
+
+      <div class="pay-option" onclick="selectPay(this)">
+        <div class="pay-icon bank">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="3"/>
+            <path d="M2 10h20"/>
+          </svg>
+        </div>
+        <div class="pay-label-wrap">
+          <div class="pay-name">银行卡支付</div>
+          <div class="pay-sub">支持各大银行借记卡、信用卡</div>
+        </div>
+        <div class="radio-outer"><div class="radio-inner"></div></div>
+      </div>
+    </div>
+
+    <!-- Security note -->
+    <div style="display:flex;align-items:center;gap:6px;padding:0 4px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <span style="font-size:12px;color:#94a3b8;">支付由第三方平台提供，全程加密保护</span>
+    </div>
+
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">
+    <a href="10-authorize.html" class="btn-primary">确认支付 ¥50</a>
+    <div class="fine-print">支付即表示您同意<a href="#">《服务协议》</a>和<a href="#">《隐私政策》</a></div>
+  </div>
+</div>
+
+<script>
+function selectPay(el) {
+  document.querySelectorAll('.pay-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+</script>
+</body>
+</html>

@@ -272,7 +272,7 @@ const CreditRepairPage: FC = () => {
                 <View style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e40af, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', boxShadow: '0 6px 20px rgba(37,99,235,0.3)' }}>
                   <FileSearch size={32} color="#fff" />
                 </View>
-                <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', display: 'block', marginBottom: '8px', lineHeight: '1.4' }}>需先生成信用报告</Text>
+                <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', display: 'block', marginBottom: '8px', lineHeight: '1.4' }}>需先生成职业信用报告</Text>
                 <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', lineHeight: '1.7', textAlign: 'center', marginBottom: '20px' }}>
                   生成职业信用报告并完成授权核查后，平台将检索您的行政处罚、失信名单等记录，识别符合国家修复规定的可修复项目。
                 </Text>
@@ -281,14 +281,14 @@ const CreditRepairPage: FC = () => {
                   onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
                 >
                   <FileText size={16} color="#fff" />
-                  <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>前往生成信用报告</Text>
+                  <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>前往生成职业信用报告</Text>
                 </View>
               </View>
             ) : (
               <View style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <View style={{ background: '#eff6ff', borderRadius: '12px', padding: '10px 14px', borderLeft: '3px solid #2563eb' }}>
                   <Text style={{ fontSize: '12px', color: '#1e40af', lineHeight: '1.7' }}>
-                    以下为基于您的信用报告核查的可修复项目，仅包含符合国家及行业信用修复规定的记录。
+                    以下为基于您的职业信用报告核查的可修复项目，仅包含符合国家及行业信用修复规定的记录。
                   </Text>
                 </View>
 

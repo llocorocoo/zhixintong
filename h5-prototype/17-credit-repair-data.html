@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>信用修复 - 有数据</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif;background:#f6f8fc;max-width:390px;margin:0 auto}
+.grad-header{background:linear-gradient(135deg,#0f2460 0%,#1e40af 50%,#2563eb 100%);padding:20px 20px 24px;position:relative;overflow:hidden}
+.grad-header::after{content:'';position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.07) 0%,transparent 70%);pointer-events:none}
+.grad-title{font-size:22px;font-weight:800;color:#fff;display:block;line-height:1.3;letter-spacing:.5px}
+.grad-sub{font-size:13px;color:rgba(255,255,255,.6);display:block;margin-top:4px;line-height:1.5}
+.content{padding:16px 16px 32px;display:flex;flex-direction:column;gap:12px}
+.card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.07)}
+.card-header{padding:16px 18px 12px;border-bottom:1px solid #f8fafc;font-size:15px;font-weight:700;color:#0f172a;display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:14px 18px}
+.hint-bar{background:#eff6ff;border-radius:10px;padding:10px 14px;border-left:3px solid #2563eb;font-size:12px;color:#1e40af;line-height:1.6;margin-bottom:12px}
+/* check item */
+.check-item{border:1px solid #f1f5f9;border-radius:14px;margin-bottom:10px;overflow:hidden}
+.check-item:last-child{margin-bottom:0}
+.check-top{display:flex;align-items:flex-start;gap:12px;padding:14px}
+.check-icon{flex-shrink:0;margin-top:2px}
+.check-meta{flex:1}
+.check-title{font-size:13px;font-weight:600;color:#0f172a;display:block;line-height:1.4;margin-bottom:3px}
+.check-desc{font-size:11px;color:#94a3b8;line-height:1.5}
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;flex-shrink:0}
+.badge-red{background:rgba(220,38,38,.1);color:#dc2626}
+.badge-green{background:rgba(5,150,105,.1);color:#059669}
+/* repairable detail */
+.repair-detail{padding:0 14px 14px}
+.detail-alert{background:#fef2f2;border-radius:10px;padding:10px 12px;font-size:12px;color:#dc2626;line-height:1.6;margin-bottom:8px}
+.law-box{background:#eff6ff;border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.law-title{font-size:11px;color:#1e40af;font-weight:600;display:block;margin-bottom:2px}
+.law-desc{font-size:11px;color:#64748b}
+.tpl-box{background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px}
+.tpl-text{flex:1}
+.tpl-name{font-size:11px;color:#374151;font-weight:500;display:block}
+.tpl-note{font-size:10px;color:#94a3b8;margin-top:2px}
+.channel-box{background:#eff6ff;border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;font-size:11px;color:#1e40af;line-height:1.6}
+/* accordion */
+.acc-item{border-radius:12px;overflow:hidden;margin-bottom:8px}
+.acc-item:last-child{margin-bottom:0}
+.acc-header{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;cursor:pointer}
+.acc-left{display:flex;align-items:center;gap:10px}
+.acc-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.acc-name{font-size:13px;font-weight:600;color:#0f172a}
+.acc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-top:2px;display:inline-block}
+.acc-chevron{transition:transform .25s;flex-shrink:0}
+.acc-chevron.open{transform:rotate(90deg)}
+.acc-content{padding:0 14px 12px;display:none}
+.acc-scope{font-size:12px;color:#475569;line-height:1.7;margin-bottom:8px}
+svg{display:block}
+</style>
+</head>
+<body>
+<div class="grad-header">
+  <span class="grad-title">信用修复</span>
+  <span class="grad-sub">查询可修复的信用记录，提供法律依据和修复渠道指引</span>
+</div>
+<div class="content">
+  <!-- 个性化修复建议（有数据） -->
+  <div class="card">
+    <div class="card-header">
+      <span style="display:flex;align-items:center;gap:8px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        个性化修复建议
+      </span>
+      <span class="badge badge-red">发现 2 项可修复</span>
+    </div>
+    <div class="card-body">
+      <p class="hint-bar">以下为基于您的信用报告核查的可修复项目，仅包含符合国家及行业信用修复规定的记录。</p>
+
+      <!-- 可修复 1 -->
+      <div class="check-item" style="border-color:rgba(220,38,38,.2)">
+        <div class="check-top">
+          <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="check-meta">
+            <span class="check-title">行政处罚记录</span>
+            <span class="check-desc">核查是否存在已达公示期限、符合申请修复条件的行政处罚记录</span>
+          </div>
+          <span class="badge badge-red">发现可修复项</span>
+        </div>
+        <div class="repair-detail">
+          <p class="detail-alert">发现1条行政处罚记录，公示期已满，符合申请终止公示条件。</p>
+          <div style="font-size:11px;color:#64748b;font-weight:500;margin-bottom:6px;display:flex;align-items:center;gap:4px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><path d="M18 13l-6 6-6-6"/><path d="M18 11H6a4 4 0 0 1 0-8 4 4 0 0 1 4-4h4a4 4 0 0 1 4 4 4 4 0 0 1 0 8z"/></svg>
+            适用法律法规
+          </div>
+          <div class="law-box"><span class="law-title">《失信行为纠正后的信用信息修复管理办法（试行）》</span><span class="law-desc">规定可修复范围、修复条件及申请流程</span></div>
+          <div style="font-size:11px;color:#64748b;font-weight:500;margin-bottom:6px">所需模板文件</div>
+          <div class="tpl-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <div class="tpl-text"><span class="tpl-name">《"信用中国"网站失信行为纠正后的信用信息修复申请表》</span><span class="tpl-note">可至"信用中国"官网下载</span></div>
+          </div>
+          <div class="channel-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            登录"信用中国"网站（www.creditchina.gov.cn）提交修复申请
+          </div>
+        </div>
+      </div>
+
+      <!-- 可修复 2 -->
+      <div class="check-item" style="border-color:rgba(220,38,38,.2)">
+        <div class="check-top">
+          <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="check-meta">
+            <span class="check-title">失信被执行人名单</span>
+            <span class="check-desc">核查是否在最高人民法院失信被执行人名单中且已履行完毕但未移除</span>
+          </div>
+          <span class="badge badge-red">发现可修复项</span>
+        </div>
+        <div class="repair-detail">
+          <p class="detail-alert">发现失信记录，若已履行完毕，可申请移出名单。</p>
+          <div class="law-box"><span class="law-title">《最高人民法院关于公布失信被执行人名单信息的若干规定》</span><span class="law-desc">履行完毕后可向执行法院申请移出失信名单</span></div>
+          <div class="channel-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            向作出执行裁定的人民法院提交履行证明，申请移出失信名单
+          </div>
+        </div>
+      </div>
+
+      <!-- 无问题 -->
+      <div class="check-item">
+        <div class="check-top">
+          <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+          <div class="check-meta"><span class="check-title">应封存未封存记录</span><span class="check-desc">核查是否存在依法应自动封存但仍在各平台可查询的记录</span></div>
+          <span class="badge badge-green">未发现问题</span>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-top">
+          <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+          <div class="check-meta"><span class="check-title">第三方平台数据未同步</span><span class="check-desc">核查已完成信用修复的记录是否仍在天眼查、企查查等平台可查</span></div>
+          <span class="badge badge-green">未发现问题</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 信用修复情况说明 -->
+  <div class="card">
+    <div class="card-header">
+      <span style="display:flex;align-items:center;gap:8px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        信用修复情况说明
+      </span>
+    </div>
+    <div class="card-body" style="padding:12px 14px">
+      <div class="acc-item" style="background:#f0fdf4;border:1px solid #bbf7d0">
+        <div class="acc-header" onclick="toggle(this)"><div class="acc-left"><div class="acc-icon" style="background:#dcfce7"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></div><div><div class="acc-name">可修复的职业信用记录</div><span class="acc-tag" style="background:#dcfce7;color:#059669">申请修复</span></div></div><svg class="acc-chevron open" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="acc-content" style="display:block"><p class="acc-scope">公示期满的一般行政处罚、已纠正的轻微失信行为，可向相关主管部门申请终止公示或移出失信名单。</p><div class="law-box"><span class="law-title">《失信行为纠正后的信用信息修复管理办法（试行）》</span><span class="law-desc">规定可修复范围、修复条件及申请流程</span></div></div>
+      </div>
+      <div class="acc-item" style="background:#eff6ff;border:1px solid #bfdbfe">
+        <div class="acc-header" onclick="toggle(this)"><div class="acc-left"><div class="acc-icon" style="background:#dbeafe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="acc-name">应封存仍可查询的记录</div><span class="acc-tag" style="background:#dbeafe;color:#2563eb">依法维权</span></div></div><svg class="acc-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="acc-content"><p class="acc-scope">符合国家封存规定，应自动封存但仍在政务平台或第三方平台展示的记录。</p><div style="background:#f0fdf4;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span style="font-size:12px;color:#059669;font-weight:600">检察机关举报热线：12309</span></div></div>
+      </div>
+      <div class="acc-item" style="background:#fffbeb;border:1px solid #fde68a">
+        <div class="acc-header" onclick="toggle(this)"><div class="acc-left"><div class="acc-icon" style="background:#fef3c7"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="acc-name">应停止公示但仍可查询的记录</div><span class="acc-tag" style="background:#fef3c7;color:#d97706">申诉平台</span></div></div><svg class="acc-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="acc-content"><p class="acc-scope">已达公示期限或已完成信用修复，按规定应停止公示，但仍在第三方平台可查询的记录。</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function toggle(h){const c=h.nextElementSibling,ch=h.querySelector('.acc-chevron'),open=c.style.display==='block';c.style.display=open?'none':'block';ch.classList.toggle('open',!open)}
+</script>
+</body>
+</html>

@@ -93,7 +93,7 @@ const IndexPage: FC = () => {
   ]
 
   const menuItems = [
-    { icon: FileSearch, title: '信用报告', desc: '授权查询并生成信用报告', path: '/pages/report/index',    color: '#2563eb', bg: '#eff6ff', accent: '#2563eb', requireLogin: true  },
+    { icon: FileSearch, title: '职业信用报告', desc: '授权查询并生成职业信用报告', path: '/pages/report/index',    color: '#2563eb', bg: '#eff6ff', accent: '#2563eb', requireLogin: true  },
     { icon: UserCheck,  title: '可信简历', desc: '生成和维护可信简历',    path: '/pages/resume/index',    color: '#7c3aed', bg: '#f5f3ff', accent: '#7c3aed', requireLogin: true  },
     { icon: TrendingUp, title: '提升信用', desc: '提升信用分和报告可信度', path: '/pages/enhancement/index', color: '#059669', bg: '#f0fdf4', accent: '#059669', requireLogin: false },
   ]

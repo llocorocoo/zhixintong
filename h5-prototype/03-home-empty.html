@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>职信通 - 首页</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    background: #f6f8fc;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .phone {
+    width: 100%;
+    max-width: 390px;
+    min-height: 100vh;
+    background: #f6f8fc;
+    position: relative;
+    overflow-x: hidden;
+    padding-bottom: 80px;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%);
+    padding: 52px 20px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 20px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .header-greeting {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.72);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Scroll content */
+  .content {
+    padding: 0 16px 16px;
+    margin-top: -12px;
+  }
+
+  /* Cards */
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.07);
+    overflow: hidden;
+  }
+
+  /* Score Card */
+  .score-card {
+    padding: 28px 24px 24px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .score-label {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .score-value-empty {
+    font-size: 72px;
+    font-weight: 700;
+    color: #cbd5e1;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .score-empty-hint {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    height: 48px;
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:active { opacity: 0.88; }
+  .btn-arrow {
+    width: 20px; height: 20px;
+    background: rgba(255,255,255,0.22);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Quick Actions */
+  .quick-card {
+    padding: 16px 20px 20px;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 14px;
+    letter-spacing: 0.3px;
+  }
+  .quick-actions {
+    display: flex;
+    justify-content: space-around;
+  }
+  .quick-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .quick-icon {
+    width: 52px; height: 52px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .quick-icon.blue { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
+  .quick-icon.purple { background: linear-gradient(135deg, #ede9fe, #ddd6fe); }
+  .quick-icon.amber { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+  .quick-label {
+    font-size: 12px;
+    color: #475569;
+    font-weight: 500;
+  }
+
+  /* Menu List */
+  .menu-card {
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    gap: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.12s;
+  }
+  .menu-item:active { background: #f8fafc; }
+  .menu-item + .menu-item {
+    border-top: 1px solid #f1f5f9;
+  }
+  .menu-icon-wrap {
+    width: 44px; height: 44px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .menu-icon-wrap.blue { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
+  .menu-icon-wrap.green { background: linear-gradient(135deg, #dcfce7, #bbf7d0); }
+  .menu-icon-wrap.orange { background: linear-gradient(135deg, #ffedd5, #fed7aa); }
+  .menu-text { flex: 1; }
+  .menu-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+  .menu-desc {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .menu-arrow {
+    width: 28px; height: 28px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* Tab Bar */
+  .tabbar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 390px;
+    background: #fff;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    padding: 8px 0 20px;
+    z-index: 100;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+  }
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .tab-icon {
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tab-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: #94a3b8;
+  }
+  .tab-item.active .tab-label { color: #2563eb; }
+  .tab-item.active .tab-icon svg { stroke: #2563eb; }
+  .tab-item .tab-icon svg { stroke: #94a3b8; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-greeting">Hi，张三 👋</div>
+    <div class="header-sub">管理您的职业信用档案</div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Score Card (empty) -->
+    <div class="card score-card">
+      <div class="score-label">职业信用评分</div>
+      <div class="score-value-empty">—</div>
+      <div class="score-empty-hint">生成信用报告后将自动同步评分</div>
+      <a href="09-payment.html" class="btn-primary">
+        立即生成
+        <div class="btn-arrow">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card quick-card">
+      <div class="section-title">快捷功能</div>
+      <div class="quick-actions">
+        <div class="quick-item">
+          <div class="quick-icon blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 12l2 2 4-4"/>
+              <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.51 0 2.93.37 4.18 1.02"/>
+              <path d="M21 3l-3 3-1.5-1.5"/>
+            </svg>
+          </div>
+          <span class="quick-label">AI自证</span>
+        </div>
+        <div class="quick-item">
+          <a href="18-sample-report.html" style="display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;">
+            <div class="quick-icon purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <line x1="10" y1="9" x2="8" y2="9"/>
+              </svg>
+            </div>
+            <span class="quick-label" style="color:#475569;">样例报告</span>
+          </a>
+        </div>
+        <div class="quick-item">
+          <div class="quick-icon amber">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <span class="quick-label">信用修复</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menu List -->
+    <div class="card menu-card">
+      <a href="05-report-empty.html" class="menu-item">
+        <div class="menu-icon-wrap blue">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <line x1="10" y1="9" x2="8" y2="9"/>
+          </svg>
+        </div>
+        <div class="menu-text">
+          <div class="menu-title">信用报告</div>
+          <div class="menu-desc">生成并管理您的职业信用报告</div>
+        </div>
+        <div class="menu-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </div>
+      </a>
+      <a href="12-resume-empty.html" class="menu-item">
+        <div class="menu-icon-wrap green">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="menu-text">
+          <div class="menu-title">可信简历</div>
+          <div class="menu-desc">经核验的职业履历信息</div>
+        </div>
+        <div class="menu-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </div>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon-wrap orange">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+        </div>
+        <div class="menu-text">
+          <div class="menu-title">提升信用</div>
+          <div class="menu-desc">个性化提升方案与建议</div>
+        </div>
+        <div class="menu-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Tab Bar -->
+  <div class="tabbar">
+    <a href="03-home-empty.html" class="tab-item active">
+      <div class="tab-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <span class="tab-label">首页</span>
+    </a>
+    <a href="05-report-empty.html" class="tab-item">
+      <div class="tab-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <span class="tab-label">信用报告</span>
+    </a>
+    <a href="12-resume-empty.html" class="tab-item">
+      <div class="tab-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M9 9h6M9 12h6M9 15h4"/>
+        </svg>
+      </div>
+      <span class="tab-label">可信简历</span>
+    </a>
+    <a href="19-profile.html" class="tab-item">
+      <div class="tab-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <span class="tab-label">我的</span>
+    </a>
+  </div>
+
+</div>
+</body>
+</html>

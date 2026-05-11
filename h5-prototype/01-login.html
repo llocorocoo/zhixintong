@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>职信通 - 登录 / 注册</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(160deg, #0f2460 0%, #1a3a8f 40%, #2563eb 80%, #3b82f6 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* 装饰背景圆 */
+  body::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: absolute;
+    bottom: 200px; right: -80px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* 品牌区 */
+  .brand {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 32px 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .logo {
+    width: 80px; height: 80px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  .logo svg { width: 40px; height: 40px; }
+  .brand-name {
+    font-size: 32px; font-weight: 800;
+    color: #fff;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .brand-sub { font-size: 14px; color: rgba(255,255,255,0.65); letter-spacing: 1px; }
+
+  /* 表单卡片 */
+  .card {
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 32px 32px 0 0;
+    padding: 24px 24px 40px;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Tab 切换 */
+  .tab-bar {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 14px;
+    padding: 4px;
+    margin-bottom: 20px;
+  }
+  .tab {
+    flex: 1; padding: 10px 0;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 15px; font-weight: 400;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+  }
+  .tab.active {
+    background: #fff;
+    font-weight: 600;
+    color: #0f172a;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+
+  /* 表单字段 */
+  .fields { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .field-label {
+    font-size: 12px; color: #64748b;
+    font-weight: 500; margin-bottom: 6px; margin-left: 4px;
+    display: block;
+  }
+  .input-wrap {
+    display: flex; align-items: center; gap: 12px;
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 11px 14px;
+    border: 1.5px solid transparent;
+    transition: all 0.3s ease;
+  }
+  .input-wrap:focus-within {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
+  }
+  .input-wrap svg { flex-shrink: 0; transition: all 0.3s ease; }
+  .input-wrap input {
+    flex: 1; border: none; outline: none;
+    background: transparent;
+    font-size: 15px; color: #0f172a;
+    font-family: inherit;
+    line-height: 1.5;
+  }
+  .input-wrap input::placeholder { color: #cbd5e1; }
+
+  /* 提交按钮 */
+  .submit-btn {
+    width: 100%;
+    border-radius: 16px;
+    padding: 14px 0;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+    box-shadow: 0 6px 24px rgba(37,99,235,0.45);
+    border: none; cursor: pointer;
+    font-size: 16px; font-weight: 700; color: #fff;
+    font-family: inherit;
+    letter-spacing: 1px;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .submit-btn:active { transform: scale(0.97); box-shadow: 0 2px 12px rgba(37,99,235,0.3); }
+  .submit-btn.loading { background: #93c5fd; box-shadow: none; cursor: not-allowed; }
+
+  /* 切换链接 */
+  .switch-link {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .switch-link span { color: #94a3b8; }
+  .switch-link a { color: #2563eb; font-weight: 600; text-decoration: none; margin-left: 4px; }
+
+  /* 协议 */
+  .agreement {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 11px;
+    color: #cbd5e1;
+    line-height: 1.6;
+  }
+  .agreement a { color: #93c5fd; text-decoration: none; }
+
+  /* 隐藏 */
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<!-- 品牌区 -->
+<div class="brand">
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      <polyline points="9 12 11 14 15 10"/>
+    </svg>
+  </div>
+  <div class="brand-name">职信通</div>
+  <div class="brand-sub">专业职业信用管理平台</div>
+</div>
+
+<!-- 表单卡片 -->
+<div class="card">
+
+  <!-- Tab -->
+  <div class="tab-bar">
+    <div class="tab active" id="tab-login" onclick="switchTab('login')">登录</div>
+    <div class="tab" id="tab-register" onclick="switchTab('register')">注册</div>
+  </div>
+
+  <!-- 表单 -->
+  <form onsubmit="handleSubmit(event)">
+    <div class="fields">
+      <div>
+        <label class="field-label">手机号</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="phone-icon">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.71 3.35 2 2 0 0 1 3.68 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          <input type="tel" id="phone" maxlength="11" placeholder="请输入手机号" autocomplete="tel"
+            oninput="updateIconColor('phone-icon', this.value)">
+        </div>
+      </div>
+
+      <div>
+        <label class="field-label">密码</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="pwd-icon">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <input type="password" id="password" placeholder="请输入密码" autocomplete="current-password"
+            oninput="updateIconColor('pwd-icon', this.value)">
+        </div>
+      </div>
+
+      <div id="confirm-wrap" class="hidden">
+        <label class="field-label">确认密码</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="confirm-icon">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <input type="password" id="confirm" placeholder="再次输入密码" autocomplete="new-password"
+            oninput="updateIconColor('confirm-icon', this.value)">
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submit-btn">
+      <span id="btn-text">登 录</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </button>
+  </form>
+
+  <div class="switch-link">
+    <span id="switch-hint">还没有账户？</span>
+    <a href="#" onclick="switchTab(currentTab === 'login' ? 'register' : 'login'); return false;" id="switch-link">立即注册</a>
+  </div>
+
+  <div class="agreement">
+    <span id="action-word">登录</span>即表示同意
+    <a href="#">《用户协议》</a>和<a href="#">《隐私政策》</a>
+  </div>
+</div>
+
+<script>
+let currentTab = 'login';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-login').className = 'tab' + (tab === 'login' ? ' active' : '');
+  document.getElementById('tab-register').className = 'tab' + (tab === 'register' ? ' active' : '');
+  document.getElementById('confirm-wrap').className = tab === 'register' ? '' : 'hidden';
+  document.getElementById('btn-text').textContent = tab === 'login' ? '登 录' : '注 册';
+  document.getElementById('switch-hint').textContent = tab === 'login' ? '还没有账户？' : '已有账户？';
+  document.getElementById('switch-link').textContent = tab === 'login' ? '立即注册' : '立即登录';
+  document.getElementById('action-word').textContent = tab === 'login' ? '登录' : '注册';
+  document.getElementById('password').value = '';
+  document.getElementById('confirm').value = '';
+}
+
+function updateIconColor(iconId, value) {
+  const icon = document.getElementById(iconId);
+  icon.setAttribute('stroke', value ? '#3b82f6' : '#94a3b8');
+}
+
+function handleSubmit(e) {
+  e.preventDefault();
+  const phone = document.getElementById('phone').value.trim();
+  const password = document.getElementById('password').value;
+  const confirm = document.getElementById('confirm').value;
+
+  if (!phone || !password) { alert('请填写完整信息'); return; }
+  if (currentTab === 'register' && password !== confirm) { alert('两次密码不一致'); return; }
+  if (currentTab === 'register' && password.length < 6) { alert('密码不能少于6位'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.classList.add('loading');
+  document.getElementById('btn-text').textContent = '处理中...';
+
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    document.getElementById('btn-text').textContent = currentTab === 'login' ? '登 录' : '注 册';
+    if (currentTab === 'register') {
+      alert('注册成功，请登录');
+      switchTab('login');
+    } else {
+      alert('登录成功');
+    }
+  }, 1200);
+}
+</script>
+</body>
+</html>
