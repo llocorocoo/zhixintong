@@ -342,7 +342,7 @@ const EnhancementPage: FC = () => {
       {/* ── 蓝色渐变头部 ── */}
       <View style={{ background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)', padding: '20px 20px 24px', position: 'relative', overflow: 'hidden' }}>
         <View style={{ position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <Text style={{ fontSize: '22px', fontWeight: '800', color: '#fff', display: 'block', lineHeight: '1.3', letterSpacing: '0.5px' }}>提升信用</Text>
+        <Text style={{ fontSize: '22px', fontWeight: '800', color: '#fff', display: 'block', lineHeight: '1.3', letterSpacing: '0.5px' }}>提升职业信用</Text>
         <Text style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', display: 'block', marginTop: '4px', lineHeight: '1.5' }}>完善信用档案，提升职业竞争力</Text>
       </View>
 
@@ -444,7 +444,7 @@ const EnhancementPage: FC = () => {
                 {/* 提示条 */}
                 <View style={{ background: '#fffbeb', borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                   <Zap size={15} color="#d97706" />
-                  <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.6', flex: 1 }}>优先完成标记为「重要」的项目，可快速提升信用分。</Text>
+                  <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.6', flex: 1 }}>优先完成标记为「重要」的项目，可快速提升职业信用分。</Text>
                 </View>
               </View>
             ) : (
@@ -457,11 +457,11 @@ const EnhancementPage: FC = () => {
           </View>
         </View>
 
-        {/* ── 如何提升信用分（2列网格）── */}
+        {/* ── 如何提升职业信用分（2列网格）── */}
         <View style={{ background: '#fff', borderRadius: '20px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
           <View style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
             <Award size={18} color="#2563eb" />
-            <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>如何提升信用分</Text>
+            <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>如何提升职业信用分</Text>
           </View>
           <View style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             {creditTips.map((item, i) => (
