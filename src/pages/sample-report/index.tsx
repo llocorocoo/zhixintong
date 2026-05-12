@@ -2,7 +2,6 @@ import { View, Text, ScrollView } from '@tarojs/components'
 import { FC } from 'react'
 import {
   CircleCheck,
-  CircleAlert,
   UserCheck,
   Building,
   Award,
@@ -47,14 +46,17 @@ const DIMENSIONS = [
         status: 'verified',
         items: [
           { school: '中国xx大学', major: '计算机科学与技术', degree: '本科', status: 'verified' },
-          { school: '中国xx大学', major: '计算机科学与技术', degree: '硕士', status: 'pending' },
+          { school: '中国xx大学', major: '计算机科学与技术', degree: '硕士', status: 'verified' },
         ]
       },
       {
         name: '工作经历核实',
         source: '前雇主核实',
         status: 'verified',
-        result: '最近2段工作经历核实一致',
+        workItems: [
+          { company: '某科技有限公司', position: '产品经理', period: '2022-03 至今', status: 'verified' },
+          { company: '某互联网公司', position: '产品专员', period: '2020-06 ~ 2022-02', status: 'verified' },
+        ]
       },
     ]
   },
@@ -89,17 +91,44 @@ const DIMENSIONS = [
       {
         name: '竞业限制',
         source: '前雇主',
-        status: 'verified',
+        status: 'warn',
+        result: '发现1条竞业协议记录，且存在违约被诉情况',
+        detail: {
+          rows: [
+            { label: '涉及企业', value: '某科技有限公司' },
+            { label: '协议状态', value: '是' },
+            { label: '案号', value: '（2025）京0105民初38921号' },
+            { label: '案由', value: '竞业限制纠纷' },
+            { label: '当事人身份', value: '被告' },
+            { label: '审理法院', value: '北京市海淀区人民法院' },
+          ]
+        }
       },
       {
         name: '前雇主违纪记录',
         source: '前雇主评价',
-        status: 'verified',
+        status: 'warn',
+        result: '发现1条违纪记录',
+        detail: {
+          rows: [
+            { label: '涉及企业', value: '某科技有限公司' },
+            { label: '违纪情况', value: '是（违规操作，严重违纪）' },
+          ]
+        }
       },
       {
-        name: '税务不良记录',
-        source: '税务公开信息',
-        status: 'verified',
+        name: '行政合规记录',
+        source: '税务、市场监管公开信息',
+        status: 'warn',
+        result: '发现1条公示期内行政处罚记录',
+        detail: {
+          rows: [
+            { label: '处罚机关', value: '北京市市场监督管理局' },
+            { label: '处罚内容', value: '虚假宣传，罚款人民币20,000元' },
+            { label: '处罚日期', value: '2024-11-15' },
+            { label: '负面类型', value: '行政处罚（公示期内）' },
+          ]
+        }
       },
     ]
   },
@@ -112,13 +141,13 @@ const DIMENSIONS = [
     borderColor: 'border-red-100',
     features: [
       {
-        name: '司法诉讼及劳动争议',
-        source: '司法数据、执行信息公开网、劳动仲裁数据',
+        name: '司法诉讼',
+        source: '司法数据、执行信息公开网',
         status: 'warn',
-        result: '发现1条民事诉讼记录，未发现劳动争议记录',
+        result: '发现1条民事诉讼记录',
         detail: {
-          label: '（2023）京0105民初12856号',
           rows: [
+            { label: '案件编号', value: '（2023）京0105民初12856号' },
             { label: '案由', value: '合同纠纷' },
             { label: '当事人身份', value: '原告' },
             { label: '审理法院', value: '北京市朝阳区人民法院' },
@@ -127,24 +156,73 @@ const DIMENSIONS = [
         }
       },
       {
-        name: '关联企业',
-        source: '工商数据、社保记录',
-        status: 'verified',
-      },
-      {
-        name: '个人征信',
-        source: '征信中心（授权查询）',
-        status: 'verified',
-      },
-      {
-        name: '黑名单核查',
-        source: '阳光诚信、反舞弃联盟等',
-        status: 'verified',
+        name: '法院被执行人',
+        source: '执行信息公开网',
+        status: 'warn',
+        details: [
+          {
+            label: '发现1条已结案被执行记录',
+            rows: [
+              { label: '案件编号', value: '（2025）京0108执字18833号' },
+              { label: '执行法院', value: '北京市海淀区人民法院' },
+              { label: '案件状态', value: '执行完毕' },
+            ]
+          },
+          {
+            label: '发现1条被执行记录',
+            rows: [
+              { label: '案件编号', value: '（2025）京0108执字18833号' },
+              { label: '执行法院', value: '北京市海淀区人民法院' },
+              { label: '执行标的', value: '人民币85,000元' },
+              { label: '案件状态', value: '执行中' },
+              { label: '立案时间', value: '2025-09-12' },
+            ]
+          },
+        ]
       },
       {
         name: '犯罪记录',
         source: '公安数据',
         status: 'verified',
+        result: '未发现犯罪记录',
+      },
+      {
+        name: '关联企业',
+        source: '工商数据、社保记录',
+        status: 'warn',
+        result: '发现关联企业存在异常情况',
+        detail: {
+          rows: [
+            { label: '企业名称', value: '北京某某文化传媒有限公司' },
+            { label: '担任职务', value: '法定代表人' },
+            { label: '企业状态', value: '注销' },
+          ]
+        }
+      },
+      {
+        name: '劳动争议记录',
+        source: '劳动仲裁数据',
+        status: 'warn',
+        result: '发现1条劳动仲裁记录',
+        detail: {
+          rows: [
+            { label: '争议记录', value: '劳动合同解除纠纷仲裁' },
+            { label: '核实说明', value: '被申请人（用人单位方）' },
+          ]
+        }
+      },
+      {
+        name: '行业违规记录',
+        source: '行业监管数据',
+        status: 'warn',
+        result: '发现1条行业违规记录',
+        detail: {
+          rows: [
+            { label: '风险等级', value: '3（确认违规）' },
+            { label: '处罚时间', value: '2024-08-20' },
+            { label: '处罚摘要', value: '证券从业期间违反信息披露规定，被中国证监会处理' },
+          ]
+        }
       },
     ]
   },
@@ -169,7 +247,7 @@ const DIMENSIONS = [
         name: '学历层次',
         source: '学信网',
         status: 'verified',
-        result: '本科（已认证）',
+        result: '硕士研究生（已认证）',
       },
     ]
   },
@@ -247,7 +325,6 @@ const SampleReportPage: FC = () => {
               <View>
                 {dim.features.map((feat, idx) => (
                   <View key={idx}>
-                    {/* 特征行 */}
                     <View className="px-4 pt-3 pb-3">
                       {/* 特征名 + 状态 */}
                       <View className="flex items-center justify-between mb-2">
@@ -255,13 +332,33 @@ const SampleReportPage: FC = () => {
                         <StatusBadge status={feat.status} />
                       </View>
 
-                      {/* key-value 信息（身份、稳定性等） */}
+                      {/* key-value 信息 */}
                       {feat.content && (
                         <View className="flex flex-wrap gap-x-4 gap-y-1.5">
                           {feat.content.map((row, i) => (
                             <View key={i} className="flex items-center gap-1">
                               <Text className="text-xs text-gray-500">{row.label}:</Text>
                               <Text className="text-xs text-gray-700">{row.value}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      )}
+
+                      {/* 工作经历列表 */}
+                      {feat.workItems && (
+                        <View className="space-y-2">
+                          {feat.workItems.map((item, i) => (
+                            <View key={i} className="bg-gray-50 rounded-lg p-2.5 flex items-center justify-between">
+                              <View className="flex-1">
+                                <Text className="block text-xs font-medium text-gray-900">{item.company}</Text>
+                                <View className="flex items-center gap-2 mt-0.5">
+                                  <Text className="text-xs text-gray-500">{item.position}</Text>
+                                  <Text className="text-xs text-gray-400">{item.period}</Text>
+                                </View>
+                              </View>
+                              <View className="ml-2 flex-shrink-0">
+                                <StatusBadge status={item.status} />
+                              </View>
                             </View>
                           ))}
                         </View>
@@ -296,23 +393,44 @@ const SampleReportPage: FC = () => {
 
                       {/* 单行结论 */}
                       {feat.result && (
-                        <Text className="text-xs text-gray-600">{feat.result}</Text>
+                        <Text className={`text-xs ${feat.status === 'warn' ? 'text-orange-600 font-medium' : 'text-gray-600'}`}>
+                          {feat.result}
+                        </Text>
                       )}
 
-                      {/* 诉讼等详情展开 */}
+                      {/* 单个详情块 */}
                       {feat.detail && (
                         <View className="mt-2 bg-orange-50 rounded-lg p-3">
-                          <Text className="block text-xs font-medium text-gray-700 mb-1.5">{feat.detail.label}</Text>
+                          {feat.detail.label && (
+                            <Text className="block text-xs font-medium text-gray-700 mb-1.5">{feat.detail.label}</Text>
+                          )}
                           <View className="space-y-1">
                             {feat.detail.rows.map((row, i) => (
                               <View key={i} className="flex items-start gap-2">
                                 <Text className="text-xs text-gray-500 w-16 flex-shrink-0">{row.label}</Text>
-                                <Text className="text-xs text-gray-700">{row.value}</Text>
+                                <Text className="text-xs text-gray-700 flex-1">{row.value}</Text>
                               </View>
                             ))}
                           </View>
                         </View>
                       )}
+
+                      {/* 多个详情块 */}
+                      {feat.details && feat.details.map((d, di) => (
+                        <View key={di} className="mt-2 bg-orange-50 rounded-lg p-3">
+                          {d.label && (
+                            <Text className="block text-xs font-medium text-orange-700 mb-1.5">{d.label}</Text>
+                          )}
+                          <View className="space-y-1">
+                            {d.rows.map((row, i) => (
+                              <View key={i} className="flex items-start gap-2">
+                                <Text className="text-xs text-gray-500 w-16 flex-shrink-0">{row.label}</Text>
+                                <Text className="text-xs text-gray-700 flex-1">{row.value}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        </View>
+                      ))}
 
                     </View>
 
@@ -326,11 +444,10 @@ const SampleReportPage: FC = () => {
           )
         })}
 
-        {/* 报告声明 */}
+        {/* 免责声明 */}
         <View className="bg-gray-50 rounded-xl p-4">
-          <Text className="block text-xs text-gray-400 leading-relaxed text-center">
-            本报告依据授权信息生成，评分结果仅供参考，不作为任何法律依据。{'\n'}
-            数据来源：公安网、学信网、司法数据、征信中心等权威机构。
+          <Text className="block text-xs text-gray-400 leading-relaxed">
+            【免责声明】本报告所载信息均来源于国家权威数据库及被核查人授权信息，数据准确性以原始数据源为准。本报告仅供参考，不构成任何法律意见或决策依据。报告有效期自生成之日起90天，逾期数据可能存在变化。
           </Text>
         </View>
 
