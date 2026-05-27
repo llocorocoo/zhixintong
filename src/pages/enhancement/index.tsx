@@ -181,7 +181,7 @@ const EnhancementPage: FC = () => {
       category: 'safety',
       dimension: '安全性',
       title: '授权诉讼与黑名单核查',
-      description: '主动授权系统核查诉讼记录和失信被执行人名单，无记录可显著提升安全性评分',
+      description: '主动授权系统核查诉讼记录和法院强制执行名单，无记录可显著提升安全性评分',
       priority: profile.reportGenerated ? 'medium' : 'high',
       status: 'pending',
       action: '/pages/authorize/index',
@@ -267,7 +267,7 @@ const EnhancementPage: FC = () => {
     {
       icon: Shield,
       title: '安全性',
-      desc: '授权核查诉讼记录和失信黑名单，无记录得满分',
+      desc: '授权核查诉讼记录和法院执行限制名单，无记录得满分',
       tag: '重要'
     },
     {
