@@ -1,5 +1,5 @@
 import { View, Text } from '@tarojs/components'
-import { FC, useState, useEffect, useCallback } from 'react'
+import { FC, useState, useEffect, useCallback, useRef } from 'react'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
@@ -26,13 +26,34 @@ const ReportPage: FC = () => {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const { isLoggedIn, userInfo } = useUserStore()
 
+  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
   const fetchLatestReport = useCallback(async () => {
     if (!userInfo?.id) return
     try {
       const res = await Network.request({ url: '/api/report/latest', method: 'POST', data: { userId: userInfo.id } })
-      if (res.data.code === 200 && res.data.data) setReportData(res.data.data)
+      if (res.data.code === 200 && res.data.data) {
+        const data = res.data.data
+        setReportData(data)
+        // 报告完成后停止轮询
+        if (data.status === 'completed' || data.status === 'failed') {
+          if (pollTimerRef.current) { clearInterval(pollTimerRef.current); pollTimerRef.current = null }
+        }
+      }
     } catch {}
   }, [userInfo?.id])
+
+  // 当报告处于 processing/pending 状态时每 2 秒轮询一次
+  useEffect(() => {
+    if (reportData?.status === 'processing' || reportData?.status === 'pending') {
+      if (!pollTimerRef.current) {
+        pollTimerRef.current = setInterval(fetchLatestReport, 1000)
+      }
+    } else {
+      if (pollTimerRef.current) { clearInterval(pollTimerRef.current); pollTimerRef.current = null }
+    }
+    return () => { if (pollTimerRef.current) { clearInterval(pollTimerRef.current); pollTimerRef.current = null } }
+  }, [reportData?.status, fetchLatestReport])
 
   useEffect(() => {
     if (isLoggedIn) fetchLatestReport()

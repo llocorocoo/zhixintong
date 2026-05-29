@@ -40,6 +40,10 @@ export class ReportService {
       updated_at: now,
     }
     this.reports.set(id, report)
+
+    // 演示用：1 秒后自动完成报告生成
+    setTimeout(() => { this.processReport(id) }, 1000)
+
     return { reportId: id, reportNo }
   }
 
@@ -74,6 +78,9 @@ export class ReportService {
     report.education_info = formData.educationList?.length ? formData.educationList : undefined
     report.qualification_info = formData.qualificationList?.length ? formData.qualificationList : undefined
     report.updated_at = new Date().toISOString()
+
+    // 演示用：1 秒后自动完成报告生成
+    setTimeout(() => { this.processReport(report!.id) }, 1000)
 
     return { reportId: report.id, status: 'processing' }
   }
