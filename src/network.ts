@@ -26,7 +26,7 @@ export namespace Network {
         return Taro.request({
             ...option,
             url: createUrl(option.url),
-            header: { ...getAuthHeader(), ...option.header },
+            header: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache', ...getAuthHeader(), ...option.header },
         })
     }
 

@@ -31,7 +31,7 @@ const ReportPage: FC = () => {
   const fetchLatestReport = useCallback(async () => {
     if (!userInfo?.id) return
     try {
-      const res = await Network.request({ url: '/api/report/latest', method: 'POST', data: { userId: userInfo.id } })
+      const res = await Network.request({ url: '/api/report/latest', method: 'POST', data: { userId: userInfo.id, _t: Date.now() } })
       if (res.data.code === 200 && res.data.data) {
         const data = res.data.data
         setReportData(data)
