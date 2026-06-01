@@ -39,7 +39,7 @@ const STATUS_INFO: Record<OrderStatus, { label: string; color: string; bg: strin
 const TABS = [
   { key: 'all',     label: '全部' },
   { key: 'PENDING_PAYMENT', label: '待支付' },
-  { key: 'PAID',    label: '处理中' },
+  { key: 'PAID',    label: '进行中' },
   { key: 'COMPLETED', label: '已完成' },
   { key: 'closed',  label: '已关闭' },
 ]
@@ -49,7 +49,7 @@ const fmtDate = (iso: string) => {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
 }
 
-const CLOSED = new Set(['ABANDONED','FAILED','PAYMENT_CANCELLED','EXPIRED'])
+const CLOSED = new Set(['FAILED','PAYMENT_CANCELLED','EXPIRED'])
 
 const d = (daysAgo: number, h = 10, m = 0) => {
   const t = new Date(); t.setDate(t.getDate() - daysAgo); t.setHours(h, m, 0, 0); return t.toISOString()
@@ -82,12 +82,7 @@ const MOCK_ORDERS: Order[] = [
     failureReason: '支付后未完成授权步骤',
     createdAt: d(3, 17, 10), updatedAt: d(3, 17, 45), paidAt: d(3, 17, 13),
   },
-  {
-    orderId: 'mock-006', orderType: 'personal_query', status: 'FAILED',
-    amount: 50, completionProgress: 60,
-    failureReason: '信息核验失败，请重新提交',
-    createdAt: d(5, 8, 0), updatedAt: d(4, 20, 0), paidAt: d(5, 8, 3),
-  },
+
   {
     orderId: 'mock-007', orderType: 'personal_query', status: 'PAYMENT_CANCELLED',
     amount: 50, completionProgress: 0,
@@ -125,6 +120,7 @@ const OrdersPage: FC = () => {
   const filtered = orders.filter(o => {
     if (activeTab === 'all') return true
     if (activeTab === 'closed') return CLOSED.has(o.status)
+    if (activeTab === 'PAID') return o.status === 'PAID' || o.status === 'ABANDONED'
     return o.status === activeTab
   })
 
