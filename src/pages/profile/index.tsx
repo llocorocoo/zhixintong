@@ -6,7 +6,7 @@ import { useUserStore } from '@/stores/user'
 
 import {
   User, Shield, ChevronRight, LogOut,
-  Settings, CircleAlert, PenLine
+  Settings, CircleAlert, PenLine, ShoppingBag
 } from 'lucide-react-taro'
 
 const ProfilePage: FC = () => {
@@ -28,6 +28,7 @@ const ProfilePage: FC = () => {
   }
 
   const menuItems = [
+    { id: 'orders',   icon: ShoppingBag, title: '我的订单', desc: '查看所有服务订单', color: '#7c3aed', bg: '#f5f3ff', action: () => Taro.navigateTo({ url: '/pages/orders/index' }) },
     { id: 'privacy',  icon: Shield,      title: '隐私设置', desc: '数据授权管理',   color: '#2563eb', bg: '#eff6ff', action: () => Taro.navigateTo({ url: '/pages/privacy/index' }) },
     { id: 'account',  icon: Settings,    title: '账户设置', desc: '密码、安全设置', color: '#64748b', bg: '#f1f5f9', action: () => Taro.navigateTo({ url: '/pages/account-settings/index' }) },
     { id: 'help',     icon: CircleAlert, title: '帮助中心', desc: '常见问题与反馈', color: '#059669', bg: '#f0fdf4', action: () => Taro.navigateTo({ url: '/pages/help-center/index' }) },

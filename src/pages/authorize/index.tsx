@@ -6,6 +6,7 @@ import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import { useReportFormStore } from '@/stores/report-form'
 import { useEnhancementFormStore } from '@/stores/enhancement-form'
+import { useCurrentOrderStore } from '@/stores/current-order'
 
 const AGREEMENT = `《信息核查授权书》
 
@@ -79,6 +80,9 @@ const AuthorizePage: FC = () => {
   const handleAgree = async () => {
     if (!canAgree || !isChecked || submitting) return
     setSubmitting(true)
+    const orderId = useCurrentOrderStore.getState().orderId
+    const completeOrder = () => orderId && Network.request({ url: '/api/order/complete', method: 'POST', data: { orderId } }).catch(() => {})
+    const failOrder = (reason: string) => orderId && Network.request({ url: '/api/order/fail', method: 'POST', data: { orderId, reason } }).catch(() => {})
     try {
       if (isEnhancement) {
         const { educationItems, certItems, workItems, clearAll } = useEnhancementFormStore.getState()
@@ -102,6 +106,7 @@ const AuthorizePage: FC = () => {
           })))
         }
         await Promise.all(tasks)
+        await completeOrder()
         clearAll()
         setEnhancementPending(true)
         Taro.redirectTo({ url: '/pages/query-progress/index?from=enhancement' })
@@ -110,13 +115,16 @@ const AuthorizePage: FC = () => {
           ? await Network.request({ url: '/api/report/create', method: 'POST', data: { userId: userInfo?.id } })
           : await Network.request({ url: '/api/report/submit', method: 'POST', data: pendingData || {} })
         if (res.data.code === 200) {
+          await completeOrder()
           if (!isUpdate) clearPendingData()
           Taro.redirectTo({ url: '/pages/query-progress/index' })
         } else {
+          await failOrder(res.data.message || '提交失败')
           Taro.showToast({ title: res.data.message || '提交失败', icon: 'none' })
         }
       }
     } catch {
+      await failOrder('处理失败，请重试')
       Taro.showToast({ title: '提交失败，请重试', icon: 'none' })
     } finally {
       setSubmitting(false)

@@ -1,7 +1,9 @@
 import { View, Text } from '@tarojs/components'
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 import Taro from '@tarojs/taro'
+import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
+import { useCurrentOrderStore } from '@/stores/current-order'
 import { Shield, Smartphone, CircleCheck, X } from 'lucide-react-taro'
 
 const PaymentPage: FC = () => {
@@ -16,6 +18,22 @@ const PaymentPage: FC = () => {
   const type = params.type || 'create'
   const isUpdate = type === 'update'
   const isEnhancement = type === 'enhancement'
+  const { userInfo } = useUserStore()
+  const { setOrderId } = useCurrentOrderStore()
+
+  // 进入支付页时创建订单（若已有 orderId 则跳过）
+  useEffect(() => {
+    if (!userInfo?.id) return
+    const existingOrderId = params.orderId as string | undefined
+    if (existingOrderId) { setOrderId(existingOrderId); return }
+    const orderType = isEnhancement ? 'credit_boost' : 'personal_query'
+    Network.request({
+      url: '/api/order/create', method: 'POST',
+      data: { userId: userInfo.id, orderType, amount: parseFloat(price), serviceDetails: { type } },
+    }).then(res => {
+      if (res.data.code === 200) setOrderId(res.data.data.orderId)
+    }).catch(() => {})
+  }, [])
 
   const payMethods = [
     { id: 'wechat', name: '微信支付', sub: '推荐', icon: Smartphone, color: '#07c160', bg: '#f0fdf4' },
@@ -29,6 +47,11 @@ const PaymentPage: FC = () => {
     try {
       Taro.showLoading({ title: '支付处理中...' })
       await new Promise(resolve => setTimeout(resolve, 1500))
+      // 标记订单为已支付
+      const orderId = useCurrentOrderStore.getState().orderId
+      if (orderId) {
+        await Network.request({ url: '/api/order/pay', method: 'POST', data: { orderId, paymentMethod: payMethod } }).catch(() => {})
+      }
       Taro.hideLoading()
       setShowConfirm(false)
       Taro.showToast({ title: '支付成功', icon: 'success' })

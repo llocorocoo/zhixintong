@@ -7,6 +7,7 @@ import { ReportModule } from '@/modules/report/report.module';
 import { ResumeModule } from '@/modules/resume/resume.module';
 import { EnhancementModule } from '@/modules/enhancement/enhancement.module';
 import { UploadModule } from '@/modules/upload/upload.module';
+import { OrderModule } from '@/modules/order/order.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { UploadModule } from '@/modules/upload/upload.module';
     ReportModule,
     ResumeModule,
     EnhancementModule,
-    UploadModule
+    UploadModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

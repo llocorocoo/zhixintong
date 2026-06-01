@@ -22,7 +22,9 @@ export default defineAppConfig({
     'pages/account-settings/index',
     'pages/help-center/index',
     'pages/payment/index',
-    'pages/profile/index'
+    'pages/profile/index',
+    'pages/orders/index',
+    'pages/order-detail/index'
   ],
   window: {
     backgroundTextStyle: 'light',
