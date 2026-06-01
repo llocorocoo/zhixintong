@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
-export interface SavedEducation {
+export interface SavedEducationItem {
+  id: string
   degree: string
   diplomaCertNo: string
   degreeCertNo: string
@@ -22,21 +23,21 @@ export interface SavedWorkItem {
 }
 
 interface EnhancementFormStore {
-  education: SavedEducation | null
+  educationItems: SavedEducationItem[] | null
   certItems: SavedCertItem[] | null
   workItems: SavedWorkItem[] | null
-  saveEducation: (data: SavedEducation) => void
+  saveEducation: (items: SavedEducationItem[]) => void
   saveCert: (items: SavedCertItem[]) => void
   saveWork: (items: SavedWorkItem[]) => void
   clearAll: () => void
 }
 
 export const useEnhancementFormStore = create<EnhancementFormStore>((set) => ({
-  education: null,
+  educationItems: null,
   certItems: null,
   workItems: null,
-  saveEducation: (data) => set({ education: data }),
+  saveEducation: (items) => set({ educationItems: items }),
   saveCert: (items) => set({ certItems: items }),
   saveWork: (items) => set({ workItems: items }),
-  clearAll: () => set({ education: null, certItems: null, workItems: null }),
+  clearAll: () => set({ educationItems: null, certItems: null, workItems: null }),
 }))

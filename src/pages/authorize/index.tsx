@@ -81,13 +81,13 @@ const AuthorizePage: FC = () => {
     setSubmitting(true)
     try {
       if (isEnhancement) {
-        const { education, certItems, workItems, clearAll } = useEnhancementFormStore.getState()
+        const { educationItems, certItems, workItems, clearAll } = useEnhancementFormStore.getState()
         const tasks: Promise<any>[] = []
-        if (education) {
-          tasks.push(Network.request({
+        if (educationItems) {
+          educationItems.forEach(e => tasks.push(Network.request({
             url: '/api/enhancement/educations/add', method: 'POST',
-            data: { userId: userInfo?.id, degree: education.degree, diplomaCertNo: education.diplomaCertNo, degreeCertNo: education.degreeCertNo },
-          }))
+            data: { userId: userInfo?.id, degree: e.degree, diplomaCertNo: e.diplomaCertNo, degreeCertNo: e.degreeCertNo },
+          })))
         }
         if (certItems) {
           certItems.forEach(c => tasks.push(Network.request({

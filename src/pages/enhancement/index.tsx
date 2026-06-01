@@ -10,7 +10,7 @@ import {
 
 const EnhancementPage: FC = () => {
   const { isLoggedIn } = useUserStore()
-  const { education, certItems, workItems } = useEnhancementFormStore()
+  const { educationItems, certItems, workItems } = useEnhancementFormStore()
   const [pressedId, setPressedId] = useState<string | null>(null)
   const press = (id: string) => setPressedId(id)
   const release = () => setPressedId(null)
@@ -29,7 +29,7 @@ const EnhancementPage: FC = () => {
       action: '/pages/education-form/index',
       actionText: '去认证',
       icon: GraduationCap,
-      saved: !!education,
+      saved: !!educationItems,
     },
     {
       id: 'cert',
