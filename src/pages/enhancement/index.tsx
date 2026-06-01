@@ -4,9 +4,9 @@ import Taro, { useDidShow } from '@tarojs/taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import {
-  Shield, Award, GraduationCap,
+  GraduationCap,
   CircleCheck, ChevronRight, Target,
-  UserCheck, Building, Medal, FileSearch
+  Building, Medal, FileSearch
 } from 'lucide-react-taro'
 
 interface EnhancementSuggestion {
@@ -170,39 +170,6 @@ const EnhancementPage: FC = () => {
     }
   }
 
-  const creditTips = [
-    {
-      icon: UserCheck,
-      title: '真实性',
-      desc: '完成身份认证和学历核验，确保个人信息真实可信',
-      tag: '基础'
-    },
-    {
-      icon: Building,
-      title: '稳定性',
-      desc: '完整记录工作履历，体现连续稳定的职业发展轨迹',
-      tag: '重要'
-    },
-    {
-      icon: Award,
-      title: '合规性',
-      desc: '如实填写离职及竞业协议情况，保持职业行为合规',
-      tag: '重要'
-    },
-    {
-      icon: Shield,
-      title: '安全性',
-      desc: '授权核查诉讼记录和法院执行限制名单，无记录得满分',
-      tag: '重要'
-    },
-    {
-      icon: Medal,
-      title: '专业性',
-      desc: '添加职业资格证书、学历证明，展示专业能力',
-      tag: '加分'
-    },
-  ]
-
   const [pressedId, setPressedId] = useState<string | null>(null)
   const press = (id: string) => setPressedId(id)
   const release = () => setPressedId(null)
@@ -212,8 +179,6 @@ const EnhancementPage: FC = () => {
     medium: { bg: 'rgba(217,119,6,0.1)',  color: '#d97706', label: '建议' },
     low:    { bg: 'rgba(100,116,139,0.1)', color: '#64748b', label: '可选' },
   }
-
-  const TIP_COLORS = ['#2563eb','#7c3aed','#d97706','#dc2626','#059669']
 
   return (
     <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
@@ -298,34 +263,6 @@ const EnhancementPage: FC = () => {
           </View>
         </View>
 
-        {/* ── 如何提升职业信用分（2列网格）── */}
-        <View style={{ background: '#fff', borderRadius: '20px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
-          <View style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-            <Award size={18} color="#2563eb" />
-            <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>如何提升职业信用分</Text>
-          </View>
-          <View style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            {creditTips.map((item, i) => (
-              <View
-                key={i}
-                style={{ background: '#f8fafc', borderRadius: '14px', padding: '12px', transform: pressedId === `tip-${i}` ? 'scale(0.97)' : 'scale(1)', transition: 'all 0.2s ease' }}
-                onTouchStart={() => press(`tip-${i}`)} onTouchEnd={release} onTouchCancel={release}
-                onClick={() => handleNavigate('/pages/work-history/index')}
-              >
-                <View style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${TIP_COLORS[i]}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
-                  <item.icon size={18} color={TIP_COLORS[i]} />
-                </View>
-                <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <Text style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', lineHeight: '1.4' }}>{item.title}</Text>
-                  <View style={{ background: TIP_COLORS[i] + '18', borderRadius: '6px', padding: '1px 6px' }}>
-                    <Text style={{ fontSize: '10px', fontWeight: '600', color: TIP_COLORS[i], lineHeight: '1.5' }}>{item.tag}</Text>
-                  </View>
-                </View>
-                <Text style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.6' }}>{item.desc}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
 
 
       </View>
