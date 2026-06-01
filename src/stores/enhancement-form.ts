@@ -3,7 +3,6 @@ import { create } from 'zustand'
 export interface SavedEducationItem {
   id: string
   isAbroad: boolean
-  degree?: string
   diplomaCertNo?: string
   degreeCertNo?: string
   abroadCertNo?: string

@@ -1,15 +1,12 @@
-import { View, Text, Picker, Input } from '@tarojs/components'
+import { View, Text, Input } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { useEnhancementFormStore } from '@/stores/enhancement-form'
-import { GraduationCap, ChevronRight, Plus, Trash2 } from 'lucide-react-taro'
-
-const EDU_OPTIONS = ['高中', '大专', '本科', '硕士', '博士']
+import { Plus, Trash2 } from 'lucide-react-taro'
 
 interface EduItem {
   id: string
   isAbroad: boolean
-  degreeIndex: number
   diplomaCertNo: string
   degreeCertNo: string
   abroadCertNo: string
@@ -18,7 +15,7 @@ interface EduItem {
 const genId = () => Math.random().toString(36).substring(2, 9)
 const emptyEdu = (): EduItem => ({
   id: genId(), isAbroad: false,
-  degreeIndex: 2, diplomaCertNo: '', degreeCertNo: '', abroadCertNo: '',
+  diplomaCertNo: '', degreeCertNo: '', abroadCertNo: '',
 })
 
 const Field: FC<{ label: string; required?: boolean; children: React.ReactNode }> = ({ label, required, children }) => (
@@ -62,7 +59,7 @@ const EducationFormPage: FC = () => {
     saveEducation(filled.map(e => ({
       id: e.id,
       isAbroad: e.isAbroad,
-      degree: e.isAbroad ? undefined : EDU_OPTIONS[e.degreeIndex],
+
       diplomaCertNo: e.isAbroad ? undefined : e.diplomaCertNo.trim(),
       degreeCertNo: e.isAbroad ? undefined : e.degreeCertNo.trim(),
       abroadCertNo: e.isAbroad ? e.abroadCertNo.trim() : undefined,
@@ -125,23 +122,6 @@ const EducationFormPage: FC = () => {
                 {/* 境内：学历层次 + 学历证书编号 + 学位证书编号 */}
                 {!edu.isAbroad && (
                   <>
-                    <Field label="学历层次" required>
-                      <Picker
-                        mode="selector"
-                        range={EDU_OPTIONS}
-                        value={edu.degreeIndex}
-                        onChange={e => setItem(edu.id, { degreeIndex: Number(e.detail.value) })}
-                      >
-                        <View style={inputBox(false)}>
-                          <GraduationCap size={18} color="#6b7280" />
-                          <Text style={{ flex: 1, fontSize: '14px', color: '#111827', lineHeight: '1.5' }}>
-                            {EDU_OPTIONS[edu.degreeIndex]}
-                          </Text>
-                          <ChevronRight size={16} color="#9ca3af" />
-                        </View>
-                      </Picker>
-                    </Field>
-
                     <Field label="学历证书编号" required>
                       <View style={inputBox(focusedField === `${edu.id}-diploma`)}>
                         <Input
