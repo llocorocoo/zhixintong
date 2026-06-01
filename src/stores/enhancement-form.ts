@@ -21,6 +21,8 @@ export interface SavedWorkItem {
   startDate: string
   endDate: string
   description: string
+  refName: string
+  refContact: string
 }
 
 interface EnhancementFormStore {

@@ -12,10 +12,12 @@ interface WorkItem {
   startDate: string
   endDate: string
   description: string
+  refName: string
+  refContact: string
 }
 
 const genId = () => Math.random().toString(36).substring(2, 9)
-const emptyWork = (): WorkItem => ({ id: genId(), company: '', position: '', startDate: '', endDate: '', description: '' })
+const emptyWork = (): WorkItem => ({ id: genId(), company: '', position: '', startDate: '', endDate: '', description: '', refName: '', refContact: '' })
 
 const YEARS = Array.from({ length: 30 }, (_, i) => String(new Date().getFullYear() - i))
 const MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
@@ -99,7 +101,7 @@ const WorkFormPage: FC = () => {
       Taro.showToast({ title: '请填写公司名称和职位', icon: 'none' })
       return
     }
-    saveWork(filled)
+    saveWork(filled.map(w => ({ ...w })))
     Taro.showToast({ title: '已保存', icon: 'success' })
     setTimeout(() => Taro.navigateBack(), 800)
   }
@@ -202,6 +204,32 @@ const WorkFormPage: FC = () => {
                         <Text style={{ fontSize: '13px', fontWeight: '500', color: work.endDate === '至今' ? '#fff' : '#64748b', lineHeight: '1.5' }}>至今</Text>
                       </View>
                     </View>
+                  </Field>
+
+                  {/* 证明人姓名 */}
+                  <Field label="证明人姓名">
+                    <InputBox focused={focusField === `${work.id}-refName`}>
+                      <Input
+                        style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
+                        placeholder="请输入证明人姓名" placeholderStyle="color:#cbd5e1;"
+                        value={work.refName}
+                        onFocus={() => setFocusField(`${work.id}-refName`)} onBlur={() => setFocusField(null)}
+                        onInput={e => setWork(work.id, 'refName', e.detail.value)}
+                      />
+                    </InputBox>
+                  </Field>
+
+                  {/* 证明人联系方式 */}
+                  <Field label="证明人联系方式">
+                    <InputBox focused={focusField === `${work.id}-refContact`}>
+                      <Input
+                        style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
+                        placeholder="请输入证明人手机号或邮箱" placeholderStyle="color:#cbd5e1;"
+                        value={work.refContact}
+                        onFocus={() => setFocusField(`${work.id}-refContact`)} onBlur={() => setFocusField(null)}
+                        onInput={e => setWork(work.id, 'refContact', e.detail.value)}
+                      />
+                    </InputBox>
                   </Field>
 
                   {/* 工作职责及内容 */}
