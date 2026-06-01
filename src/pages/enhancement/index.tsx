@@ -260,7 +260,6 @@ const EnhancementPage: FC = () => {
               <View style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {/* 建议列表 */}
                 {suggestions.map(item => {
-                  const ps = PRIORITY_STYLE[item.priority] || PRIORITY_STYLE.low
                   return (
                     <View
                       key={item.id}
@@ -272,11 +271,8 @@ const EnhancementPage: FC = () => {
                         <item.icon size={20} color="#2563eb" />
                       </View>
                       <View style={{ flex: 1, minWidth: 0 }}>
-                        <View style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                          <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.4', flex: 1 }}>{item.title}</Text>
-                          <View style={{ background: ps.bg, borderRadius: '20px', padding: '2px 8px', flexShrink: 0 }}>
-                            <Text style={{ fontSize: '11px', fontWeight: '600', color: ps.color, lineHeight: '1.5' }}>{ps.label}</Text>
-                          </View>
+                        <View style={{ marginBottom: '4px' }}>
+                          <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.4' }}>{item.title}</Text>
                         </View>
                         <View style={{ background: 'rgba(37,99,235,0.08)', borderRadius: '6px', padding: '1px 6px', display: 'inline-flex', marginBottom: '6px' }}>
                           <Text style={{ fontSize: '11px', color: '#2563eb', lineHeight: '1.5' }}>{item.dimension}</Text>
