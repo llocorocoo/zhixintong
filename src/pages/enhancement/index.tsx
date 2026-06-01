@@ -106,7 +106,7 @@ const EnhancementPage: FC = () => {
         description: '通过学信网核验学历学位，提升个人信息真实性评分',
         priority: 'high',
         status: 'missing',
-        action: '/pages/work-history/index?tab=education',
+        action: '/pages/education-form/index',
         actionText: '去认证',
         icon: GraduationCap
       },

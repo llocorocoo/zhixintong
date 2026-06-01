@@ -11,6 +11,7 @@ export default defineAppConfig({
     'pages/resume/index',
     'pages/resume-edit/index',
     'pages/enhancement/index',
+    'pages/education-form/index',
     'pages/work-history/index',
     'pages/credit-repair/index',
     'pages/profile-edit/index',

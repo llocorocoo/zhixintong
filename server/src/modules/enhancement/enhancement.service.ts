@@ -37,11 +37,26 @@ export interface Certificate {
   created_at: string
 }
 
+export interface Education {
+  id: string
+  user_id: string
+  degree: string
+  diploma_cert_no?: string
+  degree_cert_no?: string
+  school: string
+  major: string
+  start_date: string
+  end_date?: string
+  is_verified: boolean
+  created_at: string
+}
+
 @Injectable()
 export class EnhancementService {
   private enhancements = new Map<string, Enhancement[]>()
   private workHistories = new Map<string, WorkHistory[]>()
   private certificates = new Map<string, Certificate[]>()
+  private educations = new Map<string, Education[]>()
 
   async getEnhancements(userId: string) {
     return this.enhancements.get(userId) || []
@@ -95,7 +110,6 @@ export class EnhancementService {
     const list = this.workHistories.get(userId) || []
     list.push(item)
     this.workHistories.set(userId, list)
-
     return {
       id: item.id,
       company: item.company,
@@ -152,7 +166,6 @@ export class EnhancementService {
     const list = this.certificates.get(userId) || []
     list.push(item)
     this.certificates.set(userId, list)
-
     return {
       id: item.id,
       name: item.name,
@@ -167,6 +180,53 @@ export class EnhancementService {
   async deleteCertificate(userId: string, certId: string) {
     const list = this.certificates.get(userId) || []
     const idx = list.findIndex(c => c.id === certId)
+    if (idx >= 0) list.splice(idx, 1)
+    return { success: true }
+  }
+
+  async getEducations(userId: string) {
+    const list = this.educations.get(userId) || []
+    return list.map(item => ({
+      id: item.id,
+      degree: item.degree,
+      school: item.school,
+      major: item.major,
+      startDate: item.start_date,
+      endDate: item.end_date,
+      status: item.is_verified ? 'verified' : 'pending',
+      createdAt: item.created_at,
+    }))
+  }
+
+  async addEducation(userId: string, data: any) {
+    const item: Education = {
+      id: randomUUID(),
+      user_id: userId,
+      degree: data.degree,
+      diploma_cert_no: data.diplomaCertNo,
+      degree_cert_no: data.degreeCertNo,
+      school: data.school || '',
+      major: data.major || '',
+      start_date: data.start_date || '',
+      end_date: data.end_date,
+      is_verified: false,
+      created_at: new Date().toISOString(),
+    }
+    const list = this.educations.get(userId) || []
+    list.push(item)
+    this.educations.set(userId, list)
+    return {
+      id: item.id,
+      degree: item.degree,
+      diplomaCertNo: item.diploma_cert_no,
+      degreeCertNo: item.degree_cert_no,
+      status: 'pending',
+    }
+  }
+
+  async deleteEducation(userId: string, eduId: string) {
+    const list = this.educations.get(userId) || []
+    const idx = list.findIndex(e => e.id === eduId)
     if (idx >= 0) list.splice(idx, 1)
     return { success: true }
   }
