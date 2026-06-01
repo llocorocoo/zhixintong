@@ -3,11 +3,12 @@ import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { Input } from '@/components/ui/input'
 import { useUserStore } from '@/stores/user'
-import { User, Camera, ChevronRight } from 'lucide-react-taro'
+import { User, Camera, ChevronRight, Mail } from 'lucide-react-taro'
 
 const ProfileEditPage: FC = () => {
   const { userInfo, setUserInfo } = useUserStore()
   const [name, setName] = useState(userInfo?.name || '')
+  const [email, setEmail] = useState(userInfo?.email || '')
   const [gender, setGender] = useState('男')
   const [saving, setSaving] = useState(false)
   const [btnPressed, setBtnPressed] = useState(false)
@@ -17,7 +18,7 @@ const ProfileEditPage: FC = () => {
     if (!name.trim()) { Taro.showToast({ title: '姓名不能为空', icon: 'none' }); return }
     setSaving(true)
     await new Promise(r => setTimeout(r, 600))
-    setUserInfo({ ...userInfo!, name: name.trim() })
+    setUserInfo({ ...userInfo!, name: name.trim(), email: email.trim() || undefined })
     setSaving(false)
     Taro.showToast({ title: '保存成功', icon: 'success' })
     setTimeout(() => Taro.navigateBack(), 800)
@@ -68,6 +69,16 @@ const ProfileEditPage: FC = () => {
               <Text style={{ fontSize: '12px', color: '#2563eb', lineHeight: '1.5' }}>更换</Text>
               <ChevronRight size={13} color="#2563eb" />
             </View>
+          </View>
+
+          {/* 邮箱 */}
+          <View style={{ display: 'flex', alignItems: 'center', padding: '16px 18px', borderBottom: '1px solid #f8fafc' }}>
+            <Text style={{ fontSize: '14px', color: '#64748b', width: '60px', flexShrink: 0, lineHeight: '1.5' }}>邮箱</Text>
+            <Input
+              style={{ flex: 1, fontSize: '14px', color: '#0f172a', background: 'transparent', lineHeight: '1.5' }}
+              placeholder="请输入邮箱地址" placeholderStyle="color:#cbd5e1;"
+              value={email} onInput={e => setEmail(e.detail.value)}
+            />
           </View>
 
           {/* 性别 */}
