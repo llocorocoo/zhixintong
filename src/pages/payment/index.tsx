@@ -15,6 +15,7 @@ const PaymentPage: FC = () => {
   const price = params.price || '50'
   const type = params.type || 'create'
   const isUpdate = type === 'update'
+  const isEnhancement = type === 'enhancement'
 
   const payMethods = [
     { id: 'wechat', name: '微信支付', sub: '推荐', icon: Smartphone, color: '#07c160', bg: '#f0fdf4' },
@@ -32,9 +33,13 @@ const PaymentPage: FC = () => {
       setShowConfirm(false)
       Taro.showToast({ title: '支付成功', icon: 'success' })
       setTimeout(() => {
-        isUpdate
-          ? Taro.redirectTo({ url: '/pages/authorize/index?type=update' })
-          : Taro.redirectTo({ url: '/pages/privacy-notice/index' })
+        if (isEnhancement) {
+          Taro.redirectTo({ url: '/pages/authorize/index?type=enhancement' })
+        } else if (isUpdate) {
+          Taro.redirectTo({ url: '/pages/authorize/index?type=update' })
+        } else {
+          Taro.redirectTo({ url: '/pages/privacy-notice/index' })
+        }
       }, 1000)
     } catch {
       Taro.showToast({ title: '支付失败，请重试', icon: 'none' })
@@ -48,7 +53,7 @@ const PaymentPage: FC = () => {
 
       {/* 顶部金额展示 */}
       <View style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', paddingTop: '48px', paddingBottom: '80px', paddingLeft: '16px', paddingRight: '16px' }}>
-        <Text className="block text-blue-200 text-sm mb-2">{isUpdate ? '更新职业信用报告' : '生成职业信用报告'}</Text>
+        <Text className="block text-blue-200 text-sm mb-2">{isEnhancement ? '职业信用增信服务' : isUpdate ? '更新职业信用报告' : '生成职业信用报告'}</Text>
         <View className="flex items-end gap-1">
           <Text className="text-white text-lg font-medium">¥</Text>
           <Text className="text-white font-bold" style={{ fontSize: '48px', lineHeight: '1' }}>{price}</Text>
@@ -64,7 +69,7 @@ const PaymentPage: FC = () => {
             <Text className="text-base font-bold text-gray-900">订单信息</Text>
           </View>
           {[
-            { label: '商品', value: isUpdate ? '信用报告更新服务' : '职业信用报告生成服务' },
+            { label: '商品', value: isEnhancement ? '职业信用增信服务' : isUpdate ? '信用报告更新服务' : '职业信用报告生成服务' },
             { label: '用户', value: userInfo?.name || userInfo?.phone || '用户' },
           ].map((row, i) => (
             <View key={i} className="flex items-center justify-between py-3 border-b border-gray-50">

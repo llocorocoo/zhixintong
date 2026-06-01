@@ -1,183 +1,63 @@
 import { View, Text } from '@tarojs/components'
-import { FC, useState, useEffect, useCallback } from 'react'
-import Taro, { useDidShow } from '@tarojs/taro'
-import { Network } from '@/network'
+import { FC, useState, useEffect } from 'react'
+import Taro from '@tarojs/taro'
 import { useUserStore } from '@/stores/user'
+import { useEnhancementFormStore } from '@/stores/enhancement-form'
 import {
-  GraduationCap,
-  CircleCheck, ChevronRight, Target,
-  Building, Medal, FileSearch
+  GraduationCap, Medal, Building,
+  ChevronRight, Target, Zap, CircleCheck
 } from 'lucide-react-taro'
 
-interface EnhancementSuggestion {
-  id: string
-  category: 'authenticity' | 'stability' | 'compliance' | 'safety' | 'expertise'
-  dimension: string
-  title: string
-  description: string
-  priority: 'high' | 'medium' | 'low'
-  status: 'missing' | 'incomplete' | 'pending'
-  action: string
-  actionText: string
-  icon: any
-}
-
-interface CreditProfile {
-  totalScore: number
-  maxScore: number
-  verifiedItems: number
-  totalItems: number
-  lastReportDate?: string
-  identityVerified: boolean
-  educationVerified: boolean
-  workRecordsCount: number
-  certsCount: number
-  reportGenerated: boolean
-}
-
 const EnhancementPage: FC = () => {
-  const { isLoggedIn, userInfo } = useUserStore()
-  const [creditProfile, setCreditProfile] = useState<CreditProfile | null>(null)
-  const [suggestions, setSuggestions] = useState<EnhancementSuggestion[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const fetchCreditProfile = useCallback(async () => {
-    if (!userInfo?.id) return
-    setLoading(true)
-    try {
-      const res = await Network.request({
-        url: '/api/credit/score',
-        method: 'POST',
-        data: { userId: userInfo.id }
-      })
-
-      if (res.data.code === 200 && res.data.data) {
-        // 有信用评分，说明已生成报告
-        const score = res.data.data.score as number
-        const profile: CreditProfile = {
-          totalScore: Math.round((score - 350) / (940 - 350) * 100),
-          maxScore: 100,
-          verifiedItems: 5,
-          totalItems: 8,
-          lastReportDate: new Date().toISOString(),
-          identityVerified: true,
-          educationVerified: true,
-          workRecordsCount: 2,
-          certsCount: 1,
-          reportGenerated: true
-        }
-        setCreditProfile(profile)
-        generateSuggestions(profile)
-      } else {
-        // 没有信用评分，尚未生成报告
-        setCreditProfile(null)
-        setSuggestions([])
-      }
-    } catch (error) {
-      console.error('获取信用评分失败:', error)
-      setCreditProfile(null)
-      setSuggestions([])
-    } finally {
-      setLoading(false)
-    }
-  }, [userInfo?.id])
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      Taro.redirectTo({ url: '/pages/login/index' })
-      return
-    }
-    fetchCreditProfile()
-  }, [isLoggedIn, fetchCreditProfile])
-
-  useDidShow(() => {
-    if (isLoggedIn) {
-      fetchCreditProfile()
-    }
-  })
-
-  const generateSuggestions = (_profile: CreditProfile) => {
-    setSuggestions([
-      {
-        id: 'education',
-        category: 'authenticity',
-        dimension: '真实性',
-        title: '完善学历认证',
-        description: '通过学信网核验学历学位，提升个人信息真实性评分',
-        priority: 'high',
-        status: 'missing',
-        action: '/pages/education-form/index',
-        actionText: '去认证',
-        icon: GraduationCap
-      },
-      {
-        id: 'certs',
-        category: 'expertise',
-        dimension: '专业性',
-        title: '添加职业资格证书',
-        description: '添加行业认可的职业资格证书，有效提升专业性评分',
-        priority: 'high',
-        status: 'missing',
-        action: '/pages/cert-form/index',
-        actionText: '去添加',
-        icon: Medal
-      },
-      {
-        id: 'work',
-        category: 'stability',
-        dimension: '稳定性',
-        title: '添加工作履历',
-        description: '完整记录工作经历，连续稳定的职业轨迹有助于提升稳定性评分',
-        priority: 'medium',
-        status: 'missing',
-        action: '/pages/work-form/index',
-        actionText: '去补充',
-        icon: Building
-      },
-    ])
-  }
-
-  const isReportOutdated = (lastDate: string): boolean => {
-    const last = new Date(lastDate)
-    const now = new Date()
-    const diffMonths = (now.getFullYear() - last.getFullYear()) * 12 + (now.getMonth() - last.getMonth())
-    return diffMonths >= 3
-  }
-
-  const handleNavigate = (path: string) => {
-    Taro.navigateTo({ url: path })
-  }
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-600'
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-600'
-      default:
-        return 'bg-gray-100 text-gray-600'
-    }
-  }
-
-  const getPriorityText = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return '重要'
-      case 'medium':
-        return '建议'
-      default:
-        return '可选'
-    }
-  }
-
+  const { isLoggedIn } = useUserStore()
+  const { education, certItems, workItems } = useEnhancementFormStore()
   const [pressedId, setPressedId] = useState<string | null>(null)
   const press = (id: string) => setPressedId(id)
   const release = () => setPressedId(null)
 
-  const PRIORITY_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-    high:   { bg: 'rgba(220,38,38,0.1)',  color: '#dc2626', label: '重要' },
-    medium: { bg: 'rgba(217,119,6,0.1)',  color: '#d97706', label: '建议' },
-    low:    { bg: 'rgba(100,116,139,0.1)', color: '#64748b', label: '可选' },
+  useEffect(() => {
+    if (!isLoggedIn) {
+      Taro.redirectTo({ url: '/pages/login/index' })
+    }
+  }, [isLoggedIn])
+
+  const ITEMS = [
+    {
+      id: 'education',
+      title: '完善学历认证',
+      desc: '填写学历及学位证书编号，系统将核验并提升真实性评分',
+      action: '/pages/education-form/index',
+      actionText: '去认证',
+      icon: GraduationCap,
+      saved: !!education,
+    },
+    {
+      id: 'cert',
+      title: '添加职业资格证书',
+      desc: '添加行业认可的职业资格证书，提升专业性评分',
+      action: '/pages/cert-form/index',
+      actionText: '去添加',
+      icon: Medal,
+      saved: !!certItems,
+    },
+    {
+      id: 'work',
+      title: '添加工作履历',
+      desc: '完整记录工作经历，体现连续稳定的职业发展轨迹',
+      action: '/pages/work-form/index',
+      actionText: '去补充',
+      icon: Building,
+      saved: !!workItems,
+    },
+  ]
+
+  const savedCount = ITEMS.filter(i => i.saved).length
+  const totalPrice = (savedCount * 9.9).toFixed(1)
+
+  const handleNavigate = (path: string) => Taro.navigateTo({ url: path })
+
+  const handleSubmit = () => {
+    Taro.navigateTo({ url: `/pages/payment/index?type=enhancement&price=${totalPrice}` })
   }
 
   return (
@@ -190,85 +70,77 @@ const EnhancementPage: FC = () => {
         <Text style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', display: 'block', marginTop: '4px', lineHeight: '1.5' }}>完善信用档案，提升职业竞争力</Text>
       </View>
 
-      <View style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <View style={{ padding: '16px 16px 120px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-        {/* ── 个性化增信建议 ── */}
+        {/* ── 如何提升职业信用 ── */}
         <View style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
           <View style={{ padding: '18px 18px 14px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center' }}>
             <Target size={18} color="#2563eb" />
             <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4', marginLeft: '8px' }}>如何提升职业信用</Text>
           </View>
 
-          <View style={{ padding: '16px 18px' }}>
-            {loading ? (
-              <View style={{ padding: '24px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: '13px', color: '#94a3b8', lineHeight: '1.5' }}>分析您的信用档案中...</Text>
-              </View>
-            ) : !creditProfile ? (
-              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 0 8px' }}>
-                <View style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e40af, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', boxShadow: '0 6px 20px rgba(37,99,235,0.3)' }}>
-                  <FileSearch size={32} color="#fff" />
+          <View style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {ITEMS.map(item => (
+              <View
+                key={item.id}
+                style={{ background: '#f8fafc', borderRadius: '16px', padding: '14px', display: 'flex', alignItems: 'flex-start', gap: '12px', transform: pressedId === item.id ? 'scale(0.98)' : 'scale(1)', transition: 'all 0.2s ease' }}
+                onTouchStart={() => press(item.id)} onTouchEnd={release} onTouchCancel={release}
+                onClick={() => handleNavigate(item.action)}
+              >
+                <View style={{ width: '40px', height: '40px', borderRadius: '12px', background: item.saved ? 'rgba(5,150,105,0.1)' : '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <item.icon size={20} color={item.saved ? '#059669' : '#2563eb'} />
                 </View>
-                <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', display: 'block', marginBottom: '8px', lineHeight: '1.4' }}>暂无个性化建议</Text>
-                <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', lineHeight: '1.7', textAlign: 'center', marginBottom: '20px' }}>
-                  生成职业信用报告后，系统将根据您的信用档案提供专属增信建议。
-                </Text>
-                <View
-                  style={{ width: '100%', borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
-                  onTouchStart={() => press('empty-cta')} onTouchEnd={release} onTouchCancel={release}
-                  onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
-                >
-                  <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>前往生成职业信用报告</Text>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <View style={{ marginBottom: '4px' }}>
+                    <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.4' }}>{item.title}</Text>
+                  </View>
+                  <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.6' }}>{item.desc}</Text>
+                  <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '8px', gap: '3px' }}>
+                    {item.saved ? (
+                      <View style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <CircleCheck size={13} color="#059669" />
+                        <Text style={{ fontSize: '12px', color: '#059669', fontWeight: '600', lineHeight: '1.5' }}>已保存</Text>
+                      </View>
+                    ) : (
+                      <>
+                        <Text style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500', lineHeight: '1.5' }}>{item.actionText}</Text>
+                        <ChevronRight size={13} color="#2563eb" />
+                      </>
+                    )}
+                  </View>
                 </View>
               </View>
-            ) : suggestions.length > 0 ? (
-              <View style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {/* 建议列表 */}
-                {suggestions.map(item => {
-                  return (
-                    <View
-                      key={item.id}
-                      style={{ background: '#f8fafc', borderRadius: '16px', padding: '14px', display: 'flex', alignItems: 'flex-start', gap: '12px', transform: pressedId === item.id ? 'scale(0.98)' : 'scale(1)', transition: 'all 0.2s ease' }}
-                      onTouchStart={() => press(item.id)} onTouchEnd={release} onTouchCancel={release}
-                      onClick={() => handleNavigate(item.action)}
-                    >
-                      <View style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <item.icon size={20} color="#2563eb" />
-                      </View>
-                      <View style={{ flex: 1, minWidth: 0 }}>
-                        <View style={{ marginBottom: '4px' }}>
-                          <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.4' }}>{item.title}</Text>
-                        </View>
-                        <View style={{ background: 'rgba(37,99,235,0.08)', borderRadius: '6px', padding: '1px 6px', display: 'inline-flex', marginBottom: '6px' }}>
-                          <Text style={{ fontSize: '11px', color: '#2563eb', lineHeight: '1.5' }}>{item.dimension}</Text>
-                        </View>
-                        <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.6' }}>{item.description}</Text>
-                        <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '8px', gap: '3px' }}>
-                          <Text style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500', lineHeight: '1.5' }}>{item.actionText}</Text>
-                          <ChevronRight size={13} color="#2563eb" />
-                        </View>
-                      </View>
-                    </View>
-                  )
-                })}
+            ))}
 
-              </View>
-            ) : (
-              <View style={{ padding: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                <CircleCheck size={44} color="#059669" />
-                <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>信用档案完善</Text>
-                <Text style={{ fontSize: '13px', color: '#94a3b8', lineHeight: '1.6' }}>您的职业信用档案已基本完善，继续保持！</Text>
+            {savedCount > 0 && (
+              <View style={{ background: '#fffbeb', borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                <Zap size={15} color="#d97706" />
+                <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.6', flex: 1 }}>
+                  已填写 {savedCount} 项，可在页面底部统一提交支付。
+                </Text>
               </View>
             )}
           </View>
         </View>
 
-
-
       </View>
+
+      {/* ── 底部提交按钮（有保存项时显示）── */}
+      {savedCount > 0 && (
+        <View style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 16px 32px', background: '#fff', borderTop: '1px solid #f1f5f9', boxShadow: '0 -4px 16px rgba(0,0,0,0.06)' }}>
+          <View
+            style={{ borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
+            onClick={handleSubmit}
+          >
+            <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>
+              提交并支付 ¥{totalPrice}
+            </Text>
+          </View>
+        </View>
+      )}
+
     </View>
   )
 }
-
 
 export default EnhancementPage

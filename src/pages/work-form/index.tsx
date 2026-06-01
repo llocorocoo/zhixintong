@@ -1,9 +1,8 @@
 import { View, Text, ScrollView, Picker, Textarea } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
-import { Network } from '@/network'
 import { Input } from '@/components/ui/input'
-import { useUserStore } from '@/stores/user'
+import { useEnhancementFormStore } from '@/stores/enhancement-form'
 import { ChevronRight, Plus, Trash2 } from 'lucide-react-taro'
 
 interface WorkItem {
@@ -77,11 +76,11 @@ const DatePicker: FC<{ value: string; onChange: (v: string) => void; placeholder
 }
 
 const WorkFormPage: FC = () => {
-  const { userInfo } = useUserStore()
+  const { saveWork } = useEnhancementFormStore()
   const [list, setList] = useState<WorkItem[]>([emptyWork()])
   const [focusField, setFocusField] = useState<string | null>(null)
   const [btnPressed, setBtnPressed] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
+
 
   const setWork = (id: string, field: keyof WorkItem, value: string) =>
     setList(prev => prev.map(w => w.id === id ? { ...w, [field]: value } : w))
@@ -89,7 +88,7 @@ const WorkFormPage: FC = () => {
   const removeWork = (id: string) =>
     setList(prev => prev.filter(w => w.id !== id))
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const filled = list.filter(w => w.company || w.position)
     if (filled.length === 0) {
       Taro.showToast({ title: '请至少填写一条工作信息', icon: 'none' })
@@ -100,29 +99,9 @@ const WorkFormPage: FC = () => {
       Taro.showToast({ title: '请填写公司名称和职位', icon: 'none' })
       return
     }
-    setSubmitting(true)
-    try {
-      await Promise.all(filled.map(w =>
-        Network.request({
-          url: '/api/enhancement/work-history/add',
-          method: 'POST',
-          data: {
-            userId: userInfo?.id,
-            company: w.company,
-            position: w.position,
-            startDate: w.startDate,
-            endDate: w.endDate,
-            description: w.description,
-          }
-        })
-      ))
-      Taro.showToast({ title: '提交成功', icon: 'success' })
-      setTimeout(() => Taro.navigateBack(), 1500)
-    } catch {
-      Taro.showToast({ title: '提交失败，请重试', icon: 'none' })
-    } finally {
-      setSubmitting(false)
-    }
+    saveWork(filled)
+    Taro.showToast({ title: '已保存', icon: 'success' })
+    setTimeout(() => Taro.navigateBack(), 800)
   }
 
   return (
@@ -270,17 +249,15 @@ const WorkFormPage: FC = () => {
               style={{
                 borderRadius: '16px', padding: '14px 0',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: submitting ? '#93c5fd' : 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
+                background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
                 boxShadow: '0 6px 20px rgba(37,99,235,0.38)',
                 transform: btnPressed ? 'scale(0.97)' : 'scale(1)',
                 transition: 'all 0.2s ease',
               }}
               onTouchStart={() => setBtnPressed(true)} onTouchEnd={() => setBtnPressed(false)} onTouchCancel={() => setBtnPressed(false)}
-              onClick={submitting ? undefined : handleSubmit}
+              onClick={handleSubmit}
             >
-              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>
-                {submitting ? '提交中…' : '提交信息'}
-              </Text>
+              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>保存</Text>
             </View>
           </View>
 

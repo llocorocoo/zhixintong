@@ -5,6 +5,7 @@ import { ShieldCheck, CircleCheck, CircleAlert } from 'lucide-react-taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import { useReportFormStore } from '@/stores/report-form'
+import { useEnhancementFormStore } from '@/stores/enhancement-form'
 
 const AGREEMENT = `《信息核查授权书》
 
@@ -59,6 +60,7 @@ const AuthorizePage: FC = () => {
   const { userInfo } = useUserStore()
   const params = Taro.getCurrentInstance().router?.params || {}
   const isUpdate = params.type === 'update'
+  const isEnhancement = params.type === 'enhancement'
 
   useEffect(() => {
     timerRef.current = setInterval(() => {
@@ -78,14 +80,40 @@ const AuthorizePage: FC = () => {
     if (!canAgree || !isChecked || submitting) return
     setSubmitting(true)
     try {
-      const res = isUpdate
-        ? await Network.request({ url: '/api/report/create', method: 'POST', data: { userId: userInfo?.id } })
-        : await Network.request({ url: '/api/report/submit', method: 'POST', data: pendingData || {} })
-      if (res.data.code === 200) {
-        if (!isUpdate) clearPendingData()
+      if (isEnhancement) {
+        const { education, certItems, workItems, clearAll } = useEnhancementFormStore.getState()
+        const tasks: Promise<any>[] = []
+        if (education) {
+          tasks.push(Network.request({
+            url: '/api/enhancement/educations/add', method: 'POST',
+            data: { userId: userInfo?.id, degree: education.degree, diplomaCertNo: education.diplomaCertNo, degreeCertNo: education.degreeCertNo },
+          }))
+        }
+        if (certItems) {
+          certItems.forEach(c => tasks.push(Network.request({
+            url: '/api/enhancement/certificates/add', method: 'POST',
+            data: { userId: userInfo?.id, name: c.certNumber, certNo: c.certNumber, issuer: '', proofFiles: c.files },
+          })))
+        }
+        if (workItems) {
+          workItems.forEach(w => tasks.push(Network.request({
+            url: '/api/enhancement/work-history/add', method: 'POST',
+            data: { userId: userInfo?.id, company: w.company, position: w.position, startDate: w.startDate, endDate: w.endDate, description: w.description },
+          })))
+        }
+        await Promise.all(tasks)
+        clearAll()
         Taro.redirectTo({ url: '/pages/query-progress/index' })
       } else {
-        Taro.showToast({ title: res.data.message || '提交失败', icon: 'none' })
+        const res = isUpdate
+          ? await Network.request({ url: '/api/report/create', method: 'POST', data: { userId: userInfo?.id } })
+          : await Network.request({ url: '/api/report/submit', method: 'POST', data: pendingData || {} })
+        if (res.data.code === 200) {
+          if (!isUpdate) clearPendingData()
+          Taro.redirectTo({ url: '/pages/query-progress/index' })
+        } else {
+          Taro.showToast({ title: res.data.message || '提交失败', icon: 'none' })
+        }
       }
     } catch {
       Taro.showToast({ title: '提交失败，请重试', icon: 'none' })
@@ -97,7 +125,7 @@ const AuthorizePage: FC = () => {
   const handleCancel = () => {
     Taro.showModal({
       title: '取消授权',
-      content: '取消授权将无法生成职业信用报告，确定取消吗？',
+      content: isEnhancement ? '取消授权将无法完成信用增信，确定取消吗？' : '取消授权将无法生成职业信用报告，确定取消吗？',
       success: res => { if (res.confirm) Taro.navigateBack() }
     })
   }

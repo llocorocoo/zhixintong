@@ -3,7 +3,7 @@ import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { Network } from '@/network'
 import { Input } from '@/components/ui/input'
-import { useUserStore } from '@/stores/user'
+import { useEnhancementFormStore } from '@/stores/enhancement-form'
 import { Upload, Plus, Trash2 } from 'lucide-react-taro'
 
 interface QualificationItem {
@@ -39,11 +39,11 @@ const InputBox: FC<{ focused: boolean; children: React.ReactNode }> = ({ focused
 )
 
 const CertFormPage: FC = () => {
-  const { userInfo } = useUserStore()
+  const { saveCert } = useEnhancementFormStore()
   const [list, setList] = useState<QualificationItem[]>([emptyQual()])
   const [focusField, setFocusField] = useState<string | null>(null)
   const [btnPressed, setBtnPressed] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
+
 
   const setQual = (id: string, field: keyof QualificationItem, value: string) =>
     setList(prev => prev.map(q => q.id === id ? { ...q, [field]: value } : q))
@@ -68,34 +68,15 @@ const CertFormPage: FC = () => {
   const removeFile = (id: string, idx: number) =>
     setList(prev => prev.map(q => q.id === id ? { ...q, files: q.files.filter((_, i) => i !== idx) } : q))
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const filled = list.filter(q => q.certNumber || q.files.length > 0)
     if (filled.length === 0) {
       Taro.showToast({ title: '请至少填写一条证书信息', icon: 'none' })
       return
     }
-    setSubmitting(true)
-    try {
-      await Promise.all(filled.map(q =>
-        Network.request({
-          url: '/api/enhancement/certificates/add',
-          method: 'POST',
-          data: {
-            userId: userInfo?.id,
-            name: q.certNumber,
-            issuer: '',
-            certNo: q.certNumber,
-            proofFiles: q.files,
-          }
-        })
-      ))
-      Taro.showToast({ title: '提交成功', icon: 'success' })
-      setTimeout(() => Taro.navigateBack(), 1500)
-    } catch {
-      Taro.showToast({ title: '提交失败，请重试', icon: 'none' })
-    } finally {
-      setSubmitting(false)
-    }
+    saveCert(filled)
+    Taro.showToast({ title: '已保存', icon: 'success' })
+    setTimeout(() => Taro.navigateBack(), 800)
   }
 
   return (
@@ -190,17 +171,15 @@ const CertFormPage: FC = () => {
               style={{
                 borderRadius: '16px', padding: '14px 0',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: submitting ? '#93c5fd' : 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
+                background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
                 boxShadow: '0 6px 20px rgba(37,99,235,0.38)',
                 transform: btnPressed ? 'scale(0.97)' : 'scale(1)',
                 transition: 'all 0.2s ease',
               }}
               onTouchStart={() => setBtnPressed(true)} onTouchEnd={() => setBtnPressed(false)} onTouchCancel={() => setBtnPressed(false)}
-              onClick={submitting ? undefined : handleSubmit}
+              onClick={handleSubmit}
             >
-              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>
-                {submitting ? '提交中…' : '提交信息'}
-              </Text>
+              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#fff', lineHeight: '1.5' }}>保存</Text>
             </View>
           </View>
 

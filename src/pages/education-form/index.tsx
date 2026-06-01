@@ -1,8 +1,7 @@
 import { View, Text, Picker, Input } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
-import { Network } from '@/network'
-import { useUserStore } from '@/stores/user'
+import { useEnhancementFormStore } from '@/stores/enhancement-form'
 import { GraduationCap, ChevronRight } from 'lucide-react-taro'
 
 const EDU_OPTIONS = ['高中', '大专', '本科', '硕士', '博士']
@@ -18,37 +17,24 @@ const Field: FC<{ label: string; required?: boolean; children: React.ReactNode }
 )
 
 const EducationFormPage: FC = () => {
-  const { userInfo } = useUserStore()
+  const { saveEducation } = useEnhancementFormStore()
   const [eduIndex, setEduIndex] = useState(2) // 默认本科
   const [diplomaCertNo, setDiplomaCertNo] = useState('')
   const [degreeCertNo, setDegreeCertNo] = useState('')
   const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!diplomaCertNo.trim() && !degreeCertNo.trim()) {
       Taro.showToast({ title: '请至少填写一项编号', icon: 'none' })
       return
     }
-    setSubmitting(true)
-    try {
-      await Network.request({
-        url: '/api/enhancement/educations/add',
-        method: 'POST',
-        data: {
-          userId: userInfo?.id,
-          degree: EDU_OPTIONS[eduIndex],
-          diplomaCertNo: diplomaCertNo.trim(),
-          degreeCertNo: degreeCertNo.trim(),
-        }
-      })
-      Taro.showToast({ title: '提交成功', icon: 'success' })
-      setTimeout(() => Taro.navigateBack(), 1500)
-    } catch {
-      Taro.showToast({ title: '提交失败，请重试', icon: 'none' })
-    } finally {
-      setSubmitting(false)
-    }
+    saveEducation({
+      degree: EDU_OPTIONS[eduIndex],
+      diplomaCertNo: diplomaCertNo.trim(),
+      degreeCertNo: degreeCertNo.trim(),
+    })
+    Taro.showToast({ title: '已保存', icon: 'success' })
+    setTimeout(() => Taro.navigateBack(), 800)
   }
 
   const inputBox = (focused: boolean) => ({
@@ -132,14 +118,12 @@ const EducationFormPage: FC = () => {
           style={{
             borderRadius: '14px', padding: '14px 0',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: submitting ? '#93c5fd' : 'linear-gradient(135deg, #1e40af, #2563eb)',
+            background: 'linear-gradient(135deg, #1e40af, #2563eb)',
             boxShadow: '0 4px 16px rgba(37,99,235,0.35)',
           }}
-          onClick={submitting ? undefined : handleSubmit}
+          onClick={handleSubmit}
         >
-          <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>
-            {submitting ? '提交中…' : '提交认证'}
-          </Text>
+          <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>保存</Text>
         </View>
       </View>
 
