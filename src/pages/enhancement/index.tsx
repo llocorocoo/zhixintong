@@ -304,18 +304,9 @@ const EnhancementPage: FC = () => {
 
         {/* ── 个性化增信建议 ── */}
         <View style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
-          <View style={{ padding: '18px 18px 14px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Target size={18} color="#2563eb" />
-              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>个性化增信建议</Text>
-            </View>
-            {creditProfile && suggestions.length > 0 && (
-              <View style={{ background: 'rgba(37,99,235,0.1)', borderRadius: '20px', padding: '3px 10px' }}>
-                <Text style={{ fontSize: '11px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>
-                  {suggestions.filter(s => s.priority === 'high').length} 项重要
-                </Text>
-              </View>
-            )}
+          <View style={{ padding: '18px 18px 14px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center' }}>
+            <Target size={18} color="#2563eb" />
+            <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4', marginLeft: '8px' }}>如何提升职业信用</Text>
           </View>
 
           <View style={{ padding: '16px 18px' }}>
@@ -342,26 +333,6 @@ const EnhancementPage: FC = () => {
               </View>
             ) : suggestions.length > 0 ? (
               <View style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {/* 概览 */}
-                <View style={{ background: '#f8fafc', borderRadius: '14px', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <View>
-                    <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.5' }}>已认证项目</Text>
-                    <Text style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', display: 'block', lineHeight: '1.3' }}>{creditProfile.verifiedItems}<Text style={{ fontSize: '13px', color: '#94a3b8', fontWeight: '400' }}>/{creditProfile.totalItems}</Text></Text>
-                  </View>
-                  <View style={{ width: '1px', height: '32px', background: '#e2e8f0' }} />
-                  <View>
-                    <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.5' }}>待完成</Text>
-                    <Text style={{ fontSize: '18px', fontWeight: '700', color: '#dc2626', display: 'block', lineHeight: '1.3' }}>{suggestions.filter(s => s.priority === 'high').length}</Text>
-                  </View>
-                  <View style={{ width: '1px', height: '32px', background: '#e2e8f0' }} />
-                  <View>
-                    <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.5' }}>信用状态</Text>
-                    <Text style={{ fontSize: '13px', fontWeight: '600', color: creditProfile.totalScore >= 80 ? '#059669' : creditProfile.totalScore >= 60 ? '#d97706' : '#dc2626', display: 'block', lineHeight: '1.5' }}>
-                      {creditProfile.totalScore >= 80 ? '良好' : creditProfile.totalScore >= 60 ? '中等' : '待提升'}
-                    </Text>
-                  </View>
-                </View>
-
                 {/* 建议列表 */}
                 {suggestions.map(item => {
                   const ps = PRIORITY_STYLE[item.priority] || PRIORITY_STYLE.low
