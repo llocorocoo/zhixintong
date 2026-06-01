@@ -47,7 +47,7 @@ const EducationFormPage: FC = () => {
   })
 
   return (
-    <View style={{ background: '#f6f8fc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
 
       {/* 说明区 */}
       <View style={{ background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)', padding: '20px 20px 24px' }}>
@@ -57,7 +57,7 @@ const EducationFormPage: FC = () => {
       </View>
 
       {/* 表单 */}
-      <View style={{ flex: 1, padding: '20px 16px 32px' }}>
+      <View style={{ padding: '20px 16px 120px' }}>
         <View style={{ background: '#fff', borderRadius: '20px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
 
           {/* 学历层次 */}
@@ -109,11 +109,10 @@ const EducationFormPage: FC = () => {
           </Field>
 
         </View>
-
       </View>
 
-      {/* 底部按钮 */}
-      <View style={{ padding: '0 16px 32px', flexShrink: 0 }}>
+      {/* 底部固定按钮 */}
+      <View style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 16px 32px', background: '#fff', boxShadow: '0 -4px 16px rgba(0,0,0,0.06)' }}>
         <View
           style={{
             borderRadius: '14px', padding: '14px 0',
