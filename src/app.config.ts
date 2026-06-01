@@ -13,6 +13,7 @@ export default defineAppConfig({
     'pages/enhancement/index',
     'pages/education-form/index',
     'pages/cert-form/index',
+    'pages/work-form/index',
     'pages/work-history/index',
     'pages/credit-repair/index',
     'pages/profile-edit/index',

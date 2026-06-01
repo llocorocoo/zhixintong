@@ -130,7 +130,7 @@ const EnhancementPage: FC = () => {
         description: '完整记录工作经历，连续稳定的职业轨迹有助于提升稳定性评分',
         priority: 'medium',
         status: 'missing',
-        action: '/pages/work-history/index?tab=work',
+        action: '/pages/work-form/index',
         actionText: '去补充',
         icon: Building
       },
