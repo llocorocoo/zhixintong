@@ -30,7 +30,7 @@ export class CreditService {
   async enhanceCreditScore(userId: string) {
     const current = await this.getCreditScore(userId)
     if (!current) return null
-    const bonus = 30 + Math.floor(Math.random() * 21) // 30~50 分
+    const bonus = 50
     const newScore = Math.min(940, current.score + bonus)
     const newLevel = newScore >= 800 ? '优秀' : newScore >= 700 ? '良好' : newScore >= 600 ? '中等' : '待提升'
     return this.updateCreditScore(userId, newScore, newLevel, current.factors)
