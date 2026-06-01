@@ -6,8 +6,10 @@ interface UserState {
   userInfo: UserInfo | null
   token: string
   isLoggedIn: boolean
+  enhancementPending: boolean
   setUserInfo: (info: UserInfo) => void
   setToken: (token: string) => void
+  setEnhancementPending: (v: boolean) => void
   logout: () => void
 }
 
@@ -37,9 +39,11 @@ export const useUserStore = create<UserState>()(
       userInfo: null,
       token: '',
       isLoggedIn: false,
+      enhancementPending: false,
       setUserInfo: (info) => set({ userInfo: info, isLoggedIn: true }),
       setToken: (token) => set({ token }),
-      logout: () => set({ userInfo: null, token: '', isLoggedIn: false }),
+      setEnhancementPending: (v) => set({ enhancementPending: v }),
+      logout: () => set({ userInfo: null, token: '', isLoggedIn: false, enhancementPending: false }),
     }),
     {
       name: 'zhixintong-user',

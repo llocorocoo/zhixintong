@@ -24,7 +24,7 @@ const ReportPage: FC = () => {
   const [syncing, setSyncing] = useState(false)
   const [pressedBtn, setPressedBtn] = useState<string | null>(null)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
-  const { isLoggedIn, userInfo } = useUserStore()
+  const { isLoggedIn, userInfo, enhancementPending } = useUserStore()
 
   const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -204,16 +204,23 @@ const ReportPage: FC = () => {
                   <Text style={{ fontSize: '11px', color: '#94a3b8', display: 'block', lineHeight: '1.5' }}>{reportData.reportNo}</Text>
                 </View>
               </View>
-              <View style={{
-                padding: '4px 12px', borderRadius: '20px',
-                background: reportData.status === 'completed' ? 'rgba(5,150,105,0.1)' : reportData.status === 'processing' ? 'rgba(37,99,235,0.1)' : 'rgba(220,38,38,0.1)',
-              }}>
-                <Text style={{
-                  fontSize: '12px', fontWeight: '600', lineHeight: '1.5',
-                  color: reportData.status === 'completed' ? '#059669' : reportData.status === 'processing' ? '#2563eb' : '#dc2626',
+              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                <View style={{
+                  padding: '4px 12px', borderRadius: '20px',
+                  background: reportData.status === 'completed' ? 'rgba(5,150,105,0.1)' : reportData.status === 'processing' ? 'rgba(37,99,235,0.1)' : 'rgba(220,38,38,0.1)',
                 }}>
-                  {reportData.status === 'completed' ? '已完成' : reportData.status === 'processing' ? '生成中' : '生成失败'}
-                </Text>
+                  <Text style={{
+                    fontSize: '12px', fontWeight: '600', lineHeight: '1.5',
+                    color: reportData.status === 'completed' ? '#059669' : reportData.status === 'processing' ? '#2563eb' : '#dc2626',
+                  }}>
+                    {reportData.status === 'completed' ? '已完成' : reportData.status === 'processing' ? '生成中' : '生成失败'}
+                  </Text>
+                </View>
+                {enhancementPending && (
+                  <View style={{ padding: '3px 10px', borderRadius: '20px', background: 'rgba(37,99,235,0.1)' }}>
+                    <Text style={{ fontSize: '11px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>提升信用核查中</Text>
+                  </View>
+                )}
               </View>
             </View>
 

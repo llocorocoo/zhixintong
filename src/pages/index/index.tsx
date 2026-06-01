@@ -1,5 +1,5 @@
 import { View, Text, Swiper, SwiperItem, Image } from '@tarojs/components'
-import { FC, useState, useEffect, useMemo } from 'react'
+import { FC, useState, useEffect, useMemo, useRef } from 'react'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
@@ -40,7 +40,8 @@ const IndexPage: FC = () => {
   const [pressedAction, setPressedAction] = useState<number | null>(null)
   const [pressedMenu, setPressedMenu] = useState<number | null>(null)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
-  const { userInfo, isLoggedIn } = useUserStore()
+  const { userInfo, isLoggedIn, enhancementPending, setEnhancementPending } = useUserStore()
+  const enhanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const radarSvg = useMemo(() => {
     if (!creditScore?.factors) return null
@@ -62,7 +63,21 @@ const IndexPage: FC = () => {
   useEffect(() => {
     if (isLoggedIn) fetchCreditScore()
   }, [isLoggedIn])
-  useDidShow(() => { if (isLoggedIn) fetchCreditScore() })
+
+  useDidShow(() => {
+    if (!isLoggedIn) return
+    fetchCreditScore()
+    if (enhancementPending && !enhanceTimerRef.current) {
+      enhanceTimerRef.current = setTimeout(async () => {
+        enhanceTimerRef.current = null
+        try {
+          await Network.request({ url: '/api/credit/enhance', method: 'POST', data: { userId: userInfo?.id } })
+        } catch {}
+        setEnhancementPending(false)
+        fetchCreditScore()
+      }, 3000)
+    }
+  })
 
   const fetchCreditScore = async () => {
     if (!userInfo?.id) return
@@ -146,11 +161,15 @@ const IndexPage: FC = () => {
             {/* 标签行 */}
             <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <Text style={{ fontSize: '13px', color: '#94a3b8', fontWeight: '500', lineHeight: '1.5' }}>职业信用评分</Text>
-              {levelInfo && (
+              {enhancementPending ? (
+                <View style={{ padding: '3px 10px', borderRadius: '20px', background: 'rgba(37,99,235,0.1)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Text style={{ fontSize: '12px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>提升信用核查中</Text>
+                </View>
+              ) : levelInfo ? (
                 <View style={{ padding: '3px 10px', borderRadius: '20px', background: levelInfo.bg }}>
                   <Text style={{ fontSize: '12px', fontWeight: '600', color: levelInfo.color }}>{levelInfo.label}</Text>
                 </View>
-              )}
+              ) : null}
             </View>
 
             {/* 分数 + 按钮行 */}

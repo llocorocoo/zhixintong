@@ -5,6 +5,8 @@ import { Clock, ChevronRight } from 'lucide-react-taro'
 
 const QueryProgressPage: FC = () => {
   const [btnPressed, setBtnPressed] = useState(false)
+  const params = Taro.getCurrentInstance().router?.params || {}
+  const isEnhancement = params.from === 'enhancement'
 
   return (
     <View style={{ background: '#f6f8fc', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
@@ -22,10 +24,12 @@ const QueryProgressPage: FC = () => {
         </View>
 
         <Text style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', display: 'block', lineHeight: '1.3', marginBottom: '12px' }}>
-          核查中
+          {isEnhancement ? '提升信用核查中' : '核查中'}
         </Text>
         <Text style={{ fontSize: '14px', color: '#64748b', display: 'block', lineHeight: '1.7', marginBottom: '32px' }}>
-          平台正在核查您的信用信息{'\n'}预计 1-3 个工作日完成
+          {isEnhancement
+            ? `平台正在核查您的增信信息\n核查完成后信用评分将自动更新`
+            : `平台正在核查您的信用信息\n预计 1-3 个工作日完成`}
         </Text>
 
         {/* 提示卡片 */}
@@ -35,7 +39,9 @@ const QueryProgressPage: FC = () => {
           width: '100%', marginBottom: '24px',
         }}>
           <Text style={{ fontSize: '13px', color: '#94a3b8', lineHeight: '1.7', textAlign: 'center', display: 'block' }}>
-            核查完成后您的职业信用报告将自动生成{'\n'}您可以返回稍后查看进度
+            {isEnhancement
+              ? `核查完成后您的职业信用评分和报告将自动更新\n您可以返回首页稍后查看`
+              : `核查完成后您的职业信用报告将自动生成\n您可以返回稍后查看进度`}
           </Text>
         </View>
 

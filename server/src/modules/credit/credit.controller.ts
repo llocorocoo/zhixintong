@@ -8,10 +8,12 @@ export class CreditController {
   @Post('score')
   async getScore(@Body() body: { userId: string }) {
     const result = await this.creditService.getCreditScore(body.userId)
-    return {
-      code: 200,
-      message: '获取成功',
-      data: result
-    }
+    return { code: 200, message: '获取成功', data: result }
+  }
+
+  @Post('enhance')
+  async enhance(@Body() body: { userId: string }) {
+    const result = await this.creditService.enhanceCreditScore(body.userId)
+    return { code: 200, message: '增信完成', data: result }
   }
 }

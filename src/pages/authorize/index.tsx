@@ -57,7 +57,7 @@ const AuthorizePage: FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const { pendingData, clearPendingData } = useReportFormStore()
-  const { userInfo } = useUserStore()
+  const { userInfo, setEnhancementPending } = useUserStore()
   const params = Taro.getCurrentInstance().router?.params || {}
   const isUpdate = params.type === 'update'
   const isEnhancement = params.type === 'enhancement'
@@ -103,7 +103,8 @@ const AuthorizePage: FC = () => {
         }
         await Promise.all(tasks)
         clearAll()
-        Taro.redirectTo({ url: '/pages/query-progress/index' })
+        setEnhancementPending(true)
+        Taro.redirectTo({ url: '/pages/query-progress/index?from=enhancement' })
       } else {
         const res = isUpdate
           ? await Network.request({ url: '/api/report/create', method: 'POST', data: { userId: userInfo?.id } })
