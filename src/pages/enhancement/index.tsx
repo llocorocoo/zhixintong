@@ -4,9 +4,9 @@ import Taro, { useDidShow } from '@tarojs/taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import {
-  Shield, Award, Briefcase, GraduationCap, FileText,
-  CircleCheck, ChevronRight, ArrowRight, Target, Zap,
-  UserCheck, Building, Medal, FileSearch, Star
+  Shield, Award, GraduationCap,
+  CircleCheck, ChevronRight, Target, Zap,
+  UserCheck, Building, Medal, FileSearch
 } from 'lucide-react-taro'
 
 interface EnhancementSuggestion {
@@ -278,52 +278,6 @@ const EnhancementPage: FC = () => {
     },
   ]
 
-  const selfProofSteps = [
-    {
-      step: 1,
-      title: '填写工作履历',
-      desc: '录入完整的工作经历，包括公司、职位、时间等'
-    },
-    {
-      step: 2,
-      title: '上传证明材料',
-      desc: '提供劳动合同、社保记录、离职证明等材料'
-    },
-    {
-      step: 3,
-      title: 'AI智能核验',
-      desc: '系统自动核验材料真实性和一致性'
-    },
-    {
-      step: 4,
-      title: '生成自证报告',
-      desc: '生成可信的工作履历自证报告'
-    }
-  ]
-
-  const maintenanceItems = [
-    {
-      title: '更新个人信息',
-      desc: '保持联系方式、工作状态等信息最新',
-      action: '/pages/profile/index'
-    },
-    {
-      title: '添加新工作经历',
-      desc: '及时记录新的工作经历和成就',
-      action: '/pages/work-history/index'
-    },
-    {
-      title: '上传新证书',
-      desc: '持续添加学历、职业资格等证书',
-      action: '/pages/work-history/index?type=cert'
-    },
-    {
-      title: '定期生成报告',
-      desc: '建议每季度更新一次职业信用报告',
-      action: '/pages/report/index'
-    }
-  ]
-
   const [pressedId, setPressedId] = useState<string | null>(null)
   const press = (id: string) => setPressedId(id)
   const release = () => setPressedId(null)
@@ -486,67 +440,6 @@ const EnhancementPage: FC = () => {
           </View>
         </View>
 
-        {/* ── 自证工具 ── */}
-        <View style={{ background: '#fff', borderRadius: '20px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
-          <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-            <View style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Briefcase size={18} color="#2563eb" />
-              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>自证工具</Text>
-            </View>
-            <View style={{ background: 'rgba(37,99,235,0.1)', borderRadius: '20px', padding: '3px 10px' }}>
-              <Text style={{ fontSize: '11px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>推荐</Text>
-            </View>
-          </View>
-          <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '16px', lineHeight: '1.6' }}>完整展示工作履历，提升报告可信度和职业信用评分。</Text>
-
-          {selfProofSteps.map((item, i) => (
-            <View key={i} style={{ display: 'flex', gap: '12px', marginBottom: i < selfProofSteps.length - 1 ? '0' : '16px' }}>
-              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '28px', flexShrink: 0 }}>
-                <View style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Text style={{ color: '#fff', fontSize: '12px', fontWeight: '700', lineHeight: '1' }}>{item.step}</Text>
-                </View>
-                {i < selfProofSteps.length - 1 && <View style={{ width: '2px', flex: 1, minHeight: '16px', background: '#dbeafe', margin: '3px 0' }} />}
-              </View>
-              <View style={{ flex: 1, paddingBottom: i < selfProofSteps.length - 1 ? '12px' : '0' }}>
-                <Text style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', display: 'block', lineHeight: '1.4', marginBottom: '2px' }}>{item.title}</Text>
-                <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', lineHeight: '1.6' }}>{item.desc}</Text>
-              </View>
-            </View>
-          ))}
-
-          <View
-            style={{ borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
-            onTouchStart={() => press('self-proof')} onTouchEnd={release} onTouchCancel={release}
-            onClick={() => handleNavigate('/pages/work-history/index')}
-          >
-            <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>前往自证</Text>
-            <ArrowRight size={16} color="rgba(255,255,255,0.85)" />
-          </View>
-        </View>
-
-        {/* ── 维护信息 ── */}
-        <View style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
-          <View style={{ padding: '18px 18px 14px', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #f1f5f9' }}>
-            <Star size={18} color="#2563eb" />
-            <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>维护信息</Text>
-          </View>
-          {maintenanceItems.map((item, i) => (
-            <View
-              key={i}
-              style={{ display: 'flex', alignItems: 'center', padding: '14px 18px', borderBottom: i < maintenanceItems.length - 1 ? '1px solid #f8fafc' : 'none', transform: pressedId === `maint-${i}` ? 'scale(0.99)' : 'scale(1)', transition: 'all 0.2s ease', background: pressedId === `maint-${i}` ? '#f8fafc' : 'transparent' }}
-              onTouchStart={() => press(`maint-${i}`)} onTouchEnd={release} onTouchCancel={release}
-              onClick={() => handleNavigate(item.action)}
-            >
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: '14px', fontWeight: '500', color: '#0f172a', display: 'block', lineHeight: '1.4' }}>{item.title}</Text>
-                <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginTop: '2px', lineHeight: '1.5' }}>{item.desc}</Text>
-              </View>
-              <View style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ChevronRight size={14} color="#94a3b8" />
-              </View>
-            </View>
-          ))}
-        </View>
 
       </View>
     </View>
