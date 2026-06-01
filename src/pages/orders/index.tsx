@@ -51,9 +51,53 @@ const fmtDate = (iso: string) => {
 
 const CLOSED = new Set(['ABANDONED','FAILED','PAYMENT_CANCELLED','EXPIRED'])
 
+const d = (daysAgo: number, h = 10, m = 0) => {
+  const t = new Date(); t.setDate(t.getDate() - daysAgo); t.setHours(h, m, 0, 0); return t.toISOString()
+}
+
+const MOCK_ORDERS: Order[] = [
+  {
+    orderId: 'mock-001', orderType: 'personal_query', status: 'PENDING_PAYMENT',
+    amount: 50, completionProgress: 0,
+    createdAt: d(1, 14, 22), updatedAt: d(1, 14, 22),
+  },
+  {
+    orderId: 'mock-002', orderType: 'personal_query', status: 'PAID',
+    amount: 9.9, completionProgress: 30,
+    createdAt: d(2, 9, 5), updatedAt: d(2, 9, 8), paidAt: d(2, 9, 7),
+  },
+  {
+    orderId: 'mock-003', orderType: 'credit_boost', status: 'COMPLETED',
+    amount: 29.7, completionProgress: 100,
+    createdAt: d(7, 11, 30), updatedAt: d(5, 16, 0), paidAt: d(7, 11, 33), completedAt: d(5, 16, 0),
+  },
+  {
+    orderId: 'mock-004', orderType: 'personal_query', status: 'COMPLETED',
+    amount: 50, completionProgress: 100,
+    createdAt: d(14, 10, 0), updatedAt: d(11, 9, 0), paidAt: d(14, 10, 4), completedAt: d(11, 9, 0),
+  },
+  {
+    orderId: 'mock-005', orderType: 'credit_boost', status: 'ABANDONED',
+    amount: 9.9, completionProgress: 30,
+    failureReason: '支付后未完成授权步骤',
+    createdAt: d(3, 17, 10), updatedAt: d(3, 17, 45), paidAt: d(3, 17, 13),
+  },
+  {
+    orderId: 'mock-006', orderType: 'personal_query', status: 'FAILED',
+    amount: 50, completionProgress: 60,
+    failureReason: '信息核验失败，请重新提交',
+    createdAt: d(5, 8, 0), updatedAt: d(4, 20, 0), paidAt: d(5, 8, 3),
+  },
+  {
+    orderId: 'mock-007', orderType: 'personal_query', status: 'PAYMENT_CANCELLED',
+    amount: 50, completionProgress: 0,
+    createdAt: d(6, 15, 0), updatedAt: d(6, 15, 2),
+  },
+]
+
 const OrdersPage: FC = () => {
   const { userInfo, isLoggedIn } = useUserStore()
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS)
   const [activeTab, setActiveTab] = useState('all')
   const [loading, setLoading] = useState(false)
   const [pressedId, setPressedId] = useState<string | null>(null)
@@ -63,7 +107,12 @@ const OrdersPage: FC = () => {
     setLoading(true)
     try {
       const res = await Network.request({ url: '/api/order/list', method: 'POST', data: { userId: userInfo.id } })
-      if (res.data.code === 200) setOrders(res.data.data || [])
+      if (res.data.code === 200) {
+        const real: Order[] = res.data.data || []
+        // 真实订单在前，样例在后（去重）
+        const realIds = new Set(real.map((o: Order) => o.orderId))
+        setOrders([...real, ...MOCK_ORDERS.filter(m => !realIds.has(m.orderId))])
+      }
     } catch {}
     finally { setLoading(false) }
   }, [userInfo?.id])
