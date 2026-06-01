@@ -236,9 +236,9 @@ const WorkFormPage: FC = () => {
                       transition: 'all 0.25s ease',
                     }}>
                       <Textarea
-                        style={{ flex: 1, fontSize: '14px', color: '#0f172a', lineHeight: '1.6', minHeight: '80px', width: '100%' }}
+                        style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5', minHeight: '80px', width: '100%' }}
                         placeholder="请描述主要工作职责和工作内容"
-                        placeholderStyle="color:#cbd5e1;"
+                        placeholderStyle="color:#cbd5e1;font-size:14px;"
                         value={work.description}
                         onFocus={() => setFocusField(`${work.id}-desc`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'description', e.detail.value)}
