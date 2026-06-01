@@ -227,7 +227,14 @@ const WorkFormPage: FC = () => {
 
                   {/* 工作职责及内容 */}
                   <Field label="工作职责及内容">
-                    <InputBox focused={focusField === `${work.id}-desc`}>
+                    <View style={{
+                      display: 'flex', alignItems: 'center', gap: '10px',
+                      background: '#fff',
+                      borderRadius: '12px', padding: '12px 14px',
+                      border: `1.5px solid ${focusField === `${work.id}-desc` ? '#3b82f6' : 'transparent'}`,
+                      boxShadow: focusField === `${work.id}-desc` ? '0 0 0 3px rgba(59,130,246,0.08)' : 'none',
+                      transition: 'all 0.25s ease',
+                    }}>
                       <Textarea
                         style={{ flex: 1, fontSize: '14px', color: '#0f172a', lineHeight: '1.6', minHeight: '80px', width: '100%' }}
                         placeholder="请描述主要工作职责和工作内容"
@@ -237,7 +244,7 @@ const WorkFormPage: FC = () => {
                         onInput={e => setWork(work.id, 'description', e.detail.value)}
                         autoHeight
                       />
-                    </InputBox>
+                    </View>
                   </Field>
 
                 </View>
