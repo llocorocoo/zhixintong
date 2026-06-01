@@ -18,7 +18,6 @@ const PaymentPage: FC = () => {
   const type = params.type || 'create'
   const isUpdate = type === 'update'
   const isEnhancement = type === 'enhancement'
-  const { userInfo } = useUserStore()
   const { setOrderId } = useCurrentOrderStore()
 
   // 进入支付页时创建订单（若已有 orderId 则跳过）
