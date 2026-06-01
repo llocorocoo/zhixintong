@@ -30,7 +30,7 @@ const STATUS_INFO: Record<OrderStatus, { label: string; color: string; bg: strin
   PENDING_PAYMENT:   { label: '待支付',   color: '#d97706', bg: 'rgba(217,119,6,0.1)',    icon: Clock },
   PAID:              { label: '处理中',   color: '#2563eb', bg: 'rgba(37,99,235,0.1)',    icon: Clock },
   COMPLETED:         { label: '已完成',   color: '#059669', bg: 'rgba(5,150,105,0.1)',    icon: CircleCheck },
-  ABANDONED:         { label: '处理中断', color: '#64748b', bg: 'rgba(100,116,139,0.1)', icon: CircleAlert },
+  ABANDONED:         { label: '待授权',   color: '#7c3aed', bg: 'rgba(124,58,237,0.1)',  icon: CircleAlert },
   FAILED:            { label: '已失败',   color: '#dc2626', bg: 'rgba(220,38,38,0.1)',   icon: CircleAlert },
   PAYMENT_CANCELLED: { label: '已取消',   color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', icon: Ban },
   EXPIRED:           { label: '已过期',   color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', icon: Ban },
@@ -79,7 +79,7 @@ const MOCK_ORDERS: Order[] = [
   {
     orderId: 'mock-005', orderType: 'credit_boost', status: 'ABANDONED',
     amount: 9.9, completionProgress: 30,
-    failureReason: '支付后未完成授权步骤',
+
     createdAt: d(3, 17, 10), updatedAt: d(3, 17, 45), paidAt: d(3, 17, 13),
   },
 
