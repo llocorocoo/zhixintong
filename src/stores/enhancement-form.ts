@@ -2,9 +2,11 @@ import { create } from 'zustand'
 
 export interface SavedEducationItem {
   id: string
-  degree: string
-  diplomaCertNo: string
-  degreeCertNo: string
+  isAbroad: boolean
+  degree?: string
+  diplomaCertNo?: string
+  degreeCertNo?: string
+  abroadCertNo?: string
 }
 
 export interface SavedCertItem {

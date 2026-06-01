@@ -1,25 +1,37 @@
 import { View, Text } from '@tarojs/components'
 import { FC, useState, useEffect } from 'react'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
+import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import { useEnhancementFormStore } from '@/stores/enhancement-form'
 import {
   GraduationCap, Medal, Building,
-  ChevronRight, Target, Zap, CircleCheck
+  ChevronRight, Target, Zap, CircleCheck, FileSearch, ArrowRight
 } from 'lucide-react-taro'
 
 const EnhancementPage: FC = () => {
-  const { isLoggedIn } = useUserStore()
+  const { isLoggedIn, userInfo } = useUserStore()
   const { educationItems, certItems, workItems } = useEnhancementFormStore()
+  const [hasReport, setHasReport] = useState<boolean | null>(null)
   const [pressedId, setPressedId] = useState<string | null>(null)
   const press = (id: string) => setPressedId(id)
   const release = () => setPressedId(null)
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      Taro.redirectTo({ url: '/pages/login/index' })
-    }
+    if (!isLoggedIn) Taro.redirectTo({ url: '/pages/login/index' })
   }, [isLoggedIn])
+
+  const checkReport = async () => {
+    if (!userInfo?.id) return
+    try {
+      const res = await Network.request({ url: '/api/credit/score', method: 'POST', data: { userId: userInfo.id } })
+      setHasReport(res.data.code === 200 && !!res.data.data)
+    } catch {
+      setHasReport(false)
+    }
+  }
+
+  useDidShow(() => { if (isLoggedIn) checkReport() })
 
   const ITEMS = [
     {
@@ -72,61 +84,91 @@ const EnhancementPage: FC = () => {
 
       <View style={{ padding: '16px 16px 120px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-        {/* ── 如何提升职业信用 ── */}
-        <View style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
-          <View style={{ padding: '18px 18px 14px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center' }}>
-            <Target size={18} color="#2563eb" />
-            <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4', marginLeft: '8px' }}>如何提升职业信用</Text>
+        {/* ── 未生成报告：引导卡 ── */}
+        {hasReport === false && (
+          <View style={{ background: '#fff', borderRadius: '20px', padding: '24px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <View style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e40af, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', boxShadow: '0 6px 20px rgba(37,99,235,0.3)' }}>
+              <FileSearch size={32} color="#fff" />
+            </View>
+            <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', display: 'block', marginBottom: '8px', lineHeight: '1.4', textAlign: 'center' }}>请先生成职业信用报告</Text>
+            <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', lineHeight: '1.7', textAlign: 'center', marginBottom: '20px' }}>
+              提升职业信用需要以职业信用报告为基础，请先生成您的职业信用报告。
+            </Text>
+            <View
+              style={{ width: '100%', borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
+              onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
+            >
+              <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>前往生成职业信用报告</Text>
+              <ArrowRight size={15} color="rgba(255,255,255,0.85)" />
+            </View>
           </View>
+        )}
 
-          <View style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {ITEMS.map(item => (
-              <View
-                key={item.id}
-                style={{ background: '#f8fafc', borderRadius: '16px', padding: '14px', display: 'flex', alignItems: 'flex-start', gap: '12px', transform: pressedId === item.id ? 'scale(0.98)' : 'scale(1)', transition: 'all 0.2s ease' }}
-                onTouchStart={() => press(item.id)} onTouchEnd={release} onTouchCancel={release}
-                onClick={() => handleNavigate(item.action)}
-              >
-                <View style={{ width: '40px', height: '40px', borderRadius: '12px', background: item.saved ? 'rgba(5,150,105,0.1)' : '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <item.icon size={20} color={item.saved ? '#059669' : '#2563eb'} />
+        {/* ── 如何提升职业信用（有报告时显示）── */}
+        {hasReport !== false && (
+          <View style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07)' }}>
+            <View style={{ padding: '18px 18px 14px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center' }}>
+              <Target size={18} color="#2563eb" />
+              <Text style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4', marginLeft: '8px' }}>如何提升职业信用</Text>
+            </View>
+
+            <View style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {hasReport === null ? (
+                <View style={{ padding: '24px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: '13px', color: '#94a3b8' }}>加载中...</Text>
                 </View>
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <View style={{ marginBottom: '4px' }}>
-                    <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.4' }}>{item.title}</Text>
-                  </View>
-                  <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.6' }}>{item.desc}</Text>
-                  <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '8px', gap: '3px' }}>
-                    {item.saved ? (
-                      <View style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <CircleCheck size={13} color="#059669" />
-                        <Text style={{ fontSize: '12px', color: '#059669', fontWeight: '600', lineHeight: '1.5' }}>已保存</Text>
+              ) : (
+                <>
+                  {ITEMS.map(item => (
+                    <View
+                      key={item.id}
+                      style={{ background: '#f8fafc', borderRadius: '16px', padding: '14px', display: 'flex', alignItems: 'flex-start', gap: '12px', transform: pressedId === item.id ? 'scale(0.98)' : 'scale(1)', transition: 'all 0.2s ease' }}
+                      onTouchStart={() => press(item.id)} onTouchEnd={release} onTouchCancel={release}
+                      onClick={() => handleNavigate(item.action)}
+                    >
+                      <View style={{ width: '40px', height: '40px', borderRadius: '12px', background: item.saved ? 'rgba(5,150,105,0.1)' : '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <item.icon size={20} color={item.saved ? '#059669' : '#2563eb'} />
                       </View>
-                    ) : (
-                      <>
-                        <Text style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500', lineHeight: '1.5' }}>{item.actionText}</Text>
-                        <ChevronRight size={13} color="#2563eb" />
-                      </>
-                    )}
-                  </View>
-                </View>
-              </View>
-            ))}
+                      <View style={{ flex: 1, minWidth: 0 }}>
+                        <View style={{ marginBottom: '4px' }}>
+                          <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.4' }}>{item.title}</Text>
+                        </View>
+                        <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.6' }}>{item.desc}</Text>
+                        <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '8px', gap: '3px' }}>
+                          {item.saved ? (
+                            <View style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <CircleCheck size={13} color="#059669" />
+                              <Text style={{ fontSize: '12px', color: '#059669', fontWeight: '600', lineHeight: '1.5' }}>已保存</Text>
+                            </View>
+                          ) : (
+                            <>
+                              <Text style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500', lineHeight: '1.5' }}>{item.actionText}</Text>
+                              <ChevronRight size={13} color="#2563eb" />
+                            </>
+                          )}
+                        </View>
+                      </View>
+                    </View>
+                  ))}
 
-            {savedCount > 0 && (
-              <View style={{ background: '#fffbeb', borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                <Zap size={15} color="#d97706" />
-                <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.6', flex: 1 }}>
-                  已填写 {savedCount} 项，可在页面底部统一提交支付。
-                </Text>
-              </View>
-            )}
+                  {savedCount > 0 && (
+                    <View style={{ background: '#fffbeb', borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                      <Zap size={15} color="#d97706" />
+                      <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.6', flex: 1 }}>
+                        已填写 {savedCount} 项，可在页面底部统一提交支付。
+                      </Text>
+                    </View>
+                  )}
+                </>
+              )}
+            </View>
           </View>
-        </View>
+        )}
 
       </View>
 
-      {/* ── 底部提交按钮（有保存项时显示）── */}
-      {savedCount > 0 && (
+      {/* ── 底部提交按钮 ── */}
+      {savedCount > 0 && hasReport && (
         <View style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 16px 32px', background: '#fff', borderTop: '1px solid #f1f5f9', boxShadow: '0 -4px 16px rgba(0,0,0,0.06)' }}>
           <View
             style={{ borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
