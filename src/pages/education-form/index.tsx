@@ -3,7 +3,7 @@ import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
-import { GraduationCap, Hash, ChevronRight } from 'lucide-react-taro'
+import { GraduationCap, ChevronRight } from 'lucide-react-taro'
 
 const EDU_OPTIONS = ['高中', '大专', '本科', '硕士', '博士']
 
@@ -93,9 +93,8 @@ const EducationFormPage: FC = () => {
           </Field>
 
           {/* 学历编号 */}
-          <Field label="学历证书编号">
+          <Field label="学历证书编号" required>
             <View style={inputBox(focusedField === 'diploma')}>
-              <Hash size={18} color="#6b7280" />
               <Input
                 style={{ flex: 1, fontSize: '14px', color: '#111827', lineHeight: '1.5', background: 'transparent' }}
                 placeholder="请输入学历证书编号"
@@ -109,9 +108,8 @@ const EducationFormPage: FC = () => {
           </Field>
 
           {/* 学位编号 */}
-          <Field label="学位证书编号">
+          <Field label="学位证书编号" required>
             <View style={inputBox(focusedField === 'degree')}>
-              <Hash size={18} color="#6b7280" />
               <Input
                 style={{ flex: 1, fontSize: '14px', color: '#111827', lineHeight: '1.5', background: 'transparent' }}
                 placeholder="请输入学位证书编号"
@@ -126,12 +124,6 @@ const EducationFormPage: FC = () => {
 
         </View>
 
-        {/* 提示 */}
-        <View style={{ marginTop: '12px', padding: '12px 14px', background: '#fffbeb', borderRadius: '12px', display: 'flex', gap: '8px' }}>
-          <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.7' }}>
-            学历编号和学位编号可在学信网（chsi.com.cn）查询，填写后系统将自动核验。
-          </Text>
-        </View>
       </View>
 
       {/* 底部按钮 */}
