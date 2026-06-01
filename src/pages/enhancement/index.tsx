@@ -64,7 +64,8 @@ const EnhancementPage: FC = () => {
   ]
 
   const savedCount = ITEMS.filter(i => i.saved).length
-  const totalPrice = (savedCount * 9.9).toFixed(1)
+  const totalItems = (educationItems?.length || 0) + (certItems?.length || 0) + (workItems?.length || 0)
+  const totalPrice = (totalItems * 9.9).toFixed(1)
 
   const handleNavigate = (path: string) => Taro.navigateTo({ url: path })
 
@@ -155,7 +156,7 @@ const EnhancementPage: FC = () => {
                     <View style={{ background: '#fffbeb', borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                       <Zap size={15} color="#d97706" />
                       <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.6', flex: 1 }}>
-                        已填写 {savedCount} 项，可在页面底部统一提交支付。
+                        已填写 {totalItems} 条记录，合计 ¥{totalPrice}，可在页面底部统一提交支付。
                       </Text>
                     </View>
                   )}
