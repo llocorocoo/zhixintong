@@ -2,7 +2,7 @@ import { View, Text, ScrollView } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { Network } from '@/network'
-import { FileText, TrendingUp, Clock, CircleCheck, CircleAlert, XCircle, ChevronLeft } from 'lucide-react-taro'
+import { FileText, TrendingUp, Clock, CircleCheck, CircleAlert, Ban, ChevronLeft } from 'lucide-react-taro'
 
 type OrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'COMPLETED' | 'ABANDONED' | 'FAILED' | 'PAYMENT_CANCELLED' | 'EXPIRED'
 type OrderType = 'personal_query' | 'credit_boost'
@@ -34,8 +34,8 @@ const STATUS_INFO: Record<OrderStatus, { label: string; color: string; bg: strin
   COMPLETED:         { label: '已完成',   color: '#059669', bg: 'rgba(5,150,105,0.1)',    icon: CircleCheck,  desc: '服务已完成' },
   ABANDONED:         { label: '处理中断', color: '#64748b', bg: 'rgba(100,116,139,0.1)', icon: CircleAlert,  desc: '支付后未完成必要步骤' },
   FAILED:            { label: '已失败',   color: '#dc2626', bg: 'rgba(220,38,38,0.1)',   icon: CircleAlert,  desc: '处理过程中发生错误' },
-  PAYMENT_CANCELLED: { label: '已取消',   color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', icon: XCircle,      desc: '支付已取消' },
-  EXPIRED:           { label: '已过期',   color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', icon: XCircle,      desc: '订单已过期' },
+  PAYMENT_CANCELLED: { label: '已取消',   color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', icon: Ban,      desc: '支付已取消' },
+  EXPIRED:           { label: '已过期',   color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', icon: Ban,      desc: '订单已过期' },
 }
 
 const fmtDate = (iso?: string) => {
