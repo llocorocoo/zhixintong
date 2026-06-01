@@ -5,7 +5,7 @@ import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import {
   Shield, Award, GraduationCap,
-  CircleCheck, ChevronRight, Target, Zap,
+  CircleCheck, ChevronRight, Target,
   UserCheck, Building, Medal, FileSearch
 } from 'lucide-react-taro'
 
@@ -96,120 +96,45 @@ const EnhancementPage: FC = () => {
     }
   })
 
-  const generateSuggestions = (profile: CreditProfile) => {
-    const suggestionList: EnhancementSuggestion[] = []
-
-    // 真实性维度：身份认证、学历认证
-    if (!profile.identityVerified) {
-      suggestionList.push({
-        id: 'identity',
-        category: 'authenticity',
-        dimension: '真实性',
-        title: '身份信息未认证',
-        description: '完成实名认证是建立信用档案的基础，直接影响真实性评分',
-        priority: 'high',
-        status: 'missing',
-        action: '/pages/profile/index',
-        actionText: '去认证',
-        icon: UserCheck
-      })
-    }
-
-    if (!profile.educationVerified) {
-      suggestionList.push({
+  const generateSuggestions = (_profile: CreditProfile) => {
+    setSuggestions([
+      {
         id: 'education',
         category: 'authenticity',
         dimension: '真实性',
-        title: '学历信息未认证',
-        description: '通过学信网核验学历学位，提升个人信息真实性',
+        title: '完善学历认证',
+        description: '通过学信网核验学历学位，提升个人信息真实性评分',
         priority: 'high',
         status: 'missing',
         action: '/pages/work-history/index?tab=education',
         actionText: '去认证',
         icon: GraduationCap
-      })
-    }
-
-    // 稳定性维度：工作履历完整性
-    if (profile.workRecordsCount < 2) {
-      suggestionList.push({
-        id: 'work-stability',
-        category: 'stability',
-        dimension: '稳定性',
-        title: '工作履历记录不足',
-        description: '完整记录工作经历，连续稳定的职业轨迹有助于提升稳定性评分',
-        priority: 'high',
-        status: 'missing',
-        action: '/pages/work-history/index?tab=work',
-        actionText: '去补充',
-        icon: Building
-      })
-    } else if (profile.workRecordsCount < 3) {
-      suggestionList.push({
-        id: 'work-complete',
-        category: 'stability',
-        dimension: '稳定性',
-        title: '工作履历待完善',
-        description: '补充更完整的工作记录，展示稳定的职业发展路径',
-        priority: 'medium',
-        status: 'incomplete',
-        action: '/pages/work-history/index?tab=work',
-        actionText: '去补充',
-        icon: Building
-      })
-    }
-
-    // 专业性维度：职业资格证书
-    if (profile.certsCount === 0) {
-      suggestionList.push({
+      },
+      {
         id: 'certs',
         category: 'expertise',
         dimension: '专业性',
-        title: '缺少职业资格证书',
+        title: '添加职业资格证书',
         description: '添加行业认可的职业资格证书，有效提升专业性评分',
         priority: 'high',
         status: 'missing',
         action: '/pages/work-history/index?tab=certs',
         actionText: '去添加',
         icon: Medal
-      })
-    }
-
-    // 安全性维度：授权核查
-    suggestionList.push({
-      id: 'safety-check',
-      category: 'safety',
-      dimension: '安全性',
-      title: '授权诉讼与黑名单核查',
-      description: '主动授权系统核查诉讼记录和法院强制执行名单，无记录可显著提升安全性评分',
-      priority: profile.reportGenerated ? 'medium' : 'high',
-      status: 'pending',
-      action: '/pages/authorize/index',
-      actionText: '去授权',
-      icon: Shield
-    })
-
-    // 合规性维度：提示
-    suggestionList.push({
-      id: 'compliance',
-      category: 'compliance',
-      dimension: '合规性',
-      title: '完善离职与竞业信息',
-      description: '如实填写离职原因及竞业协议情况，合规的职业行为记录有助于提升合规性评分',
-      priority: 'medium',
-      status: 'pending',
-      action: '/pages/work-history/index?tab=work',
-      actionText: '去填写',
-      icon: Award
-    })
-
-    // 按优先级排序
-    suggestionList.sort((a, b) => {
-      const priorityOrder = { high: 0, medium: 1, low: 2 }
-      return priorityOrder[a.priority] - priorityOrder[b.priority]
-    })
-
-    setSuggestions(suggestionList)
+      },
+      {
+        id: 'work',
+        category: 'stability',
+        dimension: '稳定性',
+        title: '添加工作履历',
+        description: '完整记录工作经历，连续稳定的职业轨迹有助于提升稳定性评分',
+        priority: 'medium',
+        status: 'missing',
+        action: '/pages/work-history/index?tab=work',
+        actionText: '去补充',
+        icon: Building
+      },
+    ])
   }
 
   const isReportOutdated = (lastDate: string): boolean => {
@@ -366,11 +291,6 @@ const EnhancementPage: FC = () => {
                   )
                 })}
 
-                {/* 提示条 */}
-                <View style={{ background: '#fffbeb', borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <Zap size={15} color="#d97706" />
-                  <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.6', flex: 1 }}>优先完成标记为「重要」的项目，可快速提升职业信用分。</Text>
-                </View>
               </View>
             ) : (
               <View style={{ padding: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
