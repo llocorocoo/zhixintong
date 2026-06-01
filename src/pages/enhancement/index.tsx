@@ -118,7 +118,7 @@ const EnhancementPage: FC = () => {
         description: '添加行业认可的职业资格证书，有效提升专业性评分',
         priority: 'high',
         status: 'missing',
-        action: '/pages/work-history/index?tab=certs',
+        action: '/pages/cert-form/index',
         actionText: '去添加',
         icon: Medal
       },
