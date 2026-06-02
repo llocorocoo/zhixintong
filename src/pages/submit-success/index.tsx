@@ -5,13 +5,22 @@ import { CircleCheck, ShieldCheck, ArrowRight, FileText } from 'lucide-react-tar
 
 const SubmitSuccessPage: FC = () => {
   const [btnPressed, setBtnPressed] = useState(false)
+  const params = Taro.getCurrentInstance().router?.params || {}
+  const isEnhancement = params.type === 'enhancement'
 
-  const steps = [
-    { num: '1', title: '提交信息', done: true },
-    { num: '2', title: '签署授权书', done: false, current: true },
-    { num: '3', title: '平台核查', done: false },
-    { num: '4', title: '生成报告', done: false },
-  ]
+  const steps = isEnhancement
+    ? [
+        { num: '1', title: '支付成功', done: true },
+        { num: '2', title: '签署授权书', done: false, current: true },
+        { num: '3', title: '平台核查', done: false },
+        { num: '4', title: '信用提升', done: false },
+      ]
+    : [
+        { num: '1', title: '提交信息', done: true },
+        { num: '2', title: '签署授权书', done: false, current: true },
+        { num: '3', title: '平台核查', done: false },
+        { num: '4', title: '生成报告', done: false },
+      ]
 
   return (
     <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
@@ -45,10 +54,12 @@ const SubmitSuccessPage: FC = () => {
               <CircleCheck size={36} color="#059669" />
             </View>
             <Text style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', display: 'block', lineHeight: '1.3', marginBottom: '8px' }}>
-              信息已成功提交
+              {isEnhancement ? '支付成功' : '信息已成功提交'}
             </Text>
             <Text style={{ fontSize: '13px', color: '#94a3b8', display: 'block', lineHeight: '1.7' }}>
-              您的身份信息已安全提交，下一步请签署信息核查授权书，平台将基于您的授权开始核查。
+              {isEnhancement
+                ? '支付已完成，下一步请签署信息核查授权书，平台将基于您的授权核查并提升您的职业信用。'
+                : '您的身份信息已安全提交，下一步请签署信息核查授权书，平台将基于您的授权开始核查。'}
             </Text>
           </View>
         </View>
@@ -115,7 +126,7 @@ const SubmitSuccessPage: FC = () => {
           onTouchStart={() => setBtnPressed(true)}
           onTouchEnd={() => setBtnPressed(false)}
           onTouchCancel={() => setBtnPressed(false)}
-          onClick={() => Taro.navigateTo({ url: '/pages/authorize/index' })}
+          onClick={() => Taro.navigateTo({ url: isEnhancement ? '/pages/authorize/index?type=enhancement' : '/pages/authorize/index' })}
         >
           <ShieldCheck size={18} color="#fff" />
           <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>

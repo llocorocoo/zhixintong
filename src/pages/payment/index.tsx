@@ -56,7 +56,7 @@ const PaymentPage: FC = () => {
       Taro.showToast({ title: '支付成功', icon: 'success' })
       setTimeout(() => {
         if (isEnhancement) {
-          Taro.redirectTo({ url: '/pages/authorize/index?type=enhancement' })
+          Taro.redirectTo({ url: '/pages/submit-success/index?type=enhancement' })
         } else if (isUpdate) {
           Taro.redirectTo({ url: '/pages/authorize/index?type=update' })
         } else {
