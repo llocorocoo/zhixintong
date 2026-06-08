@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Picker, Textarea } from '@tarojs/components'
+import { View, Text, ScrollView, Picker } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { Input } from '@/components/ui/input'
@@ -14,7 +14,7 @@ interface WorkItem {
   employmentStatus: string
   startDate: string
   endDate: string
-  description: string
+  canBackcheck: string
   refRelation: string
   refName: string
   refDepartment: string
@@ -26,7 +26,7 @@ const genId = () => Math.random().toString(36).substring(2, 9)
 const emptyWork = (): WorkItem => ({
   id: genId(), company: '', position: '', department: '',
   employmentType: '全职', employmentStatus: '在职',
-  startDate: '', endDate: '', description: '',
+  startDate: '', endDate: '', canBackcheck: '',
   refRelation: '', refName: '', refDepartment: '', refPosition: '', refContact: '',
 })
 
@@ -249,26 +249,9 @@ const WorkFormPage: FC = () => {
                     </View>
                   </Field>
 
-                  {/* 工作职责及描述 */}
-                  <Field label="工作职责及描述">
-                    <View style={{
-                      display: 'flex', alignItems: 'center', gap: '10px',
-                      background: focusField === `${work.id}-desc` ? '#eff6ff' : '#f8fafc',
-                      borderRadius: '12px', padding: '12px 14px',
-                      border: `1.5px solid ${focusField === `${work.id}-desc` ? '#3b82f6' : 'transparent'}`,
-                      boxShadow: focusField === `${work.id}-desc` ? '0 0 0 3px rgba(59,130,246,0.08)' : 'none',
-                      transition: 'all 0.25s ease',
-                    }}>
-                      <Textarea
-                        style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5', minHeight: '80px', width: '100%' }}
-                        placeholder="请描述主要工作职责和工作内容"
-                        placeholderStyle="color:#cbd5e1;font-size:14px;"
-                        value={work.description}
-                        onFocus={() => setFocusField(`${work.id}-desc`)} onBlur={() => setFocusField(null)}
-                        onInput={e => setWork(work.id, 'description', e.detail.value)}
-                        autoHeight
-                      />
-                    </View>
+                  {/* 是否方便立即背调 */}
+                  <Field label="是否方便立即背调">
+                    <DropdownSelect options={['是', '否']} value={work.canBackcheck} onChange={v => setWork(work.id, 'canBackcheck', v)} placeholder="请选择" />
                   </Field>
 
                   {/* ── 证明人信息分隔 ── */}

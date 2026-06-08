@@ -23,7 +23,7 @@ export interface SavedWorkItem {
   employmentStatus: string
   startDate: string
   endDate: string
-  description: string
+  canBackcheck: string
   refRelation: string
   refName: string
   refDepartment: string
