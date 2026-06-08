@@ -18,10 +18,16 @@ export interface SavedWorkItem {
   id: string
   company: string
   position: string
+  department: string
+  employmentType: string
+  employmentStatus: string
   startDate: string
   endDate: string
   description: string
+  refRelation: string
   refName: string
+  refDepartment: string
+  refPosition: string
   refContact: string
 }
 

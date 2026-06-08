@@ -9,15 +9,29 @@ interface WorkItem {
   id: string
   company: string
   position: string
+  department: string
+  employmentType: string
+  employmentStatus: string
   startDate: string
   endDate: string
   description: string
+  refRelation: string
   refName: string
+  refDepartment: string
+  refPosition: string
   refContact: string
 }
 
 const genId = () => Math.random().toString(36).substring(2, 9)
-const emptyWork = (): WorkItem => ({ id: genId(), company: '', position: '', startDate: '', endDate: '', description: '', refName: '', refContact: '' })
+const emptyWork = (): WorkItem => ({
+  id: genId(), company: '', position: '', department: '',
+  employmentType: '全职', employmentStatus: '在职',
+  startDate: '', endDate: '', description: '',
+  refRelation: '', refName: '', refDepartment: '', refPosition: '', refContact: '',
+})
+
+const EMPLOYMENT_TYPES = ['全职', '兼职', '实习']
+const EMPLOYMENT_STATUSES = ['在职', '离职']
 
 const YEARS = Array.from({ length: 30 }, (_, i) => String(new Date().getFullYear() - i))
 const MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
@@ -46,7 +60,20 @@ const InputBox: FC<{ focused: boolean; children: React.ReactNode }> = ({ focused
   </View>
 )
 
-// 解析 "YYYY-MM" → [yearIdx, monthIdx]
+const PillSelect: FC<{ options: string[]; value: string; onChange: (v: string) => void }> = ({ options, value, onChange }) => (
+  <View style={{ display: 'flex', gap: '8px' }}>
+    {options.map(opt => (
+      <View
+        key={opt}
+        style={{ flex: 1, padding: '10px 0', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1.5px solid ${value === opt ? '#2563eb' : '#e2e8f0'}`, background: value === opt ? '#eff6ff' : '#fff', transition: 'all 0.2s' }}
+        onClick={() => onChange(opt)}
+      >
+        <Text style={{ fontSize: '13px', fontWeight: '600', color: value === opt ? '#2563eb' : '#94a3b8', lineHeight: '1.5' }}>{opt}</Text>
+      </View>
+    ))}
+  </View>
+)
+
 const parseDateIdx = (date: string) => {
   const [y, m] = date.split('-')
   const yi = YEARS.indexOf(y)
@@ -54,7 +81,6 @@ const parseDateIdx = (date: string) => {
   return [yi < 0 ? 0 : yi, mi < 0 ? 0 : mi]
 }
 
-// MultiColumnPicker 封装：年-月 两列
 const DatePicker: FC<{ value: string; onChange: (v: string) => void; placeholder: string }> = ({ value, onChange, placeholder }) => {
   const [yi, mi] = parseDateIdx(value)
   return (
@@ -82,7 +108,6 @@ const WorkFormPage: FC = () => {
   const [list, setList] = useState<WorkItem[]>([emptyWork()])
   const [focusField, setFocusField] = useState<string | null>(null)
   const [btnPressed, setBtnPressed] = useState(false)
-
 
   const setWork = (id: string, field: keyof WorkItem, value: string) =>
     setList(prev => prev.map(w => w.id === id ? { ...w, [field]: value } : w))
@@ -156,8 +181,8 @@ const WorkFormPage: FC = () => {
                     </InputBox>
                   </Field>
 
-                  {/* 职位 */}
-                  <Field label="职位" required>
+                  {/* 职位名称 */}
+                  <Field label="职位名称" required>
                     <InputBox focused={focusField === `${work.id}-position`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
@@ -167,6 +192,29 @@ const WorkFormPage: FC = () => {
                         onInput={e => setWork(work.id, 'position', e.detail.value)}
                       />
                     </InputBox>
+                  </Field>
+
+                  {/* 部门 */}
+                  <Field label="部门">
+                    <InputBox focused={focusField === `${work.id}-department`}>
+                      <Input
+                        style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
+                        placeholder="请输入部门名称" placeholderStyle="color:#cbd5e1;"
+                        value={work.department}
+                        onFocus={() => setFocusField(`${work.id}-department`)} onBlur={() => setFocusField(null)}
+                        onInput={e => setWork(work.id, 'department', e.detail.value)}
+                      />
+                    </InputBox>
+                  </Field>
+
+                  {/* 供职方式 */}
+                  <Field label="供职方式">
+                    <PillSelect options={EMPLOYMENT_TYPES} value={work.employmentType} onChange={v => setWork(work.id, 'employmentType', v)} />
+                  </Field>
+
+                  {/* 状态 */}
+                  <Field label="状态">
+                    <PillSelect options={EMPLOYMENT_STATUSES} value={work.employmentStatus} onChange={v => setWork(work.id, 'employmentStatus', v)} />
                   </Field>
 
                   {/* 入职时间 */}
@@ -206,8 +254,8 @@ const WorkFormPage: FC = () => {
                     </View>
                   </Field>
 
-                  {/* 工作职责及内容 */}
-                  <Field label="工作职责及内容">
+                  {/* 工作职责及描述 */}
+                  <Field label="工作职责及描述">
                     <View style={{
                       display: 'flex', alignItems: 'center', gap: '10px',
                       background: '#fff',
@@ -228,6 +276,24 @@ const WorkFormPage: FC = () => {
                     </View>
                   </Field>
 
+                  {/* ── 证明人信息分隔 ── */}
+                  <View style={{ borderTop: '1px solid #e2e8f0', margin: '4px 0 14px', paddingTop: '14px' }}>
+                    <Text style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', lineHeight: '1.5', marginBottom: '12px', display: 'block' }}>证明人信息</Text>
+                  </View>
+
+                  {/* 证明人与候选人关系 */}
+                  <Field label="与候选人关系">
+                    <InputBox focused={focusField === `${work.id}-refRelation`}>
+                      <Input
+                        style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
+                        placeholder="如：直属上级、同事等" placeholderStyle="color:#cbd5e1;"
+                        value={work.refRelation}
+                        onFocus={() => setFocusField(`${work.id}-refRelation`)} onBlur={() => setFocusField(null)}
+                        onInput={e => setWork(work.id, 'refRelation', e.detail.value)}
+                      />
+                    </InputBox>
+                  </Field>
+
                   {/* 证明人姓名 */}
                   <Field label="证明人姓名">
                     <InputBox focused={focusField === `${work.id}-refName`}>
@@ -237,6 +303,32 @@ const WorkFormPage: FC = () => {
                         value={work.refName}
                         onFocus={() => setFocusField(`${work.id}-refName`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'refName', e.detail.value)}
+                      />
+                    </InputBox>
+                  </Field>
+
+                  {/* 证明人部门 */}
+                  <Field label="证明人部门">
+                    <InputBox focused={focusField === `${work.id}-refDepartment`}>
+                      <Input
+                        style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
+                        placeholder="请输入证明人所在部门" placeholderStyle="color:#cbd5e1;"
+                        value={work.refDepartment}
+                        onFocus={() => setFocusField(`${work.id}-refDepartment`)} onBlur={() => setFocusField(null)}
+                        onInput={e => setWork(work.id, 'refDepartment', e.detail.value)}
+                      />
+                    </InputBox>
+                  </Field>
+
+                  {/* 证明人职位 */}
+                  <Field label="证明人职位">
+                    <InputBox focused={focusField === `${work.id}-refPosition`}>
+                      <Input
+                        style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
+                        placeholder="请输入证明人职位" placeholderStyle="color:#cbd5e1;"
+                        value={work.refPosition}
+                        onFocus={() => setFocusField(`${work.id}-refPosition`)} onBlur={() => setFocusField(null)}
+                        onInput={e => setWork(work.id, 'refPosition', e.detail.value)}
                       />
                     </InputBox>
                   </Field>
