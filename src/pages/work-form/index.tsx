@@ -32,6 +32,7 @@ const emptyWork = (): WorkItem => ({
 
 const EMPLOYMENT_TYPES = ['全职', '兼职', '实习']
 const EMPLOYMENT_STATUSES = ['在职', '离职']
+const REF_RELATIONS = ['HR', '上级领导', '直接上级', '同级同事', '直接下级', '下级同事', '跨部门同事', '其他']
 
 const YEARS = Array.from({ length: 30 }, (_, i) => String(new Date().getFullYear() - i))
 const MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
@@ -261,15 +262,7 @@ const WorkFormPage: FC = () => {
 
                   {/* 证明人与候选人关系 */}
                   <Field label="与候选人关系">
-                    <InputBox focused={focusField === `${work.id}-refRelation`}>
-                      <Input
-                        style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                        placeholder="如：直属上级、同事等" placeholderStyle="color:#cbd5e1;font-size:14px;"
-                        value={work.refRelation}
-                        onFocus={() => setFocusField(`${work.id}-refRelation`)} onBlur={() => setFocusField(null)}
-                        onInput={e => setWork(work.id, 'refRelation', e.detail.value)}
-                      />
-                    </InputBox>
+                    <DropdownSelect options={REF_RELATIONS} value={work.refRelation} onChange={v => setWork(work.id, 'refRelation', v)} placeholder="请选择与候选人关系" />
                   </Field>
 
                   {/* 证明人姓名 */}
