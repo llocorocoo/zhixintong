@@ -60,18 +60,13 @@ const InputBox: FC<{ focused: boolean; children: React.ReactNode }> = ({ focused
   </View>
 )
 
-const PillSelect: FC<{ options: string[]; value: string; onChange: (v: string) => void }> = ({ options, value, onChange }) => (
-  <View style={{ display: 'flex', gap: '8px' }}>
-    {options.map(opt => (
-      <View
-        key={opt}
-        style={{ flex: 1, padding: '10px 0', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1.5px solid ${value === opt ? '#2563eb' : '#e2e8f0'}`, background: value === opt ? '#eff6ff' : '#fff', transition: 'all 0.2s' }}
-        onClick={() => onChange(opt)}
-      >
-        <Text style={{ fontSize: '13px', fontWeight: '600', color: value === opt ? '#2563eb' : '#94a3b8', lineHeight: '1.5' }}>{opt}</Text>
-      </View>
-    ))}
-  </View>
+const DropdownSelect: FC<{ options: string[]; value: string; onChange: (v: string) => void; placeholder: string }> = ({ options, value, onChange, placeholder }) => (
+  <Picker mode="selector" range={options} value={options.indexOf(value)} onChange={e => onChange(options[Number(e.detail.value)])}>
+    <View style={{ background: '#f8fafc', borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1.5px solid transparent' }}>
+      <Text style={{ fontSize: '14px', color: value ? '#0f172a' : '#cbd5e1', lineHeight: '1.5' }}>{value || placeholder}</Text>
+      <ChevronRight size={15} color="#94a3b8" />
+    </View>
+  </Picker>
 )
 
 const parseDateIdx = (date: string) => {
@@ -209,12 +204,12 @@ const WorkFormPage: FC = () => {
 
                   {/* 供职方式 */}
                   <Field label="供职方式">
-                    <PillSelect options={EMPLOYMENT_TYPES} value={work.employmentType} onChange={v => setWork(work.id, 'employmentType', v)} />
+                    <DropdownSelect options={EMPLOYMENT_TYPES} value={work.employmentType} onChange={v => setWork(work.id, 'employmentType', v)} placeholder="请选择供职方式" />
                   </Field>
 
                   {/* 状态 */}
                   <Field label="状态">
-                    <PillSelect options={EMPLOYMENT_STATUSES} value={work.employmentStatus} onChange={v => setWork(work.id, 'employmentStatus', v)} />
+                    <DropdownSelect options={EMPLOYMENT_STATUSES} value={work.employmentStatus} onChange={v => setWork(work.id, 'employmentStatus', v)} placeholder="请选择状态" />
                   </Field>
 
                   {/* 入职时间 */}
@@ -258,7 +253,7 @@ const WorkFormPage: FC = () => {
                   <Field label="工作职责及描述">
                     <View style={{
                       display: 'flex', alignItems: 'center', gap: '10px',
-                      background: '#fff',
+                      background: focusField === `${work.id}-desc` ? '#eff6ff' : '#f8fafc',
                       borderRadius: '12px', padding: '12px 14px',
                       border: `1.5px solid ${focusField === `${work.id}-desc` ? '#3b82f6' : 'transparent'}`,
                       boxShadow: focusField === `${work.id}-desc` ? '0 0 0 3px rgba(59,130,246,0.08)' : 'none',
