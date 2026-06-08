@@ -168,7 +168,7 @@ const WorkFormPage: FC = () => {
                     <InputBox focused={focusField === `${work.id}-company`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                        placeholder="请输入公司名称" placeholderStyle="color:#cbd5e1;"
+                        placeholder="请输入公司名称" placeholderStyle="color:#cbd5e1;font-size:14px;"
                         value={work.company}
                         onFocus={() => setFocusField(`${work.id}-company`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'company', e.detail.value)}
@@ -181,7 +181,7 @@ const WorkFormPage: FC = () => {
                     <InputBox focused={focusField === `${work.id}-position`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                        placeholder="请输入职位名称" placeholderStyle="color:#cbd5e1;"
+                        placeholder="请输入职位名称" placeholderStyle="color:#cbd5e1;font-size:14px;"
                         value={work.position}
                         onFocus={() => setFocusField(`${work.id}-position`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'position', e.detail.value)}
@@ -194,7 +194,7 @@ const WorkFormPage: FC = () => {
                     <InputBox focused={focusField === `${work.id}-department`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                        placeholder="请输入部门名称" placeholderStyle="color:#cbd5e1;"
+                        placeholder="请输入部门名称" placeholderStyle="color:#cbd5e1;font-size:14px;"
                         value={work.department}
                         onFocus={() => setFocusField(`${work.id}-department`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'department', e.detail.value)}
@@ -281,7 +281,7 @@ const WorkFormPage: FC = () => {
                     <InputBox focused={focusField === `${work.id}-refRelation`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                        placeholder="如：直属上级、同事等" placeholderStyle="color:#cbd5e1;"
+                        placeholder="如：直属上级、同事等" placeholderStyle="color:#cbd5e1;font-size:14px;"
                         value={work.refRelation}
                         onFocus={() => setFocusField(`${work.id}-refRelation`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'refRelation', e.detail.value)}
@@ -294,7 +294,7 @@ const WorkFormPage: FC = () => {
                     <InputBox focused={focusField === `${work.id}-refName`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                        placeholder="请输入证明人姓名" placeholderStyle="color:#cbd5e1;"
+                        placeholder="请输入证明人姓名" placeholderStyle="color:#cbd5e1;font-size:14px;"
                         value={work.refName}
                         onFocus={() => setFocusField(`${work.id}-refName`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'refName', e.detail.value)}
@@ -307,7 +307,7 @@ const WorkFormPage: FC = () => {
                     <InputBox focused={focusField === `${work.id}-refDepartment`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                        placeholder="请输入证明人所在部门" placeholderStyle="color:#cbd5e1;"
+                        placeholder="请输入证明人所在部门" placeholderStyle="color:#cbd5e1;font-size:14px;"
                         value={work.refDepartment}
                         onFocus={() => setFocusField(`${work.id}-refDepartment`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'refDepartment', e.detail.value)}
@@ -320,7 +320,7 @@ const WorkFormPage: FC = () => {
                     <InputBox focused={focusField === `${work.id}-refPosition`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                        placeholder="请输入证明人职位" placeholderStyle="color:#cbd5e1;"
+                        placeholder="请输入证明人职位" placeholderStyle="color:#cbd5e1;font-size:14px;"
                         value={work.refPosition}
                         onFocus={() => setFocusField(`${work.id}-refPosition`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'refPosition', e.detail.value)}
@@ -333,7 +333,7 @@ const WorkFormPage: FC = () => {
                     <InputBox focused={focusField === `${work.id}-refContact`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                        placeholder="请输入证明人手机号或邮箱" placeholderStyle="color:#cbd5e1;"
+                        placeholder="请输入证明人手机号或邮箱" placeholderStyle="color:#cbd5e1;font-size:14px;"
                         value={work.refContact}
                         onFocus={() => setFocusField(`${work.id}-refContact`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'refContact', e.detail.value)}
