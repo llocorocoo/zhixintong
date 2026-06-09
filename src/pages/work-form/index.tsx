@@ -128,7 +128,7 @@ const WorkFormPage: FC = () => {
   }
 
   return (
-    <View style={{ background: '#f6f8fc', minHeight: '100vh' }}>
+    <View style={{ background: '#f6f8fc', minHeight: '100vh', overflow: 'hidden' }}>
 
       {/* 蓝色渐变头部 */}
       <View style={{ background: 'linear-gradient(135deg, #0f2460 0%, #1e40af 50%, #2563eb 100%)', padding: '20px 20px 24px', position: 'relative', overflow: 'hidden' }}>
@@ -138,8 +138,8 @@ const WorkFormPage: FC = () => {
         </Text>
       </View>
 
-      <ScrollView scrollY style={{ height: 'calc(100vh - 130px)' }}>
-        <View style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <ScrollView scrollY style={{ height: 'calc(100vh - 130px)', overflowX: 'hidden' }}>
+        <View style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', overflowX: 'hidden' }}>
 
           <View style={{ background: '#fff', borderRadius: '20px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)' }}>
             <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4', display: 'block', marginBottom: '18px' }}>工作信息</Text>
