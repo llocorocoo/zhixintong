@@ -1,9 +1,9 @@
 import { View, Text, ScrollView, Picker } from '@tarojs/components'
-import { FC, useState } from 'react'
+import { FC, useState, useRef } from 'react'
 import Taro from '@tarojs/taro'
 import { Input } from '@/components/ui/input'
 import { useEnhancementFormStore } from '@/stores/enhancement-form'
-import { ChevronRight, Plus, Trash2 } from 'lucide-react-taro'
+import { ChevronRight, Plus, Trash2, ChevronUp } from 'lucide-react-taro'
 
 interface WorkItem {
   id: string
@@ -104,6 +104,8 @@ const WorkFormPage: FC = () => {
   const [list, setList] = useState<WorkItem[]>([emptyWork()])
   const [focusField, setFocusField] = useState<string | null>(null)
   const [btnPressed, setBtnPressed] = useState(false)
+  const [scrollTop, setScrollTop] = useState(0)
+  const [showBackTop, setShowBackTop] = useState(false)
 
   const setWork = (id: string, field: keyof WorkItem, value: string) =>
     setList(prev => prev.map(w => w.id === id ? { ...w, [field]: value } : w))
@@ -138,7 +140,12 @@ const WorkFormPage: FC = () => {
         </Text>
       </View>
 
-      <ScrollView scrollY style={{ height: 'calc(100vh - 130px)', overflowX: 'hidden' }}>
+      <ScrollView
+        scrollY
+        scrollTop={scrollTop}
+        onScroll={e => setShowBackTop((e as any).detail.scrollTop > 400)}
+        style={{ height: 'calc(100vh - 130px)', overflowX: 'hidden' }}
+      >
         <View style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', overflowX: 'hidden' }}>
 
           <View style={{ background: '#fff', borderRadius: '20px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)' }}>
@@ -191,7 +198,7 @@ const WorkFormPage: FC = () => {
                   </Field>
 
                   {/* 部门 */}
-                  <Field label="部门">
+                  <Field label="部门" required>
                     <InputBox focused={focusField === `${work.id}-department`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
@@ -204,17 +211,17 @@ const WorkFormPage: FC = () => {
                   </Field>
 
                   {/* 供职方式 */}
-                  <Field label="供职方式">
+                  <Field label="供职方式" required>
                     <DropdownSelect options={EMPLOYMENT_TYPES} value={work.employmentType} onChange={v => setWork(work.id, 'employmentType', v)} placeholder="请选择供职方式" />
                   </Field>
 
                   {/* 状态 */}
-                  <Field label="状态">
+                  <Field label="状态" required>
                     <DropdownSelect options={EMPLOYMENT_STATUSES} value={work.employmentStatus} onChange={v => setWork(work.id, 'employmentStatus', v)} placeholder="请选择状态" />
                   </Field>
 
                   {/* 入职时间 */}
-                  <Field label="入职时间">
+                  <Field label="入职时间" required>
                     <DatePicker
                       value={work.startDate}
                       onChange={v => setWork(work.id, 'startDate', v)}
@@ -223,7 +230,7 @@ const WorkFormPage: FC = () => {
                   </Field>
 
                   {/* 离职时间 */}
-                  <Field label="离职时间">
+                  <Field label="离职时间" required>
                     <View style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <View style={{ flex: 1 }}>
                         {work.endDate === '至今' ? (
@@ -251,7 +258,7 @@ const WorkFormPage: FC = () => {
                   </Field>
 
                   {/* 是否方便立即背调 */}
-                  <Field label="是否方便立即背调">
+                  <Field label="是否方便立即背调" required>
                     <DropdownSelect options={['是', '否']} value={work.canBackcheck} onChange={v => setWork(work.id, 'canBackcheck', v)} placeholder="请选择" />
                   </Field>
 
@@ -261,12 +268,12 @@ const WorkFormPage: FC = () => {
                   </View>
 
                   {/* 证明人与候选人关系 */}
-                  <Field label="与候选人关系">
+                  <Field label="与候选人关系" required>
                     <DropdownSelect options={REF_RELATIONS} value={work.refRelation} onChange={v => setWork(work.id, 'refRelation', v)} placeholder="请选择与候选人关系" />
                   </Field>
 
                   {/* 证明人姓名 */}
-                  <Field label="证明人姓名">
+                  <Field label="证明人姓名" required>
                     <InputBox focused={focusField === `${work.id}-refName`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
@@ -279,7 +286,7 @@ const WorkFormPage: FC = () => {
                   </Field>
 
                   {/* 证明人部门 */}
-                  <Field label="证明人部门">
+                  <Field label="证明人部门" required>
                     <InputBox focused={focusField === `${work.id}-refDepartment`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
@@ -292,7 +299,7 @@ const WorkFormPage: FC = () => {
                   </Field>
 
                   {/* 证明人职位 */}
-                  <Field label="证明人职位">
+                  <Field label="证明人职位" required>
                     <InputBox focused={focusField === `${work.id}-refPosition`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
@@ -305,7 +312,7 @@ const WorkFormPage: FC = () => {
                   </Field>
 
                   {/* 证明人联系方式 */}
-                  <Field label="证明人联系方式">
+                  <Field label="证明人联系方式" required>
                     <InputBox focused={focusField === `${work.id}-refContact`}>
                       <Input
                         style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
@@ -354,6 +361,16 @@ const WorkFormPage: FC = () => {
 
         </View>
       </ScrollView>
+
+      {/* 返回顶部 */}
+      {showBackTop && (
+        <View
+          style={{ position: 'fixed', right: '16px', bottom: '24px', width: '40px', height: '40px', borderRadius: '50%', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}
+          onClick={() => { setScrollTop(prev => prev === 0 ? 0.1 : 0) }}
+        >
+          <ChevronUp size={20} color="#64748b" />
+        </View>
+      )}
     </View>
   )
 }
