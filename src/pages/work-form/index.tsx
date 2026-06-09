@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Picker } from '@tarojs/components'
-import { FC, useState, useRef } from 'react'
+import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { Input } from '@/components/ui/input'
 import { useEnhancementFormStore } from '@/stores/enhancement-form'
@@ -104,7 +104,7 @@ const WorkFormPage: FC = () => {
   const [list, setList] = useState<WorkItem[]>([emptyWork()])
   const [focusField, setFocusField] = useState<string | null>(null)
   const [btnPressed, setBtnPressed] = useState(false)
-  const [scrollTop, setScrollTop] = useState(0)
+  const [scrollIntoView, setScrollIntoView] = useState('')
   const [showBackTop, setShowBackTop] = useState(false)
 
   const setWork = (id: string, field: keyof WorkItem, value: string) =>
@@ -142,11 +142,11 @@ const WorkFormPage: FC = () => {
 
       <ScrollView
         scrollY
-        scrollTop={scrollTop}
-        onScroll={e => setShowBackTop((e as any).detail.scrollTop > 400)}
+        scrollIntoView={scrollIntoView}
+        onScroll={e => { setShowBackTop((e as any).detail.scrollTop > 400); setScrollIntoView('') }}
         style={{ height: 'calc(100vh - 130px)', overflowX: 'hidden' }}
       >
-        <View style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', overflowX: 'hidden' }}>
+        <View id="scroll-top" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', overflowX: 'hidden' }}>
 
           <View style={{ background: '#fff', borderRadius: '20px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)' }}>
             <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4', display: 'block', marginBottom: '18px' }}>工作信息</Text>
@@ -366,7 +366,7 @@ const WorkFormPage: FC = () => {
       {showBackTop && (
         <View
           style={{ position: 'fixed', right: '16px', bottom: '24px', width: '40px', height: '40px', borderRadius: '50%', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}
-          onClick={() => { setScrollTop(prev => prev === 0 ? 0.1 : 0) }}
+          onClick={() => setScrollIntoView('scroll-top')}
         >
           <ChevronUp size={20} color="#64748b" />
         </View>
