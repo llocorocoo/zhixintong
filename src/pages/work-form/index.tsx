@@ -143,7 +143,7 @@ const WorkFormPage: FC = () => {
       <ScrollView
         scrollY
         scrollIntoView={scrollIntoView}
-        onScroll={e => { setShowBackTop((e as any).detail.scrollTop > 400); setScrollIntoView('') }}
+        onScroll={e => setShowBackTop((e as any).detail.scrollTop > 400)}
         style={{ height: 'calc(100vh - 130px)', overflowX: 'hidden' }}
       >
         <View id="scroll-top" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', overflowX: 'hidden' }}>
@@ -366,7 +366,7 @@ const WorkFormPage: FC = () => {
       {showBackTop && (
         <View
           style={{ position: 'fixed', right: '16px', bottom: '24px', width: '40px', height: '40px', borderRadius: '50%', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}
-          onClick={() => setScrollIntoView('scroll-top')}
+          onClick={() => { setScrollIntoView(''); setTimeout(() => setScrollIntoView('scroll-top'), 50) }}
         >
           <ChevronUp size={20} color="#64748b" />
         </View>
