@@ -146,7 +146,8 @@ const WorkFormPage: FC = () => {
         onScroll={e => setShowBackTop((e as any).detail.scrollTop > 400)}
         style={{ height: 'calc(100vh - 130px)', overflowX: 'hidden' }}
       >
-        <View id="scroll-top" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', overflowX: 'hidden' }}>
+        <View id="scroll-top" style={{ height: 0 }} />
+        <View style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', overflowX: 'hidden' }}>
 
           <View style={{ background: '#fff', borderRadius: '20px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)' }}>
             <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4', display: 'block', marginBottom: '18px' }}>工作信息</Text>
