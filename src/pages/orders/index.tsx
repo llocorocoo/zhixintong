@@ -87,7 +87,6 @@ const MOCK_ORDERS: Order[] = [
   {
     orderId: 'mock-008', orderType: 'credit_boost', status: 'PAYMENT_FAILED',
     amount: 19.8, completionProgress: 0,
-    failureReason: '银行卡余额不足',
     createdAt: d(2, 11, 30), updatedAt: d(2, 11, 32),
   },
   {
