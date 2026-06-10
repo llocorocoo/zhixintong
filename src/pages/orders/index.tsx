@@ -15,6 +15,8 @@ interface Order {
   amount: number
   completionProgress: number
   failureReason?: string
+  paymentPlatform?: string
+  paymentChannel?: string
   createdAt: string
   updatedAt: string
   paidAt?: string
@@ -65,28 +67,31 @@ const MOCK_ORDERS: Order[] = [
   {
     orderId: 'mock-002', orderType: 'personal_query', status: 'PAID',
     amount: 9.9, completionProgress: 30,
+    paymentPlatform: 'H5', paymentChannel: 'wechat',
     createdAt: d(2, 9, 5), updatedAt: d(2, 9, 8), paidAt: d(2, 9, 7),
   },
   {
     orderId: 'mock-003', orderType: 'credit_boost', status: 'COMPLETED',
     amount: 29.7, completionProgress: 100,
+    paymentPlatform: '微信小程序', paymentChannel: 'wechat',
     createdAt: d(7, 11, 30), updatedAt: d(5, 16, 0), paidAt: d(7, 11, 33), completedAt: d(5, 16, 0),
   },
   {
     orderId: 'mock-004', orderType: 'personal_query', status: 'COMPLETED',
     amount: 50, completionProgress: 100,
+    paymentPlatform: 'H5', paymentChannel: 'alipay',
     createdAt: d(14, 10, 0), updatedAt: d(11, 9, 0), paidAt: d(14, 10, 4), completedAt: d(11, 9, 0),
   },
   {
     orderId: 'mock-005', orderType: 'credit_boost', status: 'ABANDONED',
     amount: 9.9, completionProgress: 30,
-
+    paymentPlatform: '微信小程序', paymentChannel: 'wechat',
     createdAt: d(3, 17, 10), updatedAt: d(3, 17, 45), paidAt: d(3, 17, 13),
   },
-
   {
     orderId: 'mock-008', orderType: 'credit_boost', status: 'PAYMENT_FAILED',
     amount: 19.8, completionProgress: 0,
+    paymentPlatform: 'H5', paymentChannel: 'wechat',
     createdAt: d(2, 11, 30), updatedAt: d(2, 11, 32),
   },
   {
