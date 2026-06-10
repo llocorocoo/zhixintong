@@ -180,15 +180,6 @@ const OrderDetailPage: FC = () => {
               <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>重新支付</Text>
             </View>
           )}
-          {(order.status === 'COMPLETED' || order.status === 'PAID') && order.orderType === 'personal_query' && (
-            <View
-              style={{ borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#fff', border: '1.5px solid #e2e8f0' }}
-              onClick={() => Taro.switchTab({ url: '/pages/report/index' })}
-            >
-              <Text style={{ color: '#2563eb', fontSize: '15px', fontWeight: '600', lineHeight: '1.5' }}>查看报告</Text>
-              <ChevronRight size={15} color="#2563eb" />
-            </View>
-          )}
           {order.status === 'ABANDONED' && (
             <View
               style={{ borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #6d28d9, #7c3aed)', boxShadow: '0 4px 16px rgba(124,58,237,0.35)' }}
