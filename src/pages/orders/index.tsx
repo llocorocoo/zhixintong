@@ -5,7 +5,7 @@ import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import { FileText, TrendingUp, Clock, CircleCheck, CircleAlert, Ban, ChevronRight, PackageOpen } from 'lucide-react-taro'
 
-type OrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'COMPLETED' | 'ABANDONED' | 'FAILED' | 'PAYMENT_CANCELLED' | 'EXPIRED'
+type OrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'COMPLETED' | 'ABANDONED' | 'FAILED' | 'PAYMENT_FAILED' | 'PAYMENT_CANCELLED' | 'EXPIRED'
 type OrderType = 'personal_query' | 'credit_boost'
 
 interface Order {
@@ -29,6 +29,7 @@ const TYPE_INFO: Record<OrderType, { label: string; icon: any; color: string; bg
 const STATUS_INFO: Record<OrderStatus, { label: string; color: string; bg: string; icon: any }> = {
   PENDING_PAYMENT:   { label: '待支付',   color: '#d97706', bg: 'rgba(217,119,6,0.1)',    icon: Clock },
   PAID:              { label: '处理中',   color: '#2563eb', bg: 'rgba(37,99,235,0.1)',    icon: Clock },
+  PAYMENT_FAILED:    { label: '支付失败', color: '#dc2626', bg: 'rgba(220,38,38,0.1)',   icon: CircleAlert },
   COMPLETED:         { label: '已完成',   color: '#059669', bg: 'rgba(5,150,105,0.1)',    icon: CircleCheck },
   ABANDONED:         { label: '待授权',   color: '#7c3aed', bg: 'rgba(124,58,237,0.1)',  icon: CircleAlert },
   FAILED:            { label: '已失败',   color: '#dc2626', bg: 'rgba(220,38,38,0.1)',   icon: CircleAlert },
@@ -84,6 +85,12 @@ const MOCK_ORDERS: Order[] = [
   },
 
   {
+    orderId: 'mock-008', orderType: 'credit_boost', status: 'PAYMENT_FAILED',
+    amount: 19.8, completionProgress: 0,
+    failureReason: '银行卡余额不足',
+    createdAt: d(2, 11, 30), updatedAt: d(2, 11, 32),
+  },
+  {
     orderId: 'mock-007', orderType: 'personal_query', status: 'PAYMENT_CANCELLED',
     amount: 50, completionProgress: 0,
     createdAt: d(6, 15, 0), updatedAt: d(6, 15, 2),
@@ -120,7 +127,7 @@ const OrdersPage: FC = () => {
   const filtered = orders.filter(o => {
     if (activeTab === 'all') return true
     if (activeTab === 'closed') return CLOSED.has(o.status)
-    if (activeTab === 'PAID') return o.status === 'PAID' || o.status === 'ABANDONED'
+    if (activeTab === 'PAID') return o.status === 'PAID' || o.status === 'ABANDONED' || o.status === 'PAYMENT_FAILED'
     return o.status === activeTab
   })
 
