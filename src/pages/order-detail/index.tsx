@@ -165,11 +165,29 @@ const OrderDetailPage: FC = () => {
 
           {/* 操作区 */}
           {order.status === 'PENDING_PAYMENT' && (
-            <View
-              style={{ borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
-              onClick={() => Taro.navigateTo({ url: `/pages/payment/index?type=${order.orderType === 'credit_boost' ? 'enhancement' : 'create'}&price=${order.amount}&orderId=${order.orderId}` })}
-            >
-              <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>继续支付</Text>
+            <View style={{ display: 'flex', gap: '10px' }}>
+              <View
+                style={{ flex: 1, borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1.5px solid #e2e8f0' }}
+                onClick={() => {
+                  Taro.showModal({
+                    title: '取消订单', content: '确定取消此订单吗？',
+                    success: async (res) => {
+                      if (!res.confirm) return
+                      await Network.request({ url: '/api/order/cancel', method: 'POST', data: { orderId: order.orderId } }).catch(() => {})
+                      Taro.showToast({ title: '已取消', icon: 'success' })
+                      setTimeout(() => Taro.navigateBack(), 800)
+                    }
+                  })
+                }}
+              >
+                <Text style={{ color: '#64748b', fontSize: '15px', fontWeight: '600', lineHeight: '1.5' }}>取消订单</Text>
+              </View>
+              <View
+                style={{ flex: 2, borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
+                onClick={() => Taro.navigateTo({ url: `/pages/payment/index?type=${order.orderType === 'credit_boost' ? 'enhancement' : 'create'}&price=${order.amount}&orderId=${order.orderId}` })}
+              >
+                <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>继续支付</Text>
+              </View>
             </View>
           )}
           {order.status === 'PAYMENT_FAILED' && (
