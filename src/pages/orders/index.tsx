@@ -61,7 +61,7 @@ const d = (daysAgo: number, h = 10, m = 0) => {
 const MOCK_ORDERS: Order[] = [
   {
     orderId: 'mock-001', orderType: 'personal_query', status: 'PENDING_PAYMENT',
-    amount: 50, completionProgress: 0,
+    amount: 50, completionProgress: 0, paymentPlatform: 'H5',
     createdAt: d(1, 14, 22), updatedAt: d(1, 14, 22),
   },
   {
@@ -96,7 +96,7 @@ const MOCK_ORDERS: Order[] = [
   },
   {
     orderId: 'mock-007', orderType: 'personal_query', status: 'PAYMENT_CANCELLED',
-    amount: 50, completionProgress: 0,
+    amount: 50, completionProgress: 0, paymentPlatform: 'H5',
     createdAt: d(6, 15, 0), updatedAt: d(6, 15, 2),
   },
 ]
