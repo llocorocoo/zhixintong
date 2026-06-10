@@ -61,13 +61,13 @@ const d = (daysAgo: number, h = 10, m = 0) => {
 const MOCK_ORDERS: Order[] = [
   {
     orderId: 'mock-001', orderType: 'personal_query', status: 'PENDING_PAYMENT',
-    amount: 50, completionProgress: 0, paymentPlatform: 'H5',
+    amount: 50, completionProgress: 0, paymentPlatform: '网页应用',
     createdAt: d(1, 14, 22), updatedAt: d(1, 14, 22),
   },
   {
     orderId: 'mock-002', orderType: 'personal_query', status: 'PAID',
     amount: 9.9, completionProgress: 30,
-    paymentPlatform: 'H5', paymentChannel: 'wechat',
+    paymentPlatform: '网页应用', paymentChannel: 'wechat',
     createdAt: d(2, 9, 5), updatedAt: d(2, 9, 8), paidAt: d(2, 9, 7),
   },
   {
@@ -79,7 +79,7 @@ const MOCK_ORDERS: Order[] = [
   {
     orderId: 'mock-004', orderType: 'personal_query', status: 'COMPLETED',
     amount: 50, completionProgress: 100,
-    paymentPlatform: 'H5', paymentChannel: 'alipay',
+    paymentPlatform: '网页应用', paymentChannel: 'alipay',
     createdAt: d(14, 10, 0), updatedAt: d(11, 9, 0), paidAt: d(14, 10, 4), completedAt: d(11, 9, 0),
   },
   {
@@ -91,12 +91,12 @@ const MOCK_ORDERS: Order[] = [
   {
     orderId: 'mock-008', orderType: 'credit_boost', status: 'PAYMENT_FAILED',
     amount: 19.8, completionProgress: 0,
-    paymentPlatform: 'H5', paymentChannel: 'wechat',
+    paymentPlatform: '网页应用', paymentChannel: 'wechat',
     createdAt: d(2, 11, 30), updatedAt: d(2, 11, 32),
   },
   {
     orderId: 'mock-007', orderType: 'personal_query', status: 'PAYMENT_CANCELLED',
-    amount: 50, completionProgress: 0, paymentPlatform: 'H5',
+    amount: 50, completionProgress: 0, paymentPlatform: '网页应用',
     createdAt: d(6, 15, 0), updatedAt: d(6, 15, 2),
   },
 ]
