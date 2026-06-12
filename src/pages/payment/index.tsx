@@ -4,13 +4,16 @@ import Taro from '@tarojs/taro'
 import { Network } from '@/network'
 import { useUserStore } from '@/stores/user'
 import { useCurrentOrderStore } from '@/stores/current-order'
-import { Shield, Smartphone, CircleCheck, X } from 'lucide-react-taro'
+import { Shield, Smartphone, CircleCheck, X, CircleAlert } from 'lucide-react-taro'
 
 const PaymentPage: FC = () => {
   const [payMethod, setPayMethod] = useState('wechat')
   const [showConfirm, setShowConfirm] = useState(false)
   const [paying, setPaying] = useState(false)
   const [btnPressed, setBtnPressed] = useState(false)
+  const [showIosTip, setShowIosTip] = useState(() => {
+    try { return !Taro.getStorageSync('ios_pay_tip_dismissed') } catch { return true }
+  })
   const { userInfo } = useUserStore()
 
   const params = Taro.getCurrentInstance().router?.params || {}
@@ -224,6 +227,58 @@ const PaymentPage: FC = () => {
               <Text style={{ color: '#fff', fontSize: '16px', fontWeight: '700', lineHeight: '1.5' }}>
                 {paying ? '支付处理中...' : `确认支付 ¥${price}`}
               </Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* ── iOS 支付提示弹窗 ── */}
+      {showIosTip && (
+        <View
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: '24px' }}
+          onClick={() => {}}
+        >
+          <View
+            style={{ background: '#fff', borderRadius: '24px', width: '100%', maxWidth: '340px', overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.15)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* 头部 */}
+            <View style={{ background: 'linear-gradient(135deg, #f97316, #f59e0b)', padding: '20px 20px 16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <CircleAlert size={22} color="#fff" />
+              <Text style={{ fontSize: '16px', fontWeight: '700', color: '#fff', lineHeight: '1.4' }}>iOS 设备支付提示</Text>
+            </View>
+
+            {/* 内容 */}
+            <View style={{ padding: '16px 20px 20px' }}>
+              <Text style={{ fontSize: '13px', color: '#475569', display: 'block', lineHeight: '1.8', marginBottom: '14px' }}>
+                如果您使用 iPhone 或 iPad 支付，请确认以下事项：
+              </Text>
+
+              <View style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                {[
+                  '设备已升级至 iOS 15 及以上版本',
+                  '微信客户端已升级至 8.0.68 及以上',
+                  'Apple ID 绑定的手机号与登录手机号一致',
+                ].map((txt, i) => (
+                  <View key={i} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                    <View style={{ width: '18px', height: '18px', borderRadius: '50%', background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
+                      <Text style={{ fontSize: '11px', fontWeight: '700', color: '#d97706', lineHeight: '1' }}>{i + 1}</Text>
+                    </View>
+                    <Text style={{ fontSize: '13px', color: '#334155', lineHeight: '1.6', flex: 1 }}>{txt}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <Text style={{ fontSize: '12px', color: '#94a3b8', display: 'block', lineHeight: '1.6', marginBottom: '16px' }}>
+                如不满足以上条件，支付可能无法正常完成。安卓设备用户可忽略此提示。
+              </Text>
+
+              <View
+                style={{ borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
+                onClick={() => { setShowIosTip(false); try { Taro.setStorageSync('ios_pay_tip_dismissed', '1') } catch {} }}
+              >
+                <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>我知道了</Text>
+              </View>
             </View>
           </View>
         </View>
