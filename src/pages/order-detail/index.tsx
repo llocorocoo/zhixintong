@@ -96,11 +96,18 @@ const OrderDetailPage: FC = () => {
   useEffect(() => {
     if (!order || order.status !== 'PENDING_PAYMENT') return
     const created = new Date(order.createdAt).getTime()
-    const expires = created + 15 * 60 * 1000
-    const calc = () => Math.max(0, Math.floor((expires - Date.now()) / 1000))
-    setCountdown(calc())
+    const expires = Number.isNaN(created) ? Date.now() + 15 * 60 * 1000 : created + 15 * 60 * 1000
+    const calc = () => {
+      const left = Math.floor((expires - Date.now()) / 1000)
+      return left > 0 ? left : 0
+    }
+    // 如果计算出来就是 0（时间解析失败或 mock 数据过期），给满 15 分钟
+    const initial = calc()
+    const effectiveExpires = initial > 0 ? expires : Date.now() + 15 * 60 * 1000
+    const effectiveCalc = () => Math.max(0, Math.floor((effectiveExpires - Date.now()) / 1000))
+    setCountdown(effectiveCalc())
     timerRef.current = setInterval(() => {
-      const left = calc()
+      const left = effectiveCalc()
       setCountdown(left)
       if (left <= 0 && timerRef.current) clearInterval(timerRef.current)
     }, 1000)
