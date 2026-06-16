@@ -244,6 +244,65 @@ async function mockRequest(url: string, data: any): Promise<any> {
     return ok([])
   }
 
+  // ── 订单 ──
+  if (url.includes('/order/create')) {
+    const orderId = 'order-' + Math.random().toString(36).substring(2, 10)
+    const orders = state.orders || []
+    const order = {
+      orderId, userId: data?.userId, orderType: data?.orderType, status: 'PENDING_PAYMENT',
+      amount: data?.amount || 0, completionProgress: 0, paymentPlatform: '网页应用',
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    }
+    orders.unshift(order)
+    setState({ orders })
+    return ok(order)
+  }
+  if (url.includes('/order/get')) {
+    const orders: any[] = state.orders || []
+    const order = orders.find((o: any) => o.orderId === data?.orderId)
+    return order ? ok(order) : fail('订单不存在', 404)
+  }
+  if (url.includes('/order/list')) {
+    return ok(state.orders || [])
+  }
+  if (url.includes('/order/pay')) {
+    const orders: any[] = state.orders || []
+    const order = orders.find((o: any) => o.orderId === data?.orderId)
+    if (order) {
+      order.status = 'PAID'; order.paidAt = new Date().toISOString()
+      order.paymentMethod = data?.paymentMethod; order.completionProgress = 30
+      order.updatedAt = new Date().toISOString()
+      setState({ orders })
+    }
+    return ok(order)
+  }
+  if (url.includes('/order/complete')) {
+    const orders: any[] = state.orders || []
+    const order = orders.find((o: any) => o.orderId === data?.orderId)
+    if (order) {
+      order.status = 'COMPLETED'; order.completionProgress = 100
+      order.completedAt = new Date().toISOString(); order.updatedAt = new Date().toISOString()
+      setState({ orders })
+    }
+    return ok(order)
+  }
+  if (url.includes('/order/cancel')) {
+    const orders: any[] = state.orders || []
+    const order = orders.find((o: any) => o.orderId === data?.orderId)
+    if (order) { order.status = 'PAYMENT_CANCELLED'; order.updatedAt = new Date().toISOString(); setState({ orders }) }
+    return ok(order)
+  }
+  if (url.includes('/order/fail') || url.includes('/order/abandon')) {
+    const orders: any[] = state.orders || []
+    const order = orders.find((o: any) => o.orderId === data?.orderId)
+    if (order) {
+      order.status = url.includes('fail') ? 'FAILED' : 'ABANDONED'
+      order.failureReason = data?.reason; order.updatedAt = new Date().toISOString()
+      setState({ orders })
+    }
+    return ok(order)
+  }
+
   // ── 文件上传 ──
   if (url.includes('/upload')) {
     return ok({ url: 'https://example.com/uploads/demo.jpg', filename: 'demo.jpg' })
