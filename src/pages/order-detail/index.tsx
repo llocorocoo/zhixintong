@@ -58,13 +58,15 @@ const Row: FC<{ label: string; value: string; accent?: boolean; red?: boolean }>
 const dm = (daysAgo: number, h = 10, m = 0) => {
   const t = new Date(); t.setDate(t.getDate() - daysAgo); t.setHours(h, m, 0, 0); return t.toISOString()
 }
+const minsAgoDt = (mins: number) => new Date(Date.now() - mins * 60 * 1000).toISOString()
 const MOCK_MAP: Record<string, Order> = {
-  'mock-001': { orderId: 'mock-001', orderType: 'personal_query', status: 'PENDING_PAYMENT', amount: 50, completionProgress: 0, paymentPlatform: '网页应用', createdAt: dm(1,14,22), updatedAt: dm(1,14,22) },
+  'mock-001': { orderId: 'mock-001', orderType: 'personal_query', status: 'PENDING_PAYMENT', amount: 50, completionProgress: 0, paymentPlatform: '网页应用', createdAt: minsAgoDt(5), updatedAt: minsAgoDt(5) },
   'mock-002': { orderId: 'mock-002', orderType: 'personal_query', status: 'PAID', amount: 9.9, completionProgress: 30, paymentPlatform: '网页应用', paymentChannel: 'wechat', createdAt: dm(2,9,5), updatedAt: dm(2,9,8), paidAt: dm(2,9,7) },
   'mock-003': { orderId: 'mock-003', orderType: 'credit_boost', status: 'COMPLETED', amount: 29.7, completionProgress: 100, paymentPlatform: '微信小程序', paymentChannel: 'wechat', createdAt: dm(7,11,30), updatedAt: dm(5,16,0), paidAt: dm(7,11,33), completedAt: dm(5,16,0) },
   'mock-004': { orderId: 'mock-004', orderType: 'personal_query', status: 'COMPLETED', amount: 50, completionProgress: 100, paymentPlatform: '网页应用', paymentChannel: 'alipay', createdAt: dm(14,10,0), updatedAt: dm(11,9,0), paidAt: dm(14,10,4), completedAt: dm(11,9,0) },
   'mock-005': { orderId: 'mock-005', orderType: 'credit_boost', status: 'ABANDONED', amount: 9.9, completionProgress: 30, paymentPlatform: '微信小程序', paymentChannel: 'wechat', createdAt: dm(3,17,10), updatedAt: dm(3,17,45), paidAt: dm(3,17,13) },
   'mock-008': { orderId: 'mock-008', orderType: 'credit_boost', status: 'PAYMENT_FAILED', amount: 19.8, completionProgress: 0, paymentPlatform: '网页应用', paymentChannel: 'wechat', createdAt: dm(2,11,30), updatedAt: dm(2,11,32) },
+  'mock-009': { orderId: 'mock-009', orderType: 'personal_query', status: 'EXPIRED', amount: 50, completionProgress: 0, paymentPlatform: '网页应用', createdAt: dm(1,10,0), updatedAt: dm(1,10,15) },
   'mock-007': { orderId: 'mock-007', orderType: 'personal_query', status: 'PAYMENT_CANCELLED', amount: 50, completionProgress: 0, paymentPlatform: '网页应用', createdAt: dm(6,15,0), updatedAt: dm(6,15,2) },
 }
 

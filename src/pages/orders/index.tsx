@@ -57,12 +57,13 @@ const CLOSED = new Set(['FAILED','PAYMENT_CANCELLED','EXPIRED'])
 const d = (daysAgo: number, h = 10, m = 0) => {
   const t = new Date(); t.setDate(t.getDate() - daysAgo); t.setHours(h, m, 0, 0); return t.toISOString()
 }
+const minsAgo = (mins: number) => new Date(Date.now() - mins * 60 * 1000).toISOString()
 
 const MOCK_ORDERS: Order[] = [
   {
     orderId: 'mock-001', orderType: 'personal_query', status: 'PENDING_PAYMENT',
     amount: 50, completionProgress: 0, paymentPlatform: '网页应用',
-    createdAt: d(1, 14, 22), updatedAt: d(1, 14, 22),
+    createdAt: minsAgo(5), updatedAt: minsAgo(5),
   },
   {
     orderId: 'mock-002', orderType: 'personal_query', status: 'PAID',
@@ -93,6 +94,11 @@ const MOCK_ORDERS: Order[] = [
     amount: 19.8, completionProgress: 0,
     paymentPlatform: '网页应用', paymentChannel: 'wechat',
     createdAt: d(2, 11, 30), updatedAt: d(2, 11, 32),
+  },
+  {
+    orderId: 'mock-009', orderType: 'personal_query', status: 'EXPIRED',
+    amount: 50, completionProgress: 0, paymentPlatform: '网页应用',
+    createdAt: d(1, 10, 0), updatedAt: d(1, 10, 15),
   },
   {
     orderId: 'mock-007', orderType: 'personal_query', status: 'PAYMENT_CANCELLED',
