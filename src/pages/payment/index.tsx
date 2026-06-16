@@ -302,36 +302,21 @@ const PaymentPage: FC = () => {
               ))}
             </View>
 
-            {/* 提示 */}
-            <View style={{ padding: '12px 14px', background: '#fffbeb', borderRadius: '12px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-              <CircleAlert size={15} color="#d97706" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <Text style={{ fontSize: '12px', color: '#92400e', lineHeight: '1.7', flex: 1 }}>
-                如已在微信/支付宝中完成支付，请点击「已完成支付」。如需重新发起支付，请点击「继续支付」。
-              </Text>
-            </View>
           </View>
 
           {/* 底部按钮 */}
-          <View style={{ flexShrink: 0, padding: '12px 16px 32px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <View style={{ flexShrink: 0, padding: '12px 16px 32px', display: 'flex', gap: '10px' }}>
             <View
-              style={{ borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
+              style={{ flex: 1, borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1.5px solid #e2e8f0' }}
+              onClick={handlePayCancel}
+            >
+              <Text style={{ color: '#64748b', fontSize: '14px', fontWeight: '600', lineHeight: '1.5' }}>取消支付</Text>
+            </View>
+            <View
+              style={{ flex: 2, borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
               onClick={handlePayDone}
             >
-              <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>已完成支付</Text>
-            </View>
-            <View style={{ display: 'flex', gap: '10px' }}>
-              <View
-                style={{ flex: 1, borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1.5px solid #e2e8f0' }}
-                onClick={handlePayCancel}
-              >
-                <Text style={{ color: '#64748b', fontSize: '14px', fontWeight: '600', lineHeight: '1.5' }}>取消支付</Text>
-              </View>
-              <View
-                style={{ flex: 1, borderRadius: '14px', padding: '13px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1.5px solid #2563eb' }}
-                onClick={() => { setShowPayWaiting(false); setShowConfirm(true) }}
-              >
-                <Text style={{ color: '#2563eb', fontSize: '14px', fontWeight: '600', lineHeight: '1.5' }}>继续支付</Text>
-              </View>
+              <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>继续支付</Text>
             </View>
           </View>
         </View>
