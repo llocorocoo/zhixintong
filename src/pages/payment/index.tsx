@@ -49,12 +49,31 @@ const PaymentPage: FC = () => {
     setPaying(true)
     Taro.showLoading({ title: '正在跳转支付...' })
     await new Promise(r => setTimeout(r, 1200))
+
+    // 确保 orderId 存在，如果尚未创建则现场创建
+    let orderId = useCurrentOrderStore.getState().orderId
+    if (!orderId && userInfo?.id) {
+      try {
+        const orderType = isEnhancement ? 'credit_boost' : 'personal_query'
+        const res = await Network.request({
+          url: '/api/order/create', method: 'POST',
+          data: { userId: userInfo.id, orderType, amount: parseFloat(price), serviceDetails: { type } },
+        })
+        if (res.data.code === 200) {
+          orderId = res.data.data.orderId
+          setOrderId(orderId)
+        }
+      } catch {}
+    }
+
     Taro.hideLoading()
     setPaying(false)
     setShowConfirm(false)
-    const orderId = useCurrentOrderStore.getState().orderId
+
     if (orderId) {
       Taro.redirectTo({ url: `/pages/order-detail/index?orderId=${orderId}` })
+    } else {
+      Taro.showToast({ title: '订单创建失败，请重试', icon: 'none' })
     }
   }
 
