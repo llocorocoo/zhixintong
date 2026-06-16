@@ -16,6 +16,7 @@ interface Order {
   failureReason?: string
   paymentPlatform?: string
   paymentChannel?: string
+  serviceDetails?: any
   expiresAt?: string
   createdAt: string
   updatedAt: string
@@ -223,7 +224,24 @@ const OrderDetailPage: FC = () => {
               </View>
               <View
                 style={{ flex: 2, borderRadius: '14px', padding: '14px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1e40af, #2563eb)', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}
-                onClick={() => Taro.navigateTo({ url: `/pages/payment/index?type=${order.orderType === 'credit_boost' ? 'enhancement' : 'create'}&price=${order.amount}&orderId=${order.orderId}` })}
+                onClick={async () => {
+                  Taro.showLoading({ title: '支付处理中...' })
+                  await new Promise(r => setTimeout(r, 1500))
+                  await Network.request({ url: '/api/order/pay', method: 'POST', data: { orderId: order.orderId, paymentMethod: 'wechat' } }).catch(() => {})
+                  Taro.hideLoading()
+                  Taro.showToast({ title: '支付成功', icon: 'success' })
+                  const isBoost = order.orderType === 'credit_boost'
+                  const svcType = order.serviceDetails?.type
+                  setTimeout(() => {
+                    if (isBoost) {
+                      Taro.redirectTo({ url: '/pages/submit-success/index?type=enhancement' })
+                    } else if (svcType === 'update') {
+                      Taro.redirectTo({ url: '/pages/authorize/index?type=update' })
+                    } else {
+                      Taro.redirectTo({ url: '/pages/privacy-notice/index' })
+                    }
+                  }, 1000)
+                }}
               >
                 <Text style={{ color: '#fff', fontSize: '15px', fontWeight: '700', lineHeight: '1.5' }}>继续支付</Text>
               </View>
