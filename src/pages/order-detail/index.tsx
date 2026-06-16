@@ -1,5 +1,5 @@
 import { View, Text, ScrollView } from '@tarojs/components'
-import { FC, useState } from 'react'
+import { FC, useState, useEffect, useRef } from 'react'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { Network } from '@/network'
 import { FileText, TrendingUp, Clock, CircleCheck, CircleAlert, Ban, ChevronRight } from 'lucide-react-taro'
@@ -87,6 +87,26 @@ const OrderDetailPage: FC = () => {
     setLoading(false)
   })
 
+  // 待支付倒计时（15分钟窗口）
+  const [countdown, setCountdown] = useState(0)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    if (!order || order.status !== 'PENDING_PAYMENT') return
+    const created = new Date(order.createdAt).getTime()
+    const expires = created + 15 * 60 * 1000
+    const calc = () => Math.max(0, Math.floor((expires - Date.now()) / 1000))
+    setCountdown(calc())
+    timerRef.current = setInterval(() => {
+      const left = calc()
+      setCountdown(left)
+      if (left <= 0 && timerRef.current) clearInterval(timerRef.current)
+    }, 1000)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [order])
+
+  const fmtCountdown = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
+
   if (loading && !order) {
     return (
       <View style={{ background: '#f6f8fc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -118,11 +138,15 @@ const OrderDetailPage: FC = () => {
           <View style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <type.icon size={24} color="#fff" />
           </View>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={{ fontSize: '18px', fontWeight: '800', color: '#fff', display: 'block', lineHeight: '1.3' }}>{type.label}</Text>
             <View style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '4px' }}>
               <StatusIcon size={13} color="rgba(255,255,255,0.75)" />
-              <Text style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)', lineHeight: '1.5' }}>{status.label}</Text>
+              <Text style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)', lineHeight: '1.5' }}>
+                {order.status === 'PENDING_PAYMENT' && countdown > 0
+                  ? `待支付 · 剩余 ${fmtCountdown(countdown)}`
+                  : status.label}
+              </Text>
             </View>
           </View>
         </View>
@@ -139,7 +163,13 @@ const OrderDetailPage: FC = () => {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: '15px', fontWeight: '700', color: status.color, display: 'block', lineHeight: '1.4' }}>{status.label}</Text>
-                <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.5' }}>{status.desc}</Text>
+                <Text style={{ fontSize: '12px', color: '#64748b', display: 'block', lineHeight: '1.5' }}>
+                  {order.status === 'PENDING_PAYMENT' && countdown > 0
+                    ? `请在 ${fmtCountdown(countdown)} 内完成支付`
+                    : order.status === 'PENDING_PAYMENT' && countdown <= 0
+                      ? '支付超时，请重新下单'
+                      : status.desc}
+                </Text>
               </View>
             </View>
           </View>
