@@ -29,6 +29,8 @@ export interface SavedWorkItem {
   refDepartment: string
   refPosition: string
   refContact: string
+  refLanguage: string
+  refWorkDuration: string
 }
 
 interface EnhancementFormStore {

@@ -20,6 +20,8 @@ interface WorkItem {
   refDepartment: string
   refPosition: string
   refContact: string
+  refLanguage: string
+  refWorkDuration: string
 }
 
 const genId = () => Math.random().toString(36).substring(2, 9)
@@ -28,11 +30,13 @@ const emptyWork = (): WorkItem => ({
   employmentType: '全职', employmentStatus: '在职',
   startDate: '', endDate: '', canBackcheck: '',
   refRelation: '', refName: '', refDepartment: '', refPosition: '', refContact: '',
+  refLanguage: '普通话', refWorkDuration: '',
 })
 
 const EMPLOYMENT_TYPES = ['全职', '兼职', '实习']
 const EMPLOYMENT_STATUSES = ['在职', '离职']
 const REF_RELATIONS = ['HR', '上级领导', '直接上级', '同级同事', '直接下级', '下级同事', '跨部门同事', '其他']
+const REF_LANGUAGES = ['普通话', '英语', '法语', '韩语', '葡萄牙语', '日语', '德语', '西班牙语', '俄语', '阿拉伯语', '其他']
 
 const YEARS = Array.from({ length: 30 }, (_, i) => String(new Date().getFullYear() - i))
 const MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
@@ -321,6 +325,24 @@ const WorkFormPage: FC = () => {
                         value={work.refContact}
                         onFocus={() => setFocusField(`${work.id}-refContact`)} onBlur={() => setFocusField(null)}
                         onInput={e => setWork(work.id, 'refContact', e.detail.value)}
+                      />
+                    </InputBox>
+                  </Field>
+
+                  {/* 证明人沟通使用语言 */}
+                  <Field label="证明人沟通使用语言" required>
+                    <DropdownSelect options={REF_LANGUAGES} value={work.refLanguage} onChange={v => setWork(work.id, 'refLanguage', v)} placeholder="请选择沟通语言" />
+                  </Field>
+
+                  {/* 与证明人共事时长 */}
+                  <Field label="与证明人共事时长" required>
+                    <InputBox focused={focusField === `${work.id}-refWorkDuration`}>
+                      <Input
+                        style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
+                        placeholder="请输入共事时长，如：2年3个月" placeholderStyle="color:#cbd5e1;font-size:14px;"
+                        value={work.refWorkDuration}
+                        onFocus={() => setFocusField(`${work.id}-refWorkDuration`)} onBlur={() => setFocusField(null)}
+                        onInput={e => setWork(work.id, 'refWorkDuration', e.detail.value)}
                       />
                     </InputBox>
                   </Field>
