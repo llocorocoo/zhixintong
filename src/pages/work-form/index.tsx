@@ -3,7 +3,7 @@ import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { Input } from '@/components/ui/input'
 import { useEnhancementFormStore } from '@/stores/enhancement-form'
-import { ChevronRight, Plus, Trash2, ChevronUp } from 'lucide-react-taro'
+import { ChevronRight, ChevronUp } from 'lucide-react-taro'
 
 interface WorkItem {
   id: string
@@ -114,9 +114,6 @@ const WorkFormPage: FC = () => {
   const setWork = (id: string, field: keyof WorkItem, value: string) =>
     setList(prev => prev.map(w => w.id === id ? { ...w, [field]: value } : w))
 
-  const removeWork = (id: string) =>
-    setList(prev => prev.filter(w => w.id !== id))
-
   const handleSubmit = () => {
     const filled = list.filter(w => w.company || w.position)
     if (filled.length === 0) {
@@ -169,11 +166,6 @@ const WorkFormPage: FC = () => {
                         工作经历 {list.length > 1 ? idx + 1 : ''}
                       </Text>
                     </View>
-                    {list.length > 1 && (
-                      <View onClick={() => removeWork(work.id)} style={{ padding: '4px' }}>
-                        <Trash2 size={17} color="#ef4444" />
-                      </View>
-                    )}
                   </View>
 
                   {/* 公司名称 */}
@@ -350,17 +342,6 @@ const WorkFormPage: FC = () => {
                 </View>
               ))}
 
-              {/* 添加按钮 */}
-              <View
-                style={{ borderRadius: '14px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', border: '1.5px dashed #93c5fd', background: '#eff6ff' }}
-                onClick={() => setList(prev => [...prev, emptyWork()])}
-              >
-                <Plus size={16} color="#2563eb" />
-                <Text style={{ fontSize: '14px', color: '#2563eb', fontWeight: '500', lineHeight: '1.5' }}>添加工作经历</Text>
-              </View>
-              <Text style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.5' }}>
-                可添加多段工作经历，按时间倒序填写
-              </Text>
             </View>
           </View>
 
