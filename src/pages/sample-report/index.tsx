@@ -203,6 +203,20 @@ const DIMENSIONS = [
         }
       },
       {
+        name: '劳动争议记录',
+        source: '劳动仲裁数据',
+        status: 'warn',
+        result: '发现1条劳动仲裁记录',
+        detail: {
+          rows: [
+            { label: '案件类型', value: '劳动争议' },
+            { label: '案号', value: '京海劳人仲字（2024）第5621号' },
+            { label: '案件进展阶段', value: '已结案' },
+            { label: '结案案由', value: '劳动合同解除纠纷' },
+          ]
+        }
+      },
+      {
         name: '行业违规记录',
         source: '行业监管数据',
         status: 'warn',
