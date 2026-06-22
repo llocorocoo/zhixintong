@@ -89,22 +89,6 @@ const DIMENSIONS = [
     borderColor: 'border-amber-100',
     features: [
       {
-        name: '竞业限制',
-        source: '前雇主',
-        status: 'warn',
-        result: '发现1条竞业协议记录，且存在违约被诉情况',
-        detail: {
-          rows: [
-            { label: '涉及企业', value: '某科技有限公司' },
-            { label: '协议状态', value: '是' },
-            { label: '案号', value: '（2025）京0105民初38921号' },
-            { label: '案由', value: '竞业限制纠纷' },
-            { label: '当事人身份', value: '被告' },
-            { label: '审理法院', value: '北京市海淀区人民法院' },
-          ]
-        }
-      },
-      {
         name: '前雇主违纪记录',
         source: '前雇主评价',
         status: 'warn',
@@ -141,19 +125,38 @@ const DIMENSIONS = [
     borderColor: 'border-red-100',
     features: [
       {
-        name: '司法诉讼',
-        source: '司法数据、执行信息公开网',
+        name: '有限诉讼记录',
+        source: '司法数据、中国裁判文书网',
         status: 'warn',
-        result: '发现1条民事诉讼记录',
-        detail: {
-          rows: [
-            { label: '案件编号', value: '（2023）京0105民初12856号' },
-            { label: '案由', value: '合同纠纷' },
-            { label: '当事人身份', value: '原告' },
-            { label: '审理法院', value: '北京市朝阳区人民法院' },
-            { label: '结案方式', value: '调解结案' },
-          ]
-        }
+        result: '发现2条诉讼记录',
+        litigationCategories: [
+          {
+            category: '民事案件',
+            hit: true,
+            records: [
+              { label: '案件类型', value: '民事案件' },
+              { label: '案号', value: '（2023）京0105民初12856号' },
+              { label: '案件进展阶段', value: '已结案' },
+              { label: '结案案由', value: '合同纠纷' },
+            ]
+          },
+          { category: '刑事案件', hit: false },
+          { category: '行政案件', hit: false },
+          { category: '非诉保全审查', hit: false },
+          {
+            category: '执行案件',
+            hit: true,
+            records: [
+              { label: '案件类型', value: '执行案件' },
+              { label: '案号', value: '（2024）京0108执字20137号' },
+              { label: '案件进展阶段', value: '已结案' },
+              { label: '结案案由', value: '借款合同纠纷' },
+            ]
+          },
+          { category: '强制清算与破产案件', hit: false },
+          { category: '管辖案件', hit: false },
+          { category: '赔偿案件', hit: false },
+        ]
       },
       {
         name: '法院被执行人',
@@ -200,18 +203,6 @@ const DIMENSIONS = [
         }
       },
       {
-        name: '劳动争议记录',
-        source: '劳动仲裁数据',
-        status: 'warn',
-        result: '发现1条劳动仲裁记录',
-        detail: {
-          rows: [
-            { label: '争议记录', value: '劳动合同解除纠纷仲裁' },
-            { label: '核实说明', value: '被申请人（用人单位方）' },
-          ]
-        }
-      },
-      {
         name: '行业违规记录',
         source: '行业监管数据',
         status: 'warn',
@@ -242,12 +233,6 @@ const DIMENSIONS = [
           { name: '教师资格证', issuer: '教育部', status: 'verified' },
           { name: '法律职业资格证', issuer: '司法部', status: 'verified' },
         ]
-      },
-      {
-        name: '学历层次',
-        source: '学信网',
-        status: 'verified',
-        result: '硕士研究生（已认证）',
       },
     ]
   },
@@ -414,6 +399,28 @@ const SampleReportPage: FC = () => {
                           </View>
                         </View>
                       )}
+
+                      {/* 有限诉讼记录 — 按案件类型逐条展示 */}
+                      {feat.litigationCategories && feat.litigationCategories.map((cat, ci) => (
+                        cat.hit && cat.records ? (
+                          <View key={ci} className="mt-2 bg-orange-50 rounded-lg p-3">
+                            <Text className="block text-xs font-medium text-orange-700 mb-1.5">{cat.category}</Text>
+                            <View className="space-y-1">
+                              {cat.records.map((row, i) => (
+                                <View key={i} className="flex items-start gap-2">
+                                  <Text className="text-xs text-gray-500 w-20 flex-shrink-0">{row.label}</Text>
+                                  <Text className="text-xs text-gray-700 flex-1">{row.value}</Text>
+                                </View>
+                              ))}
+                            </View>
+                          </View>
+                        ) : (
+                          <View key={ci} className="mt-2 bg-gray-50 rounded-lg px-3 py-2 flex items-center justify-between">
+                            <Text className="text-xs text-gray-500">{cat.category}</Text>
+                            <Text className="text-xs text-gray-400">无诉讼记录</Text>
+                          </View>
+                        )
+                      ))}
 
                       {/* 多个详情块 */}
                       {feat.details && feat.details.map((d, di) => (
