@@ -164,7 +164,7 @@ async function mockRequest(url: string, data: any): Promise<any> {
 
   // ── 退出登录 ──
   if (url.includes('/auth/logout')) {
-    setState({ loggedIn: false, reportSubmittedAt: null, resumeSynced: false })
+    setState({ loggedIn: false, reportSubmittedAt: null, reportAwaitingAuth: false, resumeSynced: false })
     return ok({ message: '已退出' })
   }
 
