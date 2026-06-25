@@ -47,11 +47,33 @@ export class ReportService {
     return { reportId: id, reportNo }
   }
 
+  async createAwaitingAuthReport(userId: string) {
+    // 如果已有待授权的报告，直接返回
+    for (const r of this.reports.values()) {
+      if (r.user_id === userId && r.status === 'awaiting_auth') {
+        return { reportId: r.id, reportNo: r.report_no }
+      }
+    }
+    const reportNo = `CR${Date.now()}${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+    const id = randomUUID()
+    const now = new Date().toISOString()
+    const report: Report = {
+      id,
+      user_id: userId,
+      report_no: reportNo,
+      status: 'awaiting_auth',
+      created_at: now,
+      updated_at: now,
+    }
+    this.reports.set(id, report)
+    return { reportId: id, reportNo }
+  }
+
   async submitReport(userId: string, formData: any) {
     // Find existing pending report
     let report: Report | undefined
     for (const r of this.reports.values()) {
-      if (r.user_id === userId && r.status === 'pending') {
+      if (r.user_id === userId && (r.status === 'pending' || r.status === 'awaiting_auth')) {
         report = r
         break
       }

@@ -41,7 +41,8 @@ const DEMO_REPORT_BASE = {
 }
 
 // 提交后 2 分钟内为 processing，之后自动变为 completed
-function getReportStatus(state: any): 'processing' | 'completed' | null {
+function getReportStatus(state: any): 'awaiting_auth' | 'processing' | 'completed' | null {
+  if (state.reportAwaitingAuth && !state.reportSubmittedAt) return 'awaiting_auth'
   if (!state.reportSubmittedAt) return null
   const elapsed = Date.now() - state.reportSubmittedAt
   return elapsed < 2 * 60 * 1000 ? 'processing' : 'completed'
@@ -174,6 +175,12 @@ async function mockRequest(url: string, data: any): Promise<any> {
     return ok(DEMO_CREDIT_SCORE)
   }
 
+  // ── 创建待授权报告 ──
+  if (url.includes('/report/create-awaiting')) {
+    setState({ reportAwaitingAuth: true, reportSubmittedAt: undefined })
+    return ok({ reportId: DEMO_REPORT_BASE.id, reportNo: DEMO_REPORT_BASE.report_no })
+  }
+
   // ── 创建报告 ──
   if (url.includes('/report/create')) {
     return ok({ reportId: DEMO_REPORT_BASE.id, reportNo: DEMO_REPORT_BASE.report_no })
@@ -182,7 +189,7 @@ async function mockRequest(url: string, data: any): Promise<any> {
   // ── 提交报告（触发生成）──
   if (url.includes('/report/submit')) {
     await delay(1500)
-    setState({ reportSubmittedAt: Date.now() })
+    setState({ reportSubmittedAt: Date.now(), reportAwaitingAuth: false })
     return ok({ reportId: DEMO_REPORT_BASE.id, status: 'processing' })
   }
 

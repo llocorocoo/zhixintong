@@ -11,7 +11,7 @@ import {
 interface ReportData {
   id: string
   reportNo: string
-  status: 'pending' | 'processing' | 'completed' | 'failed'
+  status: 'pending' | 'awaiting_auth' | 'processing' | 'completed' | 'failed'
   reportUrl?: string
   identityInfo?: any
   educationInfo?: any
@@ -211,17 +211,44 @@ const ReportPage: FC = () => {
               ) : (
                 <View style={{
                   padding: '4px 12px', borderRadius: '20px',
-                  background: reportData.status === 'completed' ? 'rgba(5,150,105,0.1)' : reportData.status === 'processing' ? 'rgba(37,99,235,0.1)' : 'rgba(220,38,38,0.1)',
+                  background: reportData.status === 'completed' ? 'rgba(5,150,105,0.1)' : reportData.status === 'awaiting_auth' ? 'rgba(245,158,11,0.1)' : reportData.status === 'processing' ? 'rgba(37,99,235,0.1)' : 'rgba(220,38,38,0.1)',
                 }}>
                   <Text style={{
                     fontSize: '12px', fontWeight: '600', lineHeight: '1.5',
-                    color: reportData.status === 'completed' ? '#059669' : reportData.status === 'processing' ? '#2563eb' : '#dc2626',
+                    color: reportData.status === 'completed' ? '#059669' : reportData.status === 'awaiting_auth' ? '#d97706' : reportData.status === 'processing' ? '#2563eb' : '#dc2626',
                   }}>
-                    {reportData.status === 'completed' ? '已完成' : reportData.status === 'processing' ? '生成中' : '生成失败'}
+                    {reportData.status === 'completed' ? '已完成' : reportData.status === 'awaiting_auth' ? '待授权' : reportData.status === 'processing' ? '生成中' : '生成失败'}
                   </Text>
                 </View>
               )}
             </View>
+
+            {/* ─ 待授权 ─ */}
+            {reportData.status === 'awaiting_auth' && (
+              <View style={{ padding: '32px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <View style={{
+                  width: '88px', height: '88px', borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginBottom: '20px',
+                  boxShadow: '0 8px 24px rgba(245,158,11,0.3)',
+                }}>
+                  <Clock size={40} color="#fff" />
+                </View>
+                <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '8px', lineHeight: '1.4' }}>还未签署授权书</Text>
+                <Text style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '24px', lineHeight: '1.7', textAlign: 'center' }}>
+                  前往签署授权书后，平台将开始核查并生成您的职业信用报告
+                </Text>
+                <View
+                  style={{ ...btn('sign'), borderRadius: '14px', padding: '12px 36px', display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #d97706, #f59e0b)', boxShadow: '0 4px 16px rgba(245,158,11,0.35)' }}
+                  onTouchStart={() => press('sign')} onTouchEnd={release} onTouchCancel={release}
+                  onClick={() => Taro.navigateTo({ url: '/pages/privacy-notice/index' })}
+                >
+                  <ArrowRight size={16} color="#fff" />
+                  <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>去签署</Text>
+                </View>
+              </View>
+            )}
 
             {/* ─ 核查中 ─ */}
             {reportData.status === 'processing' && (

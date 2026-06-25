@@ -15,6 +15,16 @@ export class ReportController {
     }
   }
 
+  @Post('create-awaiting')
+  async createAwaitingAuthReport(@Body() body: { userId: string }) {
+    const result = await this.reportService.createAwaitingAuthReport(body.userId)
+    return {
+      code: 200,
+      message: '创建成功，等待授权',
+      data: result
+    }
+  }
+
   @Post('submit')
   async submitReport(@Body() body: { userId: string; [key: string]: any }) {
     const { userId, ...formData } = body

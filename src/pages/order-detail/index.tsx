@@ -3,6 +3,7 @@ import { FC, useState, useEffect, useRef } from 'react'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { Network } from '@/network'
 import { FileText, TrendingUp, Clock, CircleCheck, CircleAlert, Ban, ChevronRight } from 'lucide-react-taro'
+import { useUserStore } from '@/stores/user'
 
 type OrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'COMPLETED' | 'ABANDONED' | 'FAILED' | 'PAYMENT_FAILED' | 'PAYMENT_CANCELLED' | 'EXPIRED'
 type OrderType = 'personal_query' | 'credit_boost'
@@ -232,6 +233,13 @@ const OrderDetailPage: FC = () => {
                   Taro.showToast({ title: '支付成功', icon: 'success' })
                   const isBoost = order.orderType === 'credit_boost'
                   const svcType = order.serviceDetails?.type
+                  // 新建报告时，支付成功后创建待授权报告
+                  if (!isBoost && svcType !== 'update') {
+                    try {
+                      const uid = useUserStore.getState().userInfo?.id
+                      if (uid) await Network.request({ url: '/api/report/create-awaiting', method: 'POST', data: { userId: uid } })
+                    } catch {}
+                  }
                   setTimeout(() => {
                     if (isBoost) {
                       Taro.redirectTo({ url: '/pages/submit-success/index?type=enhancement' })

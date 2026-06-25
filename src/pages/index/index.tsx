@@ -34,6 +34,7 @@ const getLevelInfo = (score: number) => {
 const IndexPage: FC = () => {
   const [creditScore, setCreditScore] = useState<CreditScoreData | null>(null)
   const [reportProcessing, setReportProcessing] = useState(false)
+  const [reportAwaitingAuth, setReportAwaitingAuth] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
   const [showModel, setShowModel] = useState(false)
   const [detailTab, setDetailTab] = useState(0)
@@ -87,9 +88,9 @@ const IndexPage: FC = () => {
         Network.request({ url: '/api/report/latest', method: 'POST', data: { userId: userInfo.id } }),
       ])
       if (scoreRes.data.code === 200 && scoreRes.data.data) setCreditScore(scoreRes.data.data)
-      setReportProcessing(
-        reportRes.data.code === 200 && reportRes.data.data?.status === 'processing'
-      )
+      const reportStatus = reportRes.data.code === 200 ? reportRes.data.data?.status : null
+      setReportProcessing(reportStatus === 'processing')
+      setReportAwaitingAuth(reportStatus === 'awaiting_auth')
     } catch {}
   }
 
@@ -165,6 +166,10 @@ const IndexPage: FC = () => {
                 <View style={{ padding: '3px 10px', borderRadius: '20px', background: 'rgba(37,99,235,0.1)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Text style={{ fontSize: '12px', fontWeight: '600', color: '#2563eb', lineHeight: '1.5' }}>提升信用核查中</Text>
                 </View>
+              ) : reportAwaitingAuth ? (
+                <View style={{ padding: '3px 10px', borderRadius: '20px', background: 'rgba(245,158,11,0.1)' }}>
+                  <Text style={{ fontSize: '12px', fontWeight: '600', color: '#d97706', lineHeight: '1.5' }}>待授权</Text>
+                </View>
               ) : levelInfo ? (
                 <View style={{ padding: '3px 10px', borderRadius: '20px', background: levelInfo.bg }}>
                   <Text style={{ fontSize: '12px', fontWeight: '600', color: levelInfo.color }}>{levelInfo.label}</Text>
@@ -198,15 +203,15 @@ const IndexPage: FC = () => {
                 onClick={() => navigate('/pages/report/index', !isLoggedIn)}
               >
                 <Text style={{ color: '#fff', fontSize: '13px', fontWeight: '600', lineHeight: '1.5' }}>
-                  {creditScore ? '查看报告' : reportProcessing ? '查看进度' : '立即生成'}
+                  {creditScore ? '查看报告' : reportProcessing ? '查看进度' : reportAwaitingAuth ? '去签署' : '立即生成'}
                 </Text>
                 <ChevronRight size={14} color="rgba(255,255,255,0.8)" />
               </View>
             </View>
 
             {!creditScore && (
-              <Text style={{ fontSize: '12px', color: reportProcessing ? '#f59e0b' : '#cbd5e1', marginTop: '6px', display: 'block', lineHeight: '1.6' }}>
-                {reportProcessing ? '信用核查中，完成后可查看完整职业信用报告' : '生成信用报告后将自动同步评分'}
+              <Text style={{ fontSize: '12px', color: reportAwaitingAuth ? '#d97706' : reportProcessing ? '#f59e0b' : '#cbd5e1', marginTop: '6px', display: 'block', lineHeight: '1.6' }}>
+                {reportAwaitingAuth ? '还未签署授权书，前往签署生成职业信用报告' : reportProcessing ? '信用核查中，完成后可查看完整职业信用报告' : '生成信用报告后将自动同步评分'}
               </Text>
             )}
           </View>
