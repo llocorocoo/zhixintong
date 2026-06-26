@@ -24,6 +24,7 @@ const ReportPage: FC = () => {
   const [syncing, setSyncing] = useState(false)
   const [pressedBtn, setPressedBtn] = useState<string | null>(null)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const [pendingPaymentOrderId, setPendingPaymentOrderId] = useState<string | null>(null)
   const { isLoggedIn, userInfo, enhancementPending } = useUserStore()
 
   const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -31,15 +32,19 @@ const ReportPage: FC = () => {
   const fetchLatestReport = useCallback(async () => {
     if (!userInfo?.id) return
     try {
-      const res = await Network.request({ url: '/api/report/latest', method: 'POST', data: { userId: userInfo.id, _t: Date.now() } })
+      const [res, orderRes] = await Promise.all([
+        Network.request({ url: '/api/report/latest', method: 'POST', data: { userId: userInfo.id, _t: Date.now() } }),
+        Network.request({ url: '/api/order/list', method: 'POST', data: { userId: userInfo.id, status: 'PENDING_PAYMENT' } }),
+      ])
       if (res.data.code === 200 && res.data.data) {
         const data = res.data.data
         setReportData(data)
-        // 报告完成后停止轮询
         if (data.status === 'completed' || data.status === 'failed') {
           if (pollTimerRef.current) { clearInterval(pollTimerRef.current); pollTimerRef.current = null }
         }
       }
+      const pendingOrder = (orderRes.data.data || []).find((o: any) => o.orderType === 'personal_query' && o.status === 'PENDING_PAYMENT')
+      setPendingPaymentOrderId(pendingOrder?.orderId || null)
     } catch {}
   }, [userInfo?.id])
 
@@ -134,8 +139,42 @@ const ReportPage: FC = () => {
       {/* ── 主内容（上移覆盖头部底部） ── */}
       <View style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
+        {/* ══ 待支付状态 ══ */}
+        {!reportData && pendingPaymentOrderId && (
+          <View style={{ background: '#fff', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.08)' }}>
+            <View style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <View style={{
+                width: '88px', height: '88px', borderRadius: '50%',
+                background: 'linear-gradient(135deg, #ef4444, #f97316)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                marginBottom: '20px',
+                boxShadow: '0 8px 24px rgba(239,68,68,0.3)',
+              }}>
+                <Clock size={40} color="#fff" />
+              </View>
+              <View style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                <View style={{ padding: '3px 10px', borderRadius: '20px', background: 'rgba(239,68,68,0.1)' }}>
+                  <Text style={{ fontSize: '12px', fontWeight: '600', color: '#ef4444', lineHeight: '1.5' }}>待支付</Text>
+                </View>
+              </View>
+              <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '8px', lineHeight: '1.4' }}>订单待支付</Text>
+              <Text style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '24px', lineHeight: '1.7', textAlign: 'center' }}>
+                立即支付获得职业信用报告
+              </Text>
+              <View
+                style={{ ...btn('pay'), borderRadius: '14px', padding: '12px 36px', display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #ef4444, #f97316)', boxShadow: '0 4px 16px rgba(239,68,68,0.35)' }}
+                onTouchStart={() => press('pay')} onTouchEnd={release} onTouchCancel={release}
+                onClick={() => Taro.navigateTo({ url: `/pages/order-detail/index?orderId=${pendingPaymentOrderId}` })}
+              >
+                <ArrowRight size={16} color="#fff" />
+                <Text style={{ color: '#fff', fontSize: '14px', fontWeight: '700', lineHeight: '1.5' }}>去支付</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
         {/* ══ 空状态 ══ */}
-        {!reportData && (
+        {!reportData && !pendingPaymentOrderId && (
           <View style={{ background: '#fff', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.08)' }}>
             {/* 插画区 */}
             <View style={{ padding: '36px 24px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

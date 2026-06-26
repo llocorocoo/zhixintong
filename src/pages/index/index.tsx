@@ -35,6 +35,7 @@ const IndexPage: FC = () => {
   const [creditScore, setCreditScore] = useState<CreditScoreData | null>(null)
   const [reportProcessing, setReportProcessing] = useState(false)
   const [reportAwaitingAuth, setReportAwaitingAuth] = useState(false)
+  const [pendingPaymentOrderId, setPendingPaymentOrderId] = useState<string | null>(null)
   const [showDetail, setShowDetail] = useState(false)
   const [showModel, setShowModel] = useState(false)
   const [detailTab, setDetailTab] = useState(0)
@@ -83,14 +84,18 @@ const IndexPage: FC = () => {
   const fetchCreditScore = async () => {
     if (!userInfo?.id) return
     try {
-      const [scoreRes, reportRes] = await Promise.all([
+      const [scoreRes, reportRes, orderRes] = await Promise.all([
         Network.request({ url: '/api/credit/score', method: 'POST', data: { userId: userInfo.id } }),
         Network.request({ url: '/api/report/latest', method: 'POST', data: { userId: userInfo.id } }),
+        Network.request({ url: '/api/order/list', method: 'POST', data: { userId: userInfo.id, status: 'PENDING_PAYMENT' } }),
       ])
       if (scoreRes.data.code === 200 && scoreRes.data.data) setCreditScore(scoreRes.data.data)
       const reportStatus = reportRes.data.code === 200 ? reportRes.data.data?.status : null
       setReportProcessing(reportStatus === 'processing')
       setReportAwaitingAuth(reportStatus === 'awaiting_auth')
+      // 检查是否有待支付的报告订单
+      const pendingOrder = (orderRes.data.data || []).find((o: any) => o.orderType === 'personal_query' && o.status === 'PENDING_PAYMENT')
+      setPendingPaymentOrderId(pendingOrder?.orderId || null)
     } catch {}
   }
 
@@ -170,6 +175,10 @@ const IndexPage: FC = () => {
                 <View style={{ padding: '3px 10px', borderRadius: '20px', background: 'rgba(245,158,11,0.1)' }}>
                   <Text style={{ fontSize: '12px', fontWeight: '600', color: '#d97706', lineHeight: '1.5' }}>待授权</Text>
                 </View>
+              ) : pendingPaymentOrderId ? (
+                <View style={{ padding: '3px 10px', borderRadius: '20px', background: 'rgba(239,68,68,0.1)' }}>
+                  <Text style={{ fontSize: '12px', fontWeight: '600', color: '#ef4444', lineHeight: '1.5' }}>待支付</Text>
+                </View>
               ) : levelInfo ? (
                 <View style={{ padding: '3px 10px', borderRadius: '20px', background: levelInfo.bg }}>
                   <Text style={{ fontSize: '12px', fontWeight: '600', color: levelInfo.color }}>{levelInfo.label}</Text>
@@ -200,18 +209,24 @@ const IndexPage: FC = () => {
                   boxShadow: '0 4px 14px rgba(37,99,235,0.38)',
                   transition: 'all 0.2s ease',
                 }}
-                onClick={() => navigate('/pages/report/index', !isLoggedIn)}
+                onClick={() => {
+                  if (!creditScore && pendingPaymentOrderId) {
+                    Taro.navigateTo({ url: `/pages/order-detail/index?orderId=${pendingPaymentOrderId}` })
+                  } else {
+                    navigate('/pages/report/index', !isLoggedIn)
+                  }
+                }}
               >
                 <Text style={{ color: '#fff', fontSize: '13px', fontWeight: '600', lineHeight: '1.5' }}>
-                  {creditScore ? '查看报告' : reportProcessing ? '查看进度' : reportAwaitingAuth ? '去签署' : '立即生成'}
+                  {creditScore ? '查看报告' : reportProcessing ? '查看进度' : reportAwaitingAuth ? '去签署' : pendingPaymentOrderId ? '去支付' : '立即生成'}
                 </Text>
                 <ChevronRight size={14} color="rgba(255,255,255,0.8)" />
               </View>
             </View>
 
             {!creditScore && (
-              <Text style={{ fontSize: '12px', color: reportAwaitingAuth ? '#d97706' : reportProcessing ? '#f59e0b' : '#cbd5e1', marginTop: '6px', display: 'block', lineHeight: '1.6' }}>
-                {reportAwaitingAuth ? '前往签署并生成职业信用报告' : reportProcessing ? '信用核查中，完成后可查看完整职业信用报告' : '生成信用报告后将自动同步评分'}
+              <Text style={{ fontSize: '12px', color: pendingPaymentOrderId ? '#ef4444' : reportAwaitingAuth ? '#d97706' : reportProcessing ? '#f59e0b' : '#cbd5e1', marginTop: '6px', display: 'block', lineHeight: '1.6' }}>
+                {pendingPaymentOrderId ? '待支付，立即支付获得职业信用报告' : reportAwaitingAuth ? '前往签署并生成职业信用报告' : reportProcessing ? '信用核查中，完成后可查看完整职业信用报告' : '生成信用报告后将自动同步评分'}
               </Text>
             )}
           </View>

@@ -164,7 +164,7 @@ async function mockRequest(url: string, data: any): Promise<any> {
 
   // ── 退出登录 ──
   if (url.includes('/auth/logout')) {
-    setState({ loggedIn: false, reportSubmittedAt: null, reportAwaitingAuth: false, resumeSynced: false })
+    setState({ loggedIn: false, reportSubmittedAt: null, reportAwaitingAuth: false, resumeSynced: false, orders: [] })
     return ok({ message: '已退出' })
   }
 
@@ -270,7 +270,9 @@ async function mockRequest(url: string, data: any): Promise<any> {
     return order ? ok(order) : fail('订单不存在', 404)
   }
   if (url.includes('/order/list')) {
-    return ok(state.orders || [])
+    const allOrders = state.orders || []
+    const filtered = data?.status ? allOrders.filter((o: any) => o.status === data.status) : allOrders
+    return ok(filtered)
   }
   if (url.includes('/order/pay')) {
     const orders: any[] = state.orders || []
