@@ -149,6 +149,12 @@ const IndexPage: FC = () => {
               管理您的职业信用档案
             </Text>
           </View>
+          <View
+            style={{ padding: '6px 12px', borderRadius: '8px', background: '#f1f5f9' }}
+            onClick={() => Taro.showToast({ title: '功能开发中', icon: 'none' })}
+          >
+            <Text style={{ fontSize: '12px', color: '#64748b', fontWeight: '500', lineHeight: '1.5' }}>清除数据</Text>
+          </View>
         </View>
       </View>
 
