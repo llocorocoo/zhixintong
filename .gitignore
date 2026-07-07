@@ -10,6 +10,8 @@ dist-*/
 
 # Misc
 .DS_Store
+~$*
+*.bak
 .env
 # .env.local
 .env.development.local
