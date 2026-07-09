@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Picker } from '@tarojs/components'
+import { View, Text, ScrollView } from '@tarojs/components'
 import { FC, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { Network } from '@/network'
@@ -7,12 +7,13 @@ import { useUserStore } from '@/stores/user'
 import { useReportFormStore } from '@/stores/report-form'
 import {
   User, GraduationCap, Award, Upload,
-  ChevronRight, CircleCheck, Plus, Trash2
+  CircleCheck, Plus, Trash2
 } from 'lucide-react-taro'
 
+type EduType = 'domestic' | 'overseas'
 interface EducationItem {
-  id: string; education: string; school: string; major: string
-  degreeCertNo: string; diplomaCertNo: string; files: string[]
+  id: string; eduType: EduType; education: string; school: string; major: string
+  degreeCertNo: string; diplomaCertNo: string; overseasCertNo: string; files: string[]
 }
 interface QualificationItem {
   id: string; certNumber: string; files: string[]
@@ -23,9 +24,8 @@ interface FormData {
   qualificationList: QualificationItem[]
 }
 
-const EDU_OPTIONS = ['高中', '大专', '本科', '硕士', '博士']
 const genId = () => Math.random().toString(36).substring(2, 9)
-const emptyEdu = (): EducationItem => ({ id: genId(), education: '本科', school: '', major: '', degreeCertNo: '', diplomaCertNo: '', files: [] })
+const emptyEdu = (): EducationItem => ({ id: genId(), eduType: 'domestic', education: '', school: '', major: '', degreeCertNo: '', diplomaCertNo: '', overseasCertNo: '', files: [] })
 const emptyQual = (): QualificationItem => ({ id: genId(), certNumber: '', files: [] })
 
 const STEPS = [
@@ -115,9 +115,10 @@ const ReportFormPage: FC = () => {
       Taro.showToast({ title: '请填写完整身份信息', icon: 'none' }); return
     }
     if (currentStep === 1) {
-      const invalid = formData.educationList.some(e => !e.education || !e.degreeCertNo || !e.diplomaCertNo)
+      const invalid = formData.educationList.some(e =>
+        e.eduType === 'overseas' ? !e.overseasCertNo : (!e.diplomaCertNo || !e.degreeCertNo))
       if (invalid) {
-        Taro.showToast({ title: '请完整填写学历、学位证书编号和毕业证书编号', icon: 'none' }); return
+        Taro.showToast({ title: '请完整填写学历学位证书编号', icon: 'none' }); return
       }
     }
     setCurrentStep(s => s + 1)
@@ -133,7 +134,8 @@ const ReportFormPage: FC = () => {
       gender: '',
       idCard: formData.idCard,
       workHistoryList: [],
-      educationList: formData.educationList.filter(e => e.degreeCertNo || e.diplomaCertNo),
+      educationList: formData.educationList.filter(e =>
+        e.eduType === 'overseas' ? e.overseasCertNo : (e.degreeCertNo || e.diplomaCertNo)),
       qualificationList: formData.qualificationList.filter(q => q.certNumber || q.files.length > 0),
     })
     Taro.redirectTo({ url: '/pages/submit-success/index' })
@@ -177,7 +179,7 @@ const ReportFormPage: FC = () => {
               <View style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: '#fff', fontSize: '11px', fontWeight: '700', lineHeight: '1' }}>{idx + 1}</Text>
               </View>
-              <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.5' }}>学历 {formData.educationList.length > 1 ? idx + 1 : ''}</Text>
+              <Text style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', lineHeight: '1.5' }}>学历学位 {formData.educationList.length > 1 ? idx + 1 : ''}</Text>
             </View>
             {formData.educationList.length > 1 && (
               <View onClick={() => removeEdu(edu.id)} style={{ padding: '4px' }}>
@@ -186,19 +188,34 @@ const ReportFormPage: FC = () => {
             )}
           </View>
 
-          <Field label="学历" required>
-            <Picker mode="selector" range={EDU_OPTIONS} value={EDU_OPTIONS.indexOf(edu.education)} onChange={e => setEdu(edu.id, 'education', EDU_OPTIONS[e.detail.value])}>
-              <View style={{ background: '#fff', borderRadius: '12px', padding: '11px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1.5px solid #e2e8f0' }}>
-                <Text style={{ fontSize: '14px', color: edu.education ? '#0f172a' : '#cbd5e1', lineHeight: '1.5' }}>{edu.education || '请选择学历'}</Text>
-                <ChevronRight size={15} color="#94a3b8" />
-              </View>
-            </Picker>
-          </Field>
+          {/* 境内/境外学历切换 */}
+          <View style={{ display: 'flex', gap: '10px', marginBottom: '14px' }}>
+            {([['domestic', '境内学历'], ['overseas', '境外学历']] as [EduType, string][]).map(([type, label]) => {
+              const active = edu.eduType === type
+              return (
+                <View
+                  key={type}
+                  onClick={() => setEdu(edu.id, 'eduType', type)}
+                  style={{
+                    flex: 1, borderRadius: '12px', padding: '11px 0',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: active ? '#fff' : '#eef0f4',
+                    border: `1.5px solid ${active ? '#3b82f6' : 'transparent'}`,
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <Text style={{ fontSize: '14px', fontWeight: active ? '600' : '400', color: active ? '#2563eb' : '#94a3b8', lineHeight: '1.5' }}>{label}</Text>
+                </View>
+              )
+            })}
+          </View>
 
-          {[
+          {(edu.eduType === 'domestic' ? [
+            { label: '学历证书编号', field: 'diplomaCertNo', placeholder: '请输入学历证书编号' },
             { label: '学位证书编号', field: 'degreeCertNo', placeholder: '请输入学位证书编号' },
-            { label: '毕业证书编号', field: 'diplomaCertNo', placeholder: '请输入毕业证书编号' },
-          ].map(row => (
+          ] : [
+            { label: '国外学历学位认证书编号', field: 'overseasCertNo', placeholder: '请输入国外学历学位认证书编号' },
+          ]).map(row => (
             <Field key={row.field} label={row.label} required>
               <InputBox focused={focusField === `${edu.id}-${row.field}`}>
                 <Input
@@ -335,7 +352,7 @@ const ReportFormPage: FC = () => {
           <View style={{ background: '#fff', borderRadius: '20px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)' }}>
             <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
               <Text style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>
-                {STEPS[currentStep].title}
+                {currentStep === 1 ? '学历学位信息' : STEPS[currentStep].title}
               </Text>
               {!STEPS[currentStep].required && currentStep > 0 && (
                 <Text

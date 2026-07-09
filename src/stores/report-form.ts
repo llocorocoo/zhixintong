@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 
 interface EducationItem {
-  id: string; education: string; school: string; major: string
-  degreeCertNo: string; diplomaCertNo: string; files: string[]
+  id: string; eduType: 'domestic' | 'overseas'; education: string; school: string; major: string
+  degreeCertNo: string; diplomaCertNo: string; overseasCertNo: string; files: string[]
 }
 interface QualificationItem {
   id: string; certNumber: string; files: string[]
