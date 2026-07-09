@@ -24,6 +24,8 @@ interface FormData {
   qualificationList: QualificationItem[]
 }
 
+// 用户明确表示无此证书/不提供，提交时转为空值，不发起该项核验
+const NONE_VALUE = '无'
 const genId = () => Math.random().toString(36).substring(2, 9)
 const emptyEdu = (): EducationItem => ({ id: genId(), eduType: 'domestic', education: '', school: '', major: '', degreeCertNo: '', diplomaCertNo: '', overseasCertNo: '', files: [] })
 const emptyQual = (): QualificationItem => ({ id: genId(), certNumber: '', files: [] })
@@ -118,7 +120,7 @@ const ReportFormPage: FC = () => {
       const invalid = formData.educationList.some(e =>
         e.eduType === 'overseas' ? !e.overseasCertNo : (!e.diplomaCertNo || !e.degreeCertNo))
       if (invalid) {
-        Taro.showToast({ title: '请完整填写学历学位证书编号', icon: 'none' }); return
+        Taro.showToast({ title: '请填写证书编号，如无请点击"无"', icon: 'none' }); return
       }
     }
     setCurrentStep(s => s + 1)
@@ -134,8 +136,14 @@ const ReportFormPage: FC = () => {
       gender: '',
       idCard: formData.idCard,
       workHistoryList: [],
-      educationList: formData.educationList.filter(e =>
-        e.eduType === 'overseas' ? e.overseasCertNo : (e.degreeCertNo || e.diplomaCertNo)),
+      educationList: formData.educationList
+        .map(e => ({
+          ...e,
+          diplomaCertNo: e.diplomaCertNo === NONE_VALUE ? '' : e.diplomaCertNo,
+          degreeCertNo: e.degreeCertNo === NONE_VALUE ? '' : e.degreeCertNo,
+          overseasCertNo: e.overseasCertNo === NONE_VALUE ? '' : e.overseasCertNo,
+        }))
+        .filter(e => e.eduType === 'overseas' ? e.overseasCertNo : (e.degreeCertNo || e.diplomaCertNo)),
       qualificationList: formData.qualificationList.filter(q => q.certNumber || q.files.length > 0),
     })
     Taro.redirectTo({ url: '/pages/submit-success/index' })
@@ -215,19 +223,33 @@ const ReportFormPage: FC = () => {
             { label: '学位证书编号', field: 'degreeCertNo', placeholder: '请输入学位证书编号' },
           ] : [
             { label: '国外学历学位认证书编号', field: 'overseasCertNo', placeholder: '请输入国外学历学位认证书编号' },
-          ]).map(row => (
-            <Field key={row.field} label={row.label} required>
-              <InputBox focused={focusField === `${edu.id}-${row.field}`}>
-                <Input
-                  style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
-                  placeholder={row.placeholder} placeholderStyle="color:#cbd5e1;"
-                  value={(edu as any)[row.field]}
-                  onFocus={() => setFocusField(`${edu.id}-${row.field}`)} onBlur={() => setFocusField(null)}
-                  onInput={e => setEdu(edu.id, row.field as keyof EducationItem, e.detail.value)}
-                />
-              </InputBox>
-            </Field>
-          ))}
+          ]).map(row => {
+            const isNone = (edu as any)[row.field] === NONE_VALUE
+            return (
+              <Field key={row.field} label={row.label} required>
+                <InputBox focused={focusField === `${edu.id}-${row.field}`}>
+                  <Input
+                    style={{ flex: 1, background: 'transparent', fontSize: '14px', color: '#0f172a', lineHeight: '1.5' }}
+                    placeholder={row.placeholder} placeholderStyle="color:#cbd5e1;"
+                    value={(edu as any)[row.field]}
+                    onFocus={() => setFocusField(`${edu.id}-${row.field}`)} onBlur={() => setFocusField(null)}
+                    onInput={e => setEdu(edu.id, row.field as keyof EducationItem, e.detail.value)}
+                  />
+                  <View
+                    onClick={() => setEdu(edu.id, row.field as keyof EducationItem, isNone ? '' : NONE_VALUE)}
+                    style={{
+                      flexShrink: 0, padding: '3px 12px', borderRadius: '8px',
+                      background: isNone ? '#eff6ff' : '#fff',
+                      border: `1px solid ${isNone ? '#3b82f6' : '#e2e8f0'}`,
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <Text style={{ fontSize: '13px', color: isNone ? '#2563eb' : '#64748b', fontWeight: isNone ? '600' : '400', lineHeight: '1.5' }}>无</Text>
+                  </View>
+                </InputBox>
+              </Field>
+            )
+          })}
         </View>
       ))}
 
